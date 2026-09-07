@@ -54,7 +54,6 @@ export type ZaloOAuthExchangeInput = z.infer<typeof zaloOAuthExchangeSchema>;
 export const adminLoginSchema = z.object({
   zalo_id: z.string().trim().min(1).max(120),
   phone: phoneSchema,
-  password: z.string().min(1).max(500),
 });
 export type AdminLoginInput = z.infer<typeof adminLoginSchema>;
 

@@ -402,21 +402,6 @@ export class AuthService {
   }
 
   async adminLogin(input: AdminLoginInput) {
-    const configuredPassword = this.config.get<string>('ADMIN_PASSWORD')?.trim();
-    if (!configuredPassword) {
-      throw new UnauthorizedException({
-        code: 'ADMIN_PASSWORD_NOT_CONFIGURED',
-        message: 'ADMIN_PASSWORD chưa được cấu hình',
-        details: null,
-      });
-    }
-    if (input.password !== configuredPassword) {
-      throw new UnauthorizedException({
-        code: 'INVALID_ADMIN_CREDENTIALS',
-        message: 'Sai tài khoản hoặc mật khẩu quản trị',
-        details: null,
-      });
-    }
     const user = await this.prisma.user.findUnique({ where: { zaloId: input.zalo_id } });
     if (!user || user.role !== Role.ADMIN || user.deletedAt || user.phone !== input.phone) {
       throw new UnauthorizedException({

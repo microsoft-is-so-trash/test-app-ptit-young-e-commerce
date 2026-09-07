@@ -77,10 +77,10 @@ export const api = {
       body: { zalo_id: zaloId, phone },
       retry: false,
     }),
-  adminLogin: (zaloId: string, phone: string, password: string) =>
+  adminLogin: (zaloId: string, phone: string) =>
     client.request<{ access_token: string; refresh_token: string; user: AuthUser }>(
       '/auth/admin/login',
-      { method: 'POST', body: { zalo_id: zaloId, phone, password }, retry: false },
+      { method: 'POST', body: { zalo_id: zaloId, phone }, retry: false },
     ),
   me: () => client.request<AuthUser>('/auth/me'),
   logout: (refreshToken?: string) =>

@@ -9,7 +9,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
   error: string | null;
-  loginAdmin: (password: string) => Promise<void>;
+  loginAdmin: () => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -31,14 +31,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     loading,
     error,
-    loginAdmin: async (password: string) => {
+    loginAdmin: async () => {
       setLoading(true);
       setError(null);
       try {
         const session = await api.adminLogin(
           process.env.NEXT_PUBLIC_ADMIN_ZALO_ID ?? 'zalo_admin_01',
           process.env.NEXT_PUBLIC_ADMIN_PHONE ?? '0900000000',
-          password,
         );
         if (session.user.role !== 'ADMIN') throw new Error('Tài khoản không có quyền quản trị');
         browserTokenStorage.setTokens(session.access_token, session.refresh_token);

@@ -14,8 +14,7 @@ Quy trình bật relay GPS, cập nhật Render, mở QR Development và thứ t
 | `PORT` | `3000` | Không | Mặc định 3000; API lắng nghe `0.0.0.0` |
 | `DATABASE_URL` | `postgresql://user:password@host:5432/uco?sslmode=require` | Có | Prisma/PostgreSQL; giữ `sslmode=require` với Neon/Supabase |
 | `JWT_SECRET` | chuỗi ngẫu nhiên dài | Có | API crash ngay nếu thiếu hoặc rỗng |
-| `ADMIN_PASSWORD` | mật khẩu mạnh | Có cho Admin | Không đặt trong source hoặc frontend |
-| `DEMO_MODE` | `true` | Không | Khi `true`, dev accounts chỉ có MERCHANT/COLLECTOR; Admin dùng mật khẩu |
+| `DEMO_MODE` | `true` | Không | Khi `true`, dev accounts chỉ có MERCHANT/COLLECTOR |
 | `ZALO_AUTH_MODE` | `real` hoặc `mock` | Không | `mock` chỉ dùng cho local/demo kiểm thử |
 | `ZALO_APP_ID` | ID ứng dụng Zalo | Có khi `ZALO_AUTH_MODE=real` | Chỉ đặt ở API/server |
 | `ZALO_APP_SECRET` | secret key của ứng dụng Zalo | Có khi `ZALO_AUTH_MODE=real` | Chỉ đặt ở API/server, không đưa vào frontend |
@@ -43,8 +42,6 @@ Khi chạy local, có thể dùng `/api/v1` cùng Vite proxy. Trên Vercel phả
 | `NEXT_PUBLIC_API_BASE_URL` | `https://eco-oil-api.onrender.com/api/v1` | Có |
 | `NEXT_PUBLIC_ADMIN_ZALO_ID` | `zalo_admin_01` | Có |
 | `NEXT_PUBLIC_ADMIN_PHONE` | `0900000000` | Có |
-
-`ADMIN_PASSWORD` chỉ được đặt ở API/server, không đặt `NEXT_PUBLIC_` và không đưa vào bundle trình duyệt.
 
 ## Thứ tự triển khai
 
@@ -77,7 +74,7 @@ Có thể build toàn workspace bằng `pnpm build`.
 
 ## Tài khoản demo
 
-Mini App dùng các tài khoản `zalo_demo_merchant_01` đến `zalo_demo_merchant_05` và `zalo_demo_collector_01`, `zalo_demo_collector_02` khi bật mock. Admin không xuất hiện trong `/auth/dev-accounts`; Admin đăng nhập tại Admin bằng `NEXT_PUBLIC_ADMIN_ZALO_ID`, số điện thoại tương ứng và `ADMIN_PASSWORD` cấu hình ở API.
+Mini App dùng các tài khoản `zalo_demo_merchant_01` đến `zalo_demo_merchant_05` và `zalo_demo_collector_01`, `zalo_demo_collector_02` khi bật mock. Admin không xuất hiện trong `/auth/dev-accounts`; Admin đăng nhập tại Admin bằng `NEXT_PUBLIC_ADMIN_ZALO_ID` và số điện thoại tương ứng (không cần mật khẩu).
 
 ## Bảo mật
 
@@ -118,7 +115,7 @@ Ba điểm bắt buộc, mỗi điểm đều từng làm deploy chết:
   timeout `P1002` và server chết trong vòng lặp restart.
 
 Biến môi trường trên Render: `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`,
-`ADMIN_PASSWORD`, `CORS_ORIGINS`, `DEMO_MODE`, `NODE_ENV`, `ZALO_AUTH_MODE`,
+`CORS_ORIGINS`, `DEMO_MODE`, `NODE_ENV`, `ZALO_AUTH_MODE`,
 `ZALO_APP_ID`, `ZALO_APP_SECRET`, `ZALO_OAUTH_CALLBACK_URL`,
 `ZALO_OAUTH_SUCCESS_REDIRECT_URL`.
 

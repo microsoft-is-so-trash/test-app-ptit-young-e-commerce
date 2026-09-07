@@ -1,13 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '../../lib/auth';
 
 export default function LoginPage() {
   const { user, loading, error, loginAdmin } = useAuth();
   const router = useRouter();
-  const [password, setPassword] = useState('');
 
   useEffect(() => {
     if (!loading && user) router.replace('/');
@@ -25,21 +24,11 @@ export default function LoginPage() {
             <h1 className="font-display text-2xl font-bold text-on-surface">Bảng vận hành</h1>
           </div>
         </div>
-        <p className="mt-4 text-sm text-on-surface-variant">Đăng nhập bằng tài khoản và mật khẩu quản trị.</p>
-        <label className="mt-6 block text-sm font-semibold text-on-surface-variant">
-          Mật khẩu
-          <input
-            className="mt-2 min-h-12 w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-3 text-on-surface transition focus:border-primary focus:outline-none"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="current-password"
-          />
-        </label>
+        <p className="mt-4 text-sm text-on-surface-variant">Đăng nhập vào tài khoản quản trị.</p>
         <button
           className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 font-bold text-on-primary shadow-m3-1 transition hover:shadow-m3-2 disabled:opacity-50"
-          disabled={loading || !password}
-          onClick={() => void loginAdmin(password)}
+          disabled={loading}
+          onClick={() => void loginAdmin()}
         >
           <span className="material-symbols-outlined text-[20px]" aria-hidden="true">login</span>
           {loading ? 'Đang đăng nhập…' : 'Đăng nhập quản trị'}
