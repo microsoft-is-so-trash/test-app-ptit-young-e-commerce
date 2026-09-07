@@ -35,7 +35,7 @@ export default function LoginPage() {
         </button>
         {error && <p className="mt-4 rounded-xl bg-error-container p-3 text-sm text-on-error-container" role="alert">{error}</p>}
         <p className="mt-6 text-xs text-on-surface-variant/60">
-          Tài khoản: {process.env.NEXT_PUBLIC_ADMIN_ZALO_ID ?? 'zalo_admin_01'}
+          Tài khoản: {process.env.NEXT_PUBLIC_ADMIN_ZALO_ID || 'zalo_admin_01'}
         </p>
       </section>
     </main>

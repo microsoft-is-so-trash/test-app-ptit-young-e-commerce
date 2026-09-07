@@ -53,7 +53,7 @@ export type StationSummaryWithForecast = AdminStationSummary & {
   fill_forecast?: StationFillForecast;
 };
 
-export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '/api/v1').replace(/\/$/, '');
+export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_BASE_URL || '/api/v1').replace(/\/$/, '');
 
 const client = createApiClient({
   baseUrl: API_BASE_URL,

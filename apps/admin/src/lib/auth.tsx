@@ -36,8 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
       try {
         const session = await api.adminLogin(
-          process.env.NEXT_PUBLIC_ADMIN_ZALO_ID ?? 'zalo_admin_01',
-          process.env.NEXT_PUBLIC_ADMIN_PHONE ?? '0900000000',
+          process.env.NEXT_PUBLIC_ADMIN_ZALO_ID || 'zalo_admin_01',
+          process.env.NEXT_PUBLIC_ADMIN_PHONE || '0900000000',
         );
         if (session.user.role !== 'ADMIN') throw new Error('Tài khoản không có quyền quản trị');
         browserTokenStorage.setTokens(session.access_token, session.refresh_token);
