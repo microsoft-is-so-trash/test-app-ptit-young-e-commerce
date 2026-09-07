@@ -1,0 +1,32 @@
+{
+  "name": "@eco-oil/miniapp",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc -b && vite build",
+    "build:zmp": "tsc -b && vite build --mode production && npx --yes zmp-cli@4.0.3 sync-config dist/index.html && node -e \"require('node:fs').copyFileSync('app-config.json', 'dist/app-config.json')\"",
+    "lint": "eslint \"src/**/*.{ts,tsx}\"",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/outbox.test.ts test/outbox-persistence.test.ts test/zalo-client.test.ts test/container-code.test.ts test/station-delivery.test.ts test/oil-grade-selector.test.ts test/grade-photo-picker.test.ts test/oil-image-analyzer.test.ts test/collector-flow.test.ts test/login-screen.test.ts test/api-base-url.test.ts test/oauth-callback.test.ts test/auth-store.test.ts test/collector-invite.test.ts test/production-web-login.test.tsx"
+  },
+  "dependencies": {
+    "@eco-oil/shared-types": "workspace:*",
+    "@tanstack/react-query": "^5.101.4",
+    "dexie": "^4.4.4",
+    "jsqr": "^1.4.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "zmp-sdk": "^2.53.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.1.1",
+    "fake-indexeddb": "^6.2.5",
+    "typescript": "^5.8.2",
+    "vite": "^7.1.2"
+  }
+}

@@ -1,0 +1,15 @@
+packages:
+  - apps/api
+  - apps/miniapp
+  - apps/admin
+  - packages/api-client
+  - packages/*
+allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+minimumReleaseAgeExclude:
+  - zmp-sdk@2.53.0
+overrides:
+  rxjs: 7.8.2

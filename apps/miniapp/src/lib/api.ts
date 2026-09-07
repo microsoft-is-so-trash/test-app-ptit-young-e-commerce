@@ -1,0 +1,273 @@
+import type {
+  ApiErrorBody,
+  AdminWardSummary,
+  AuthSession,
+  AuthUser,
+  DevAccount,
+  CollectionCreateRequest,
+  CollectionOrderResponse,
+  CollectionTransactionResponse,
+  ContainerLookupResponse,
+  CurrentRouteResponse,
+  CollectionRouteCancelResponse,
+  GeoPoint,
+  MerchantDashboardResponse,
+  MerchantTransaction,
+  MerchantRegistrationRequest,
+  MerchantOnboardingRequest,
+  PagedResponse,
+  PaymentListResponse,
+  SyncBatchResponse,
+  StationDeliveryCreateRequest,
+  StationDeliveryResponse,
+  StationRecommendation,
+} from '@eco-oil/shared-types';
+import { tokenStorage } from './storage';
+import { resolveApiBaseUrl } from './api-base-url';
+
+export const API_BASE_URL = resolveApiBaseUrl(import.meta.env?.MODE ?? 'test', import.meta.env?.VITE_API_BASE_URL);
+
+export class ApiError extends Error {
+  readonly code: string;
+  readonly details: unknown;
+  readonly status: number;
+
+  constructor(status: number, body: ApiErrorBody) {
+    super(body.message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.code = body.code;
+    this.details = body.details;
+  }
+}
+
+type RequestOptions = Omit<RequestInit, 'body'> & {
+  body?: unknown;
+  retry?: boolean;
+  timeoutMs?: number;
+};
+
+export const API_REQUEST_TIMEOUT_MS = 15_000;
+
+let refreshPromise: Promise<string | null> | null = null;
+let unauthorizedHandler: (() => void) | null = null;
+
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  unauthorizedHandler = handler;
+}
+
+async function parseResponse(response: Response): Promise<unknown> {
+  const text = await response.text();
+  if (!text) {
+    return null;
+  }
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return text;
+  }
+}
+
+function errorFromResponse(status: number, payload: unknown): ApiError {
+  if (typeof payload === 'object' && payload !== null && 'code' in payload && 'message' in payload) {
+    const body = payload as ApiErrorBody;
+    return new ApiError(status, { code: body.code, message: body.message, details: body.details ?? null });
+  }
+  return new ApiError(status, { code: status === 401 ? 'UNAUTHORIZED' : 'HTTP_ERROR', message: 'Không thể xử lý yêu cầu', details: null });
+}
+
+export async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  timeoutMs = API_REQUEST_TIMEOUT_MS,
+): Promise<Response> {
+  const controller = new AbortController();
+  let timedOut = false;
+  const abortFromCaller = () => controller.abort(init.signal?.reason);
+  if (init.signal?.aborted) abortFromCaller();
+  else init.signal?.addEventListener('abort', abortFromCaller, { once: true });
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<Response>((_resolve, reject) => {
+    timer = globalThis.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+      reject(new ApiError(0, {
+        code: 'REQUEST_TIMEOUT',
+        message: 'Máy chủ phản hồi quá thời gian chờ. Vui lòng thử lại.',
+        details: null,
+      }));
+    }, timeoutMs);
+  });
+  try {
+    return await Promise.race([
+      fetch(input, { ...init, signal: controller.signal }),
+      timeout,
+    ]);
+  } catch (error) {
+    if (timedOut) {
+      if (error instanceof ApiError && error.code === 'REQUEST_TIMEOUT') throw error;
+      throw new ApiError(0, {
+        code: 'REQUEST_TIMEOUT',
+        message: 'Máy chủ phản hồi quá thời gian chờ. Vui lòng thử lại.',
+        details: null,
+      });
+    }
+    throw error;
+  } finally {
+    if (timer !== undefined) globalThis.clearTimeout(timer);
+    init.signal?.removeEventListener('abort', abortFromCaller);
+  }
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  const refreshToken = tokenStorage.getRefreshToken();
+  if (!refreshToken) {
+    return null;
+  }
+  const response = await fetchWithTimeout(`${API_BASE_URL}/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: refreshToken ? JSON.stringify({ refresh_token: refreshToken }) : undefined,
+    credentials: 'include',
+  });
+  const payload = await parseResponse(response);
+  if (!response.ok) {
+    throw errorFromResponse(response.status, payload);
+  }
+  if (typeof payload !== 'object' || payload === null || !('access_token' in payload) || !('refresh_token' in payload)) {
+    throw new ApiError(502, { code: 'INVALID_REFRESH_RESPONSE', message: 'Phản hồi làm mới phiên không hợp lệ', details: null });
+  }
+  const tokens = payload as { access_token: string; refresh_token: string };
+  tokenStorage.setTokens(tokens.access_token, tokens.refresh_token);
+  return tokens.access_token;
+}
+
+function getRefreshOnce(): Promise<string | null> {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessToken().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
+}
+
+async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { body, retry = true, headers, timeoutMs = API_REQUEST_TIMEOUT_MS, ...init } = options;
+  const accessToken = tokenStorage.getAccessToken();
+  const requestHeaders = new Headers(headers);
+  if (body !== undefined) {
+    requestHeaders.set('Content-Type', 'application/json');
+  }
+  if (accessToken) {
+    requestHeaders.set('Authorization', `Bearer ${accessToken}`);
+  }
+
+  const response = await fetchWithTimeout(`${API_BASE_URL}${path}`, {
+    ...init,
+    headers: requestHeaders,
+    body: body === undefined ? undefined : JSON.stringify(body),
+    credentials: 'include',
+  }, timeoutMs);
+  const payload = await parseResponse(response);
+  if (response.status === 401 && retry) {
+    try {
+      const refreshedToken = await getRefreshOnce();
+      if (refreshedToken) {
+        return request<T>(path, { ...options, retry: false });
+      }
+    } catch (refreshError) {
+      if (!(refreshError instanceof ApiError) || refreshError.status !== 401) {
+        throw refreshError;
+      }
+    }
+    tokenStorage.clear();
+    unauthorizedHandler?.();
+  }
+  if (!response.ok) {
+    throw errorFromResponse(response.status, payload);
+  }
+  return payload as T;
+}
+
+export const api = {
+  devAccounts: () => request<DevAccount[]>('/auth/dev-accounts', { retry: false }),
+  registerMerchant: (payload: MerchantRegistrationRequest) =>
+    request<{ status: string; merchant: unknown }>('/merchants/register', { method: 'POST', body: payload, retry: false }),
+  registrationWards: () => request<AdminWardSummary[]>('/merchants/register/wards', { retry: false }),
+  updateMerchant: (id: string, payload: Partial<MerchantRegistrationRequest>) =>
+    request<unknown>(`/merchants/${id}`, { method: 'PATCH', body: payload }),
+  loginSeed: (zaloId: string, phone: string) =>
+    request<AuthSession>('/auth/zalo', {
+      method: 'POST',
+      body: { zalo_id: zaloId, phone },
+      retry: false,
+    }),
+  loginWithZaloAccessToken: (accessToken: string) =>
+    request<AuthSession>('/auth/zalo', {
+      method: 'POST',
+      body: { access_token: accessToken },
+      retry: false,
+    }),
+  exchangeZaloOAuthCode: (code: string) =>
+    request<AuthSession>('/auth/zalo/exchange', {
+      method: 'POST',
+      body: { code },
+      retry: false,
+    }),
+  acceptCollectorInvite: (code: string) =>
+    request<AuthSession>('/auth/collector-invites/accept', {
+      method: 'POST',
+      body: { code },
+      retry: false,
+    }),
+  registerMyMerchant: (payload: MerchantOnboardingRequest) =>
+    request<unknown>('/merchants/me', { method: 'POST', body: payload, retry: false }),
+  resolveZaloLocation: (accessToken: string, locationToken: string) =>
+    request<GeoPoint>('/auth/zalo/location', {
+      method: 'POST',
+      body: { access_token: accessToken, location_token: locationToken },
+    }),
+  logout: (refreshToken?: string) => request<{ success: true }>('/auth/logout', { method: 'POST', ...(refreshToken ? { body: { refresh_token: refreshToken } } : {}), retry: false }),
+  me: () => request<AuthUser>('/auth/me'),
+  dashboard: () => request<MerchantDashboardResponse>('/merchants/me/dashboard'),
+  createReadyOrder: (expectedLiters?: number) =>
+    request<CollectionOrderResponse>('/orders/ready', {
+      method: 'POST',
+      body: expectedLiters === undefined ? {} : { expected_liters: expectedLiters },
+    }),
+  transactions: (page: number, limit = 10, from?: string, to?: string) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    return request<PagedResponse<MerchantTransaction>>(`/merchants/me/transactions?${params.toString()}`);
+  },
+  payments: (period?: string, page = 1, limit = 50) => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (period) params.set('period', period);
+    return request<PaymentListResponse>(`/merchants/me/payments?${params.toString()}`);
+  },
+  orders: () => request<PagedResponse<CollectionOrderResponse>>('/orders/me?page=1&limit=50'),
+  cancelOrder: (orderId: string) => request<CollectionOrderResponse>(`/orders/${orderId}/cancel`, { method: 'POST' }),
+  currentRoute: (location?: GeoPoint) => {
+    const query = location ? `?lat=${location.lat}&lng=${location.lng}` : '';
+    return request<CurrentRouteResponse>(`/routes/current${query}`);
+  },
+  startRoute: (clientUuid: string, location?: GeoPoint) => request<CurrentRouteResponse>('/routes/start', {
+    method: 'POST',
+    body: { client_uuid: clientUuid, ...(location ? { lat: location.lat, lng: location.lng } : {}) },
+  }),
+  completeCurrentRoute: () => request<CurrentRouteResponse>('/routes/current/complete', { method: 'POST' }),
+  cancelCurrentRoute: (reason?: string) => request<CollectionRouteCancelResponse>('/routes/current/cancel', {
+    method: 'POST',
+    body: reason ? { reason } : {},
+  }),
+  containerByQr: (code: string) => request<ContainerLookupResponse>(`/containers/by-qr/${encodeURIComponent(code)}`),
+  createCollection: (payload: CollectionCreateRequest) =>
+    request<CollectionTransactionResponse>('/collections', { method: 'POST', body: payload }),
+  syncBatch: (items: CollectionCreateRequest[]) =>
+    request<SyncBatchResponse>('/sync/batch', { method: 'POST', body: { items } }),
+  recommendStations: (location: GeoPoint, liters: number) =>
+    request<StationRecommendation[]>(`/stations/recommend?lat=${location.lat}&lng=${location.lng}&liters=${liters}`),
+  createStationDelivery: (payload: StationDeliveryCreateRequest) =>
+    request<StationDeliveryResponse>('/station-deliveries', { method: 'POST', body: payload }),
+};

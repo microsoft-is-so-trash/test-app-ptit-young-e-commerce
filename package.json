@@ -1,0 +1,42 @@
+{
+  "name": "uco-platform",
+  "private": true,
+  "packageManager": "pnpm@11.16.0",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "generate": "prisma generate",
+    "lint": "turbo run lint",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset --force",
+    "db:seed": "prisma db seed",
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "demo:zalo-location-relay": "pnpm --filter @eco-oil/api demo:zalo-location-relay",
+    "db:cleanup-invalid-orders": "tsx scripts/cleanup-invalid-orders.ts",
+    "db:cleanup-legacy-hcm-demo": "tsx scripts/cleanup-legacy-hcm-demo.ts",
+    "prisma:migrate": "prisma migrate deploy",
+    "prisma:validate": "prisma validate",
+    "dev:all": "turbo run dev --parallel",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "@nestjs/cli": "^11.0.0",
+    "eslint": "^9.22.0",
+    "prettier": "^3.5.3",
+    "prisma": "^6.5.0",
+    "turbo": "^2.4.4",
+    "typescript": "^5.8.2",
+    "typescript-eslint": "^8.26.0",
+    "tsx": "^4.19.3"
+  },
+  "prisma": {
+    "seed": "tsx scripts/seed-demo.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.5.0"
+  }
+}
