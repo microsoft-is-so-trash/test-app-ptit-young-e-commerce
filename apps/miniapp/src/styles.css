@@ -1903,7 +1903,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .summary-grid strong { font-size: 15px; }
 .station-button { display: grid; gap: 2px; margin-top: 18px; }
 .station-button small { color: inherit; font-size: 10px; font-weight: 600; }
-.outbox-badge { min-height: 40px; max-width: 150px; padding: 0 10px; border: 1px solid var(--outline-variant); border-radius: 10px; color: var(--primary); background: var(--surface-container-lowest); font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; }
+.outbox-badge { min-height: 40px; max-width: 150px; padding: 0 10px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); color: var(--primary); background: var(--surface-container-lowest); font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
 .outbox-badge-failed { color: var(--error); border-color: rgba(186,26,26,0.35); background: var(--error-container); }
 .outbox-row { padding: 15px; border: 1px solid var(--outline-variant); border-radius: var(--radius-md); background: var(--surface-container-lowest); box-shadow: var(--shadow-xs); }
 .outbox-row-top { display: flex; align-items: center; gap: 8px; }
