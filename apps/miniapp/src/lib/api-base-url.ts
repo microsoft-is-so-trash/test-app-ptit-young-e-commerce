@@ -1,4 +1,4 @@
-export const PRODUCTION_API_BASE_URL = 'https://eco-oil-api.onrender.com/api/v1';
+export const PRODUCTION_API_BASE_URL = 'https://eco-oil-api-kgoe.onrender.com/api/v1';
 
 const INVALID_PRODUCTION_HOSTS = new Set(['localhost', '127.0.0.1', '::1', 'example.com']);
 

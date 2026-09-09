@@ -7,7 +7,7 @@ test('production web Zalo login is a same-tab anchor with no click handler', () 
   const element = WebZaloLoginLink({ href: `${PRODUCTION_API_BASE_URL}/auth/zalo/start` });
 
   assert.equal(element.type, 'a');
-  assert.equal(element.props.href, 'https://eco-oil-api.onrender.com/api/v1/auth/zalo/start');
+  assert.equal(element.props.href, `${PRODUCTION_API_BASE_URL}/auth/zalo/start`);
   assert.equal(element.props.target, undefined);
   assert.equal(element.props.onClick, undefined);
   assert.equal(element.props.onClickCapture, undefined);
