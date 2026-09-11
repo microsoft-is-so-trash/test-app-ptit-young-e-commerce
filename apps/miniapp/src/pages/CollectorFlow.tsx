@@ -1081,7 +1081,7 @@ interface CollectorRouteScreenProps {
   onOpenLastReceipt: () => void;
 }
 
-function CollectorRouteScreen({ stops, route, location, locationDenied, completed, completedOrderIds, totalStops, outboxRows, outboxStats, shiftStarted, shiftError, prefetching, refreshing, refreshNotice, loadError, lastReceipt, onStartShift, onCancelShift, onOpenQr, onOpenSummary, onOpenOutbox, onRefresh, onOpenLastReceipt }: CollectorRouteScreenProps) {
+export function CollectorRouteScreen({ stops, route, location, locationDenied, completed, completedOrderIds, totalStops, outboxRows, outboxStats, shiftStarted, shiftError, prefetching, refreshing, refreshNotice, loadError, lastReceipt, onStartShift, onCancelShift, onOpenQr, onOpenSummary, onOpenOutbox, onRefresh, onOpenLastReceipt }: CollectorRouteScreenProps) {
   const vehicleCapacity = route.route.total_expected_liters + route.route.remaining_capacity_l;
   const routeFill = vehicleCapacity > 0 ? Math.min(100, Math.round((route.route.total_expected_liters / vehicleCapacity) * 100)) : 0;
   const completedLiters = Object.values(completed).reduce((sum, item) => sum + item.liters, 0);
@@ -1090,7 +1090,7 @@ function CollectorRouteScreen({ stops, route, location, locationDenied, complete
   const emptyState = getEmptyRouteState(route.route, stops.length, completedOrderIds);
 
   return (
-    <div className="page-content collector-content">
+    <div className="page-content collector-content collector-route-screen">
       <header className="page-header collector-page-header">
         <div><p className="eyebrow">CA HÔM NAY</p><h1>Tuyến thu gom</h1></div>
         <div className="collector-header-actions">
@@ -1154,8 +1154,12 @@ function OutboxIssueNotice({ rows, stats, onOpen }: { rows: OutboxRecord[]; stat
   const unsynced = stats.pending + stats.syncing + stats.failed;
   const latestError = rows.find((row) => row.last_error)?.last_error ?? null;
   if (unsynced === 0 && !latestError) return null;
+  const hasError = Boolean(latestError);
   return (
-    <div className="outbox-issue-banner" role="alert">
+    <div
+      className={`outbox-issue-banner ${hasError ? 'outbox-issue-banner-error' : 'outbox-issue-banner-pending'}`}
+      role={hasError ? 'alert' : 'status'}
+    >
       <strong>{unsynced} giao dịch chưa đồng bộ</strong>
       <span>{latestError ? outboxErrorMessage(latestError) : 'Đang gửi dữ liệu, vui lòng giữ mạng và không xoá hàng chờ.'}</span>
       {onOpen ? <button className="text-button" onClick={onOpen}>Xem hàng chờ đồng bộ</button> : null}
@@ -1170,6 +1174,9 @@ function CollectorStopCard({ stop, outboxRow, onOpenQr }: { stop: RouteStop; out
   const [actionBusy, setActionBusy] = useState<'phone' | 'directions' | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
+  // Chỉ là trạng thái hiển thị của thẻ (đóng/mở phần chi tiết AI) — không ảnh hưởng dữ liệu.
+  const [aiOpen, setAiOpen] = useState(false);
+  const aiPanelId = `stop-ai-${stop.order_id}`;
   const rawPhone = typeof stop.merchant.phone === 'string' ? stop.merchant.phone.trim() : '';
   let normalizedPhone = '';
   try {
@@ -1219,19 +1226,35 @@ function CollectorStopCard({ stop, outboxRow, onOpenQr }: { stop: RouteStop; out
         <div className="stop-title-row"><h2>{stop.merchant.name}</h2><span className="distance-label">{formatDistance(stop.distance_m)}</span></div>
         <p className="stop-address">{stop.merchant.address ?? 'Chưa có địa chỉ'}</p>
         <strong className="stop-liters">{formatLiters(stop.expected_liters)} dự kiến</strong>
-        {pickupVolumeForecast ? (
-          <section className={`pickup-volume-forecast pickup-volume-forecast-${pickupVolumeForecast.className}`} aria-label="Dự báo AI sản lượng">
-            <div className="pickup-volume-forecast-heading"><span className="pickup-volume-ai-label">Dự báo AI</span><span>{pickupVolumeForecast.confidenceLabel}</span></div>
-            {pickupVolumeForecast.predictedLiters === null ? <strong>Chưa đủ dữ liệu để dự báo sản lượng</strong> : <strong>Khoảng {formatPickupVolumeLiters(pickupVolumeForecast.predictedLiters)}</strong>}
-            {pickupVolumeForecast.declaredOnly ? <small>Tạm tính theo số quán khai</small> : pickupVolumeForecast.sampleSize !== null ? <small>Dựa trên {pickupVolumeForecast.sampleSize} lần thu gần nhất</small> : null}
-            {pickupVolumeForecast.reasons.length > 0 ? <div className="pickup-volume-forecast-reasons">{pickupVolumeForecast.reasons.map((reason, index) => <span className="pickup-volume-forecast-reason" key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
-          </section>
-        ) : null}
-        {pickupPriority ? (
-          <section className={`pickup-priority pickup-priority-${pickupPriority.className}`} aria-label={`Mức ưu tiên: ${pickupPriority.label}`}>
-            <div className="pickup-priority-heading"><strong>{pickupPriority.label}</strong><span>Điểm ưu tiên: {pickupPriority.score}</span></div>
-            {pickupPriority.reasons.length > 0 ? <div className="pickup-priority-reasons">{pickupPriority.reasons.map((reason, index) => <span className="pickup-priority-reason" key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
-          </section>
+        {pickupVolumeForecast || pickupPriority ? (
+          <div className="stop-ai">
+            <button
+              type="button"
+              className="stop-ai-toggle"
+              onClick={() => setAiOpen((open) => !open)}
+              aria-expanded={aiOpen}
+              aria-controls={aiPanelId}
+            >
+              <span className="stop-ai-toggle-label">Chi tiết AI{pickupPriority ? ` · ${pickupPriority.label}` : ''}</span>
+              <span className="stop-ai-toggle-caret" aria-hidden="true">{aiOpen ? '▲' : '▼'}</span>
+            </button>
+            <div id={aiPanelId} hidden={!aiOpen}>
+              {pickupVolumeForecast ? (
+                <section className={`pickup-volume-forecast pickup-volume-forecast-${pickupVolumeForecast.className}`} aria-label="Dự báo AI sản lượng">
+                  <div className="pickup-volume-forecast-heading"><span className="pickup-volume-ai-label">Dự báo AI</span><span>{pickupVolumeForecast.confidenceLabel}</span></div>
+                  {pickupVolumeForecast.predictedLiters === null ? <strong>Chưa đủ dữ liệu để dự báo sản lượng</strong> : <strong>Khoảng {formatPickupVolumeLiters(pickupVolumeForecast.predictedLiters)}</strong>}
+                  {pickupVolumeForecast.declaredOnly ? <small>Tạm tính theo số quán khai</small> : pickupVolumeForecast.sampleSize !== null ? <small>Dựa trên {pickupVolumeForecast.sampleSize} lần thu gần nhất</small> : null}
+                  {pickupVolumeForecast.reasons.length > 0 ? <div className="pickup-volume-forecast-reasons">{pickupVolumeForecast.reasons.map((reason, index) => <span className="pickup-volume-forecast-reason" key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
+                </section>
+              ) : null}
+              {pickupPriority ? (
+                <section className={`pickup-priority pickup-priority-${pickupPriority.className}`} aria-label={`Mức ưu tiên: ${pickupPriority.label}`}>
+                  <div className="pickup-priority-heading"><strong>{pickupPriority.label}</strong><span>Điểm ưu tiên: {pickupPriority.score}</span></div>
+                  {pickupPriority.reasons.length > 0 ? <div className="pickup-priority-reasons">{pickupPriority.reasons.map((reason, index) => <span className="pickup-priority-reason" key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
+                </section>
+              ) : null}
+            </div>
+          </div>
         ) : null}
         {status ? <p className={`transaction-status transaction-status-${status}`}>{statusLabel(status)}</p> : null}
         <div className="stop-actions">

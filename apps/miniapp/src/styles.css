@@ -1749,10 +1749,152 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
    Collector Flow (Preserved Mostly)
    ============================================ */
 .collector-content { min-height: 100vh; background: var(--background); }
+
+/* Collector shell — nền đồng nhất cho toàn nhánh Collector, cô lập khỏi Merchant.
+   Chỉ đổi nền (surface/background), không đụng bảng màu của các màn Collector khác. */
+.collector-shell {
+  --surface: #ffffff;
+  --background: #ffffff;
+}
+.collector-shell .brand-header { background: rgba(255, 255, 255, 0.85); }
+
+/* Collector Route Screen — Direction A minimal palette, scoped to this screen only
+   (does not affect other Collector screens: QR/Entry/Summary/Outbox/Receipt, or Merchant) */
+.collector-route-screen {
+  background: #ffffff;
+  /* Bỏ padding ngang lặp: màn này nằm trong .page-content của App.tsx đã có padding rồi */
+  padding-left: 0;
+  padding-right: 0;
+  --primary: #0f5c1f;
+  --on-primary: #ffffff;
+  --primary-fixed-dim: #8fd3a3;
+  --error: #b3261e;
+  --on-error: #ffffff;
+  --error-container: #fbe4e1;
+  --on-error-container: #7a1912;
+  --on-surface: #14140f;
+}
+.collector-route-screen .route-refresh-notice-cache,
+.collector-route-screen .route-refresh-notice-warning,
+.collector-route-screen .location-banner,
+.collector-route-screen .offline-cache-banner {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  background: var(--surface-container-lowest);
+}
+.collector-route-screen .route-refresh-notice-error,
+.collector-route-screen .outbox-issue-banner-error {
+  border-color: rgba(179,38,30,0.32);
+}
+.collector-route-screen .outbox-issue-banner-pending {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  background: var(--surface-container-lowest);
+}
+
+/* A2/A3 — Khối AI: bỏ tầng vàng và tầng đỏ, chỉ dùng primary để nhấn.
+   Đỏ được giữ riêng cho lỗi thật, không dùng cho "ưu tiên cao". */
+.collector-route-screen .route-capacity-risk-warning,
+.collector-route-screen .route-optimization-warning,
+.collector-route-screen .pickup-volume-forecast-low,
+.collector-route-screen .pickup-priority-high {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  border-left-color: var(--primary);
+  background: var(--surface-container-lowest);
+}
+.collector-route-screen .route-capacity-risk-danger,
+.collector-route-screen .pickup-priority-urgent {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  border-left-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, white);
+}
+
+/* A4b — Hai trạng thái còn dùng màu thứ 5 (--secondary): thông báo tải lại thành công
+   và banner đã lưu biên nhận. Đưa về đúng bảng 4 màu, nhấn bằng viền trái primary. */
+.collector-route-screen .route-refresh-notice,
+.collector-route-screen .receipt-saved-banner {
+  color: var(--on-surface);
+  border: 1px solid var(--outline-variant);
+  border-left: 4px solid var(--primary);
+  background: var(--surface-container-lowest);
+}
+
+/* A4 — Khối "tuyến đã sẵn sàng": bỏ màu thứ 5, tách nút Hủy ca khỏi dòng văn và bỏ màu đỏ */
+.collector-route-screen .shift-ready-note {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  background: var(--surface-container-lowest);
+}
+.collector-route-screen .shift-ready-note .text-button {
+  display: block;
+  margin: 8px 0 0;
+  min-height: 44px;
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+
+/* A4c — Hai chỗ còn lại dùng màu thứ 5: chip "CA HÔM NAY" và mức ưu tiên NORMAL */
+.collector-route-screen .page-header .eyebrow {
+  color: var(--on-surface-variant);
+  background: var(--surface-container-high);
+}
+.collector-route-screen .pickup-priority-normal {
+  border-left-color: var(--outline);
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
+}
+
+/* A5 — Gom thang chữ phụ về 12px, chữ nhấn về 14px (thay cho 10/11/13px rải rác) */
+.collector-route-screen .route-optimization-ai,
+.collector-route-screen .route-capacity-risk-ai,
+.collector-route-screen .pickup-volume-ai-label,
+.collector-route-screen .pickup-volume-forecast-reason,
+.collector-route-screen .pickup-priority-reason,
+.collector-route-screen .route-optimization-card small,
+.collector-route-screen .route-capacity-risk-card small,
+.collector-route-screen .pickup-volume-forecast small,
+.collector-route-screen .pickup-volume-forecast-heading,
+.collector-route-screen .pickup-priority-heading,
+.collector-route-screen .route-capacity-risk-meta,
+.collector-route-screen .action-error,
+.collector-route-screen .action-notice {
+  font-size: 12px;
+}
+.collector-route-screen .pickup-volume-forecast > strong { font-size: 14px; }
+.collector-route-screen .stop-number { font-size: 18px; }
+
+/* A6 — Nén chiều cao thẻ điểm dừng */
+.collector-route-screen .collector-stop-card { padding: 14px; gap: 12px; }
+.collector-route-screen .pickup-volume-forecast,
+.collector-route-screen .pickup-priority { margin-top: 8px; padding: 10px 12px; gap: 4px; }
+
+/* B1 — Nút gộp phần chi tiết AI */
+.collector-route-screen .stop-ai { margin-top: 10px; }
+.collector-route-screen .stop-ai-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  color: var(--primary);
+  background: var(--surface-container-lowest);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: left;
+}
+.collector-route-screen .stop-ai-toggle-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.collector-route-screen .stop-ai-toggle-caret { flex: 0 0 auto; font-size: 10px; }
+
 .collector-page-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 4px 0 24px; }
 .collector-header-actions { display: flex; align-items: center; gap: 8px; }
 .round-action {
-  min-width: 68px; min-height: 40px; padding: 0 10px;
+  min-width: 68px; min-height: 44px; padding: 0 10px;
   border: 1px solid var(--outline-variant); border-radius: var(--radius-sm);
   color: var(--primary); background: var(--surface-container-lowest);
   font-size: 12px; font-weight: 800;
@@ -1777,22 +1919,22 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .route-capacity-top { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
 .route-capacity-top strong { font-size: 14px; }
 .route-progress { height: 10px; margin: 14px 0 9px; overflow: hidden; border-radius: 5px; background: rgb(255 255 255 / 23%); }
-.route-progress span { display: block; height: 100%; border-radius: inherit; background: #8ee0c4; transition: width .2s ease; }
-.route-progress span.route-progress-high { background: #ffd36a; }
-.route-capacity-bottom { display: flex; align-items: center; justify-content: space-between; color: rgba(255,255,255,0.85); font-size: 11px; }
+.route-progress span { display: block; height: 100%; border-radius: inherit; background: var(--primary-fixed-dim, #8ee0c4); transition: width .2s ease; }
+.route-progress span.route-progress-high { background: var(--primary-fixed-dim, #8ee0c4); }
+.route-capacity-bottom { display: flex; align-items: center; justify-content: space-between; color: rgba(255,255,255,0.85); font-size: 12px; }
 
 .collector-stop-list, .outbox-list, .station-list { display: grid; gap: 12px; }
 .collector-stop-card { display: flex; gap: 13px; padding: 16px; border: 1px solid var(--outline-variant); border-radius: var(--radius-md); background: var(--surface-container-lowest); box-shadow: var(--shadow-xs); }
 .stop-number { flex: 0 0 38px; display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; color: #ffffff; background: var(--primary); font-size: 16px; font-weight: 850; }
-.stop-number-pending, .stop-number-syncing { color: #754900; background: #fff1c7; }
-.stop-number-synced { color: #ffffff; background: #245f87; }
+.stop-number-pending, .stop-number-syncing { color: var(--on-surface-variant); background: var(--surface-container-high); }
+.stop-number-synced { color: var(--on-primary, #ffffff); background: var(--primary); }
 .stop-number-failed { color: #ffffff; background: var(--error); }
 .stop-body { min-width: 0; flex: 1; }
 .stop-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .stop-title-row h2 { margin: 0; overflow: hidden; font-size: 14px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .distance-label { flex: 0 0 auto; color: var(--primary); font-size: 12px; font-weight: 800; }
 .stop-address { min-height: 20px; margin: 6px 0 7px; color: var(--on-surface-variant); font-size: 12px; line-height: 1.4; }
-.stop-liters { display: block; color: var(--primary); font-size: 13px; }
+.stop-liters { display: block; color: var(--primary); font-size: 14px; }
 
 .route-optimization-card, .route-capacity-risk-card, .pickup-volume-forecast, .pickup-priority, .entry-volume-forecast, .image-grade-analysis, .pickup-volume-deviation { display: grid; gap: 6px; margin-top: 10px; padding: 12px 13px; border: 1px solid var(--outline-variant); border-left: 4px solid var(--primary); border-radius: var(--radius-md); color: var(--on-surface); background: var(--surface-container-lowest); }
 .route-optimization-heading, .route-capacity-risk-heading, .pickup-volume-forecast-heading, .pickup-priority-heading, .image-grade-analysis-heading, .route-capacity-risk-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
@@ -1807,16 +1949,16 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .route-summary-line strong { font-size: 14px; }
 
 .stop-actions { display: grid; grid-template-columns: 1fr 1fr 1.12fr; gap: 7px; margin-top: 13px; }
-.stop-actions button { min-height: 42px; padding: 0 6px; border: 0; border-radius: 10px; font-size: 11px; font-weight: 800; }
-.call-action, .map-action { color: var(--primary); background: rgba(206,237,157,0.4); }
+.stop-actions button { min-height: 44px; padding: 0 6px; border: 0; border-radius: 10px; font-size: 12px; font-weight: 800; }
+.call-action, .map-action { color: var(--primary); background: color-mix(in srgb, var(--primary) 12%, white); }
 .collect-action { color: #ffffff; background: var(--primary); }
 .disabled-action { color: var(--outline) !important; background: var(--surface-container-high) !important; pointer-events: none; }
 .action-error { margin: 8px 0 0; color: var(--error); font-size: 11px; font-weight: 750; }
 .phone-fallback { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; color: var(--on-surface-variant); font-size: 12px; }
 .action-notice { margin: 6px 0 0; color: var(--primary); font-size: 11px; font-weight: 750; }
-.transaction-status { margin: 8px 0 0; font-size: 11px; font-weight: 800; }
-.transaction-status-pending, .transaction-status-syncing { color: #754900; }
-.transaction-status-synced { color: #245f87; }
+.transaction-status { margin: 8px 0 0; font-size: 12px; font-weight: 800; }
+.transaction-status-pending, .transaction-status-syncing { color: var(--on-surface-variant); }
+.transaction-status-synced { color: var(--primary); }
 .transaction-status-failed { color: var(--error); }
 
 .collector-screen-heading { padding: 18px 0; }
@@ -1903,8 +2045,8 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .summary-grid strong { font-size: 15px; }
 .station-button { display: grid; gap: 2px; margin-top: 18px; }
 .station-button small { color: inherit; font-size: 10px; font-weight: 600; }
-.outbox-badge { min-height: 40px; max-width: 150px; padding: 0 10px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); color: var(--primary); background: var(--surface-container-lowest); font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
-.outbox-badge-failed { color: var(--error); border-color: rgba(186,26,26,0.35); background: var(--error-container); }
+.outbox-badge { min-height: 44px; max-width: 150px; padding: 0 10px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); color: var(--primary); background: var(--surface-container-lowest); font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+.outbox-badge-failed { color: var(--error); border-color: rgba(179,38,30,0.35); background: var(--error-container); }
 .outbox-row { padding: 15px; border: 1px solid var(--outline-variant); border-radius: var(--radius-md); background: var(--surface-container-lowest); box-shadow: var(--shadow-xs); }
 .outbox-row-top { display: flex; align-items: center; gap: 8px; }
 .outbox-row p { margin: 7px 0 0; color: var(--on-surface-variant); font-size: 11px; overflow-wrap: anywhere; }

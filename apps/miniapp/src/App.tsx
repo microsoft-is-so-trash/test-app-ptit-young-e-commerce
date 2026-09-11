@@ -38,7 +38,7 @@ const TAB_TITLES: Record<Tab, string> = {
   account: 'Tài khoản',
 };
 
-function BrandHeader({ title }: { title: string }) {
+export function BrandHeader({ title }: { title: string }) {
   return (
     <header className="brand-header">
       <div className="brand-header-inner">
@@ -199,7 +199,7 @@ export function App() {
       await signOut();
     }
     return (
-      <div className="app-shell">
+      <div className="app-shell collector-shell">
         <BrandHeader title="Tuyến hôm nay" />
         <main className="main-area">
           <div className="page-content" style={{ paddingTop: 24, paddingBottom: 32 }}>
