@@ -1826,6 +1826,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
   color: var(--on-surface);
   border-color: var(--outline-variant);
   background: var(--surface-container-lowest);
+  font-size: 12px;
 }
 .collector-route-screen .shift-ready-note .text-button {
   display: block;
@@ -1839,12 +1840,16 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .collector-route-screen .page-header .eyebrow {
   color: var(--on-surface-variant);
   background: var(--surface-container-high);
+  font-size: 12px;
 }
 .collector-route-screen .pickup-priority-normal {
   border-left-color: var(--outline);
   color: var(--on-surface);
   background: var(--surface-container-lowest);
 }
+
+/* A4d — Vùng chạm: các nút dạng chữ trong màn này cũng đạt tối thiểu 44px */
+.collector-route-screen .text-button { min-height: 44px; }
 
 /* A5 — Gom thang chữ phụ về 12px, chữ nhấn về 14px (thay cho 10/11/13px rải rác) */
 .collector-route-screen .route-optimization-ai,
@@ -1889,7 +1894,315 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
   text-align: left;
 }
 .collector-route-screen .stop-ai-toggle-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.collector-route-screen .stop-ai-toggle-caret { flex: 0 0 auto; font-size: 10px; }
+.collector-route-screen .stop-ai-toggle-caret { flex: 0 0 auto; font-size: 12px; }
+
+/* ============================================
+   Collector Entry Screen — Hướng A, scoped riêng cho màn này
+   (không ảnh hưởng QR/Summary/Outbox/StationDelivery hay Merchant)
+   ============================================ */
+.collector-entry-screen {
+  background: #ffffff;
+  --primary: #0f5c1f;
+  --on-primary: #ffffff;
+  --error: #b3261e;
+  --on-error: #ffffff;
+  --error-container: #fbe4e1;
+  --on-error-container: #7a1912;
+  --on-surface: #14140f;
+}
+
+/* Lựa chọn đang chọn (hạng dầu A/B/C và "Đạt"): bỏ màu thứ 5, dùng primary đặc */
+.collector-entry-screen .quality-option.selected {
+  border-color: var(--primary);
+  color: var(--on-primary);
+  background: var(--primary);
+}
+.collector-entry-screen .quality-option.selected small,
+.collector-entry-screen .grade-option.selected small {
+  color: var(--on-primary);
+}
+
+/* "Cần kiểm tra": viền + chữ đỏ trên nền trắng — phân biệt rõ với "Đạt" mà không chói */
+.collector-entry-screen .quality-option.flag-selected {
+  border-color: var(--error);
+  color: var(--error);
+  background: var(--surface-container-lowest);
+}
+.collector-entry-screen .quality-option.flag-selected small { color: var(--error); }
+
+/* Các biến thể cảnh báo: bỏ tầng vàng và tầng xanh-thứ-5, nhấn bằng viền trái primary.
+   Đỏ giữ riêng cho lệch sản lượng cao và lỗi thật (tự đúng nhờ override --error ở trên). */
+.collector-entry-screen .pickup-volume-deviation-normal,
+.collector-entry-screen .pickup-volume-deviation-review,
+.collector-entry-screen .image-grade-analysis-low,
+.collector-entry-screen .image-grade-analysis-neutral {
+  border-color: var(--outline-variant);
+  border-left-color: var(--primary);
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
+}
+/* Chỉ hiện khi GPS phải dùng vị trí dự phòng — không xuất hiện ở trạng thái mặc định
+   nên phép đo trên preview không bắt được, phải xử lý theo selector. */
+.collector-entry-screen .location-banner {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  background: var(--surface-container-lowest);
+}
+
+/* Thang chữ về 12 / 14 / 18 (thay cho 11 và 13px rải rác) */
+.collector-entry-screen .section-label,
+.collector-entry-screen .entry-volume-forecast small,
+.collector-entry-screen .image-grade-analysis small,
+.collector-entry-screen .photo-card p,
+.collector-entry-screen .grade-option small,
+.collector-entry-screen .collector-screen-heading .eyebrow,
+.collector-entry-screen .entry-meta-card small,
+.collector-entry-screen .pickup-volume-ack span,
+.collector-entry-screen .image-grade-override span,
+.collector-entry-screen .submit-block-reason,
+.collector-entry-screen .submit-block-reason li {
+  font-size: 12px;
+}
+.collector-entry-screen .liter-entry-card label,
+.collector-entry-screen .toggle-row,
+.collector-entry-screen .photo-card strong {
+  font-size: 14px;
+}
+
+/* "Xoá ảnh": vùng chạm 32px là mức thấp nhất phát hiện được trong toàn bộ đợt audit —
+   độc quyền GradePhotoPicker, chỉ dùng trong màn này */
+.collector-entry-screen .photo-remove-button {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+/* Vùng chạm tối thiểu 44px */
+.collector-entry-screen .back-button,
+.collector-entry-screen .text-button { min-height: 44px; }
+.collector-entry-screen .grade-note-input { min-height: 72px; }
+
+/* Khối phụ: mã giao dịch + trạng thái GPS, tách khỏi thẻ "Số lít quán khai".
+   Cố tình KHÔNG có viền/nền — đây là thông tin tham chiếu, thêm chrome chỉ làm dài trang. */
+.collector-entry-screen .entry-meta-card {
+  display: grid;
+  gap: 2px;
+  margin-top: 12px;
+  padding: 0;
+  color: var(--on-surface-variant);
+  font-size: 12px;
+}
+.collector-entry-screen .entry-meta-card p { margin: 0; }
+.collector-entry-screen .entry-meta-card .text-button { justify-self: start; padding: 0; }
+
+/* ============================================
+   Collector QR Screen — Hướng A, scoped riêng cho màn này
+   (không ảnh hưởng Route/Entry/Summary/Outbox/StationDelivery hay Merchant)
+   ============================================ */
+.collector-qr-screen {
+  background: #ffffff;
+  --primary: #0f5c1f;
+  --on-primary: #ffffff;
+  --error: #b3261e;
+  --on-error: #ffffff;
+  --error-container: #fbe4e1;
+  --on-error-container: #7a1912;
+  --on-surface: #14140f;
+}
+
+/* "Đã đối chiếu": bỏ màu thứ 5, dùng primary — tương phản 3:1 cũ dưới chuẩn, primary/container đạt >4.5 */
+.collector-qr-screen .verified-badge {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+
+/* Cảnh báo sai can / ghi chú dùng cache offline: bỏ tầng vàng, nhấn bằng viền trái primary */
+.collector-qr-screen .warning-panel,
+.collector-qr-screen .offline-cache-note {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  background: var(--surface-container-lowest);
+}
+
+/* Vùng chạm tối thiểu 44px */
+.collector-qr-screen .back-button { min-height: 44px; }
+
+/* Thang chữ về 12px (thay cho 11px rải rác); giữ 16px cho số can vì đây là số liệu cần đọc nhanh, không gộp vào 14 */
+.collector-qr-screen .qr-target-card small,
+.collector-qr-screen .verified-badge,
+.collector-qr-screen .verified-container-card p {
+  font-size: 12px;
+}
+
+/* ============================================
+   Collector Summary Screen — Hướng A, scoped riêng cho màn này
+   (summary-hero/summary-grid dùng chung với ShiftCloseout ở StationDeliveryFlow —
+   KHÔNG sửa rule gốc, chỉ override qua ancestor selector)
+   ============================================ */
+.collector-summary-screen {
+  background: #ffffff;
+  --primary: #0f5c1f;
+  --on-primary: #ffffff;
+  --error: #b3261e;
+  --on-error: #ffffff;
+  --error-container: #fbe4e1;
+  --on-error-container: #7a1912;
+  --on-surface: #14140f;
+}
+
+/* Lỗi tương phản có sẵn (1.65:1): span dùng --on-surface-variant (chữ tối, dành cho nền
+   sáng) trong khi summary-hero nền primary đậm. Cùng bug tồn tại ở ShiftCloseout nhưng
+   CHƯA sửa ở đó theo quyết định phạm vi — chỉ vá tại đây. */
+.collector-summary-screen .summary-hero span {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.collector-summary-screen .back-button { min-height: 44px; }
+.collector-summary-screen .collector-screen-heading .eyebrow { font-size: 12px; }
+.collector-summary-screen .summary-grid strong { font-size: 14px; }
+
+/* ============================================
+   Collector Outbox Screen — Hướng A, scoped riêng cho màn này
+   (warning-panel dùng chung StationDeliveryFlow — override qua ancestor, không sửa gốc.
+   outbox-issue-banner-error/-pending: fix "không báo đỏ khi chỉ đang chờ" ở Route KHÔNG
+   lan sang đây vì scoped riêng — lặp lại đúng khối override tương tự tại đây.)
+   ============================================ */
+.collector-outbox-screen {
+  background: #ffffff;
+  --primary: #0f5c1f;
+  --on-primary: #ffffff;
+  --error: #b3261e;
+  --on-error: #ffffff;
+  --error-container: #fbe4e1;
+  --on-error-container: #7a1912;
+  --on-surface: #14140f;
+}
+
+.collector-outbox-screen .warning-panel {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  background: var(--surface-container-lowest);
+}
+
+.collector-outbox-screen .outbox-issue-banner-error {
+  border-color: rgba(179, 38, 30, 0.32);
+}
+.collector-outbox-screen .outbox-issue-banner-pending {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  background: var(--surface-container-lowest);
+}
+
+/* Chấm trạng thái: đồng bộ = primary (khớp ngữ nghĩa "xong" dùng ở Route/collect-action),
+   chờ/đang gửi = trung tính, lỗi tự đúng nhờ token --error đã scope ở trên */
+.collector-outbox-screen .outbox-dot-pending,
+.collector-outbox-screen .outbox-dot-syncing {
+  background: var(--on-surface-variant);
+}
+.collector-outbox-screen .outbox-dot-synced {
+  background: var(--primary);
+}
+
+.collector-outbox-screen .back-button { min-height: 44px; }
+.collector-outbox-screen .collector-screen-heading .eyebrow { font-size: 12px; }
+.collector-outbox-screen .outbox-row p { font-size: 12px; }
+
+/* ============================================
+   StationDeliveryFlow — 4 màn con, mỗi màn 1 class scope riêng
+   (receipt-card/delivery-transactions-card/delivery-transaction-row/station-page dùng
+   chung với SavedStationReceiptView ở CollectorFlow.tsx — KHÔNG sửa rule gốc;
+   map-action dùng chung với CollectorStopCard ở Route — cũng override qua ancestor)
+   ============================================ */
+.collector-station-select-screen,
+.collector-station-review-screen,
+.collector-station-receipt-screen,
+.collector-shift-closeout-screen {
+  background: #ffffff;
+  --primary: #0f5c1f;
+  --on-primary: #ffffff;
+  --error: #b3261e;
+  --on-error: #ffffff;
+  --error-container: #fbe4e1;
+  --on-error-container: #7a1912;
+  --on-surface: #14140f;
+}
+
+.collector-station-select-screen .back-button,
+.collector-station-review-screen .back-button,
+.collector-station-receipt-screen .back-button,
+.collector-shift-closeout-screen .back-button {
+  min-height: 44px;
+}
+.collector-station-select-screen .collector-screen-heading .eyebrow,
+.collector-station-review-screen .collector-screen-heading .eyebrow,
+.collector-station-receipt-screen .collector-screen-heading .eyebrow,
+.collector-shift-closeout-screen .collector-screen-heading .eyebrow {
+  font-size: 12px;
+}
+
+/* StationSelectScreen: "Đang nhận dầu" bỏ màu thứ 5; map-action đồng bộ với Route.
+   station-card-top h2 và station-receiving-status (small) trước đó không có font-size
+   riêng, ăn theo mặc định trình duyệt (21px / 11.6667px) — đặt tường minh theo thang. */
+.collector-station-select-screen .station-card-top h2 { font-size: 18px; }
+.collector-station-select-screen .station-receiving-status { color: var(--primary); font-size: 12px; }
+.collector-station-select-screen .map-action {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, white);
+}
+
+/* StationDeliveryReview: "chênh lệch trong ngưỡng" bỏ màu thứ 5, dùng primary (khớp
+   ngữ nghĩa "ổn/đã xong" đã dùng ở Route/Outbox); cảnh báo vượt ngưỡng bỏ tầng vàng */
+.collector-station-review-screen .variance-ok { color: var(--primary); }
+.collector-station-review-screen .warning-panel {
+  color: var(--on-surface);
+  border-color: var(--outline-variant);
+  background: var(--surface-container-lowest);
+}
+/* Thang chữ: h2/strong/span của danh sách giao dịch dùng chung với SavedStationReceiptView,
+   nên override qua scope thay vì sửa rule gốc */
+.collector-station-review-screen .delivery-transactions-card h2 { font-size: 14px; }
+.collector-station-review-screen .delivery-transaction-row strong { font-size: 14px; }
+.collector-station-review-screen .delivery-transaction-row span { font-size: 12px; }
+
+/* StationDeliveryReceipt: trạng thái phiếu bỏ màu thứ 5 và tầng vàng, dùng đúng 4 màu */
+.collector-station-receipt-screen .receipt-status-OK,
+.collector-station-receipt-screen .receipt-status-synced {
+  color: var(--on-primary);
+  background: var(--primary);
+}
+.collector-station-receipt-screen .receipt-status-pending,
+.collector-station-receipt-screen .receipt-status-syncing {
+  color: var(--on-surface);
+  background: var(--surface-container-high);
+}
+
+/* ShiftCloseout: cùng lỗi tương phản 1.65:1 đã vá ở CollectorSummaryScreen (span chữ tối
+   trên nền primary đậm) — đến lượt màn này, vá y hệt */
+.collector-shift-closeout-screen .summary-hero span {
+  color: rgba(255, 255, 255, 0.85);
+}
+.collector-shift-closeout-screen .summary-grid strong { font-size: 14px; }
+
+/* ============================================
+   SavedStationReceiptView — Hướng A (màn xem lại biên nhận đã lưu, khác StationDeliveryReceipt
+   "vừa nộp" ở StationDeliveryFlow — dùng chung receipt-card/delivery-transaction-row/eyebrow
+   với màn đó, nên override qua ancestor riêng, không sửa rule gốc)
+   ============================================ */
+.collector-saved-receipt-screen {
+  background: #ffffff;
+  --primary: #0f5c1f;
+  --on-primary: #ffffff;
+  --error: #b3261e;
+  --on-error: #ffffff;
+  --error-container: #fbe4e1;
+  --on-error-container: #7a1912;
+  --on-surface: #14140f;
+}
+.collector-saved-receipt-screen .back-button { min-height: 44px; }
+.collector-saved-receipt-screen .collector-screen-heading .eyebrow { font-size: 12px; }
+.collector-saved-receipt-screen .delivery-transactions-card h2 { font-size: 14px; }
+.collector-saved-receipt-screen .delivery-transaction-row strong { font-size: 14px; }
+.collector-saved-receipt-screen .delivery-transaction-row span { font-size: 12px; }
 
 .collector-page-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 4px 0 24px; }
 .collector-header-actions { display: flex; align-items: center; gap: 8px; }
@@ -1986,7 +2299,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .liter-entry-card { margin-top: 13px; }
 .liter-entry-card label { display: block; margin: 14px 0 9px; font-size: 13px; font-weight: 700; }
 .liter-entry-card label:first-child { margin-top: 0; }
-.large-number-input { display: grid; grid-template-columns: 48px minmax(0, 1fr) 36px 48px; align-items: center; gap: 7px; }
+.large-number-input { display: grid; grid-template-columns: 48px minmax(0, 1fr) 36px 48px; align-items: center; gap: 8px; }
 .large-number-input input { min-width: 0; min-height: 64px; padding: 0 4px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); text-align: center; font-size: 28px; font-weight: 850; background: var(--surface-container-lowest); color: var(--on-surface); }
 .large-number-input button { min-height: 48px; padding: 0; border: 1px solid var(--outline-variant); border-radius: 10px; color: var(--primary); background: var(--surface-container-low); font-size: 20px; font-weight: 750; }
 .large-number-input span { color: var(--on-surface-variant); font-size: 12px; }
@@ -2044,7 +2357,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .summary-grid > div { display: grid; gap: 7px; padding: 17px; border: 1px solid var(--outline-variant); border-radius: var(--radius-md); background: var(--surface-container-lowest); }
 .summary-grid strong { font-size: 15px; }
 .station-button { display: grid; gap: 2px; margin-top: 18px; }
-.station-button small { color: inherit; font-size: 10px; font-weight: 600; }
+.station-button small { color: inherit; font-size: 12px; font-weight: 600; }
 .outbox-badge { min-height: 44px; max-width: 150px; padding: 0 10px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); color: var(--primary); background: var(--surface-container-lowest); font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
 .outbox-badge-failed { color: var(--error); border-color: rgba(179,38,30,0.35); background: var(--error-container); }
 .outbox-row { padding: 15px; border: 1px solid var(--outline-variant); border-radius: var(--radius-md); background: var(--surface-container-lowest); box-shadow: var(--shadow-xs); }
@@ -2081,7 +2394,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .delivery-total-row { margin-top: 3px; padding-bottom: 0; font-weight: 800; }
 .delivery-total-row strong { color: var(--primary); font-size: 16px; text-align: right; }
 .delivery-input-card, .delivery-note-card { margin-top: 13px; }
-.delivery-input-card > label, .delivery-note-card label { display: block; margin: 14px 0 9px; font-size: 13px; font-weight: 700; }
+.delivery-input-card > label, .delivery-note-card label { display: block; margin: 14px 0 9px; font-size: 14px; font-weight: 700; }
 .delivery-input-card > label:first-child { margin-top: 0; }
 .delivery-liters-input { display: flex; align-items: center; gap: 10px; }
 .delivery-liters-input input { min-width: 0; min-height: 62px; font-size: 28px; font-weight: 850; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); background: var(--surface-container-lowest); padding: 0 4px; text-align: center; color: var(--on-surface); }
@@ -2091,7 +2404,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .variance-danger { color: var(--error); }
 .variance-help { color: var(--on-surface-variant); font-size: 12px; line-height: 1.45; }
 .server-calculation-note { margin-top: 14px; color: var(--on-surface-variant); background: var(--surface-container-low); }
-.receipt-status { margin-bottom: 15px; padding: 10px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; }
+.receipt-status { margin-bottom: 15px; padding: 10px 12px; border-radius: 8px; font-size: 12px; font-weight: 800; }
 .receipt-status-OK, .receipt-status-synced { color: var(--secondary); background: var(--secondary-container); }
 .receipt-status-pending, .receipt-status-syncing { color: #754900; background: #fff1c7; }
 .receipt-status-FLAGGED { color: var(--error); background: var(--error-container); }

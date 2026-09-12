@@ -1271,7 +1271,7 @@ function CollectorStopCard({ stop, outboxRow, onOpenQr }: { stop: RouteStop; out
   );
 }
 
-function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteStop; onBack: () => void; onContinue: (container: ContainerLookupResponse, containerCode: string) => void }) {
+export function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteStop; onBack: () => void; onContinue: (container: ContainerLookupResponse, containerCode: string) => void }) {
   const [code, setCode] = useState(stop.container_code);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -1325,7 +1325,7 @@ function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteStop; onBa
   }
 
   return (
-    <div className="page-content collector-content">
+    <div className="page-content collector-content collector-qr-screen">
       <button className="back-button" onClick={onBack}>Quay lại tuyến</button>
       <header className="collector-screen-heading"><p className="eyebrow">ĐIỂM {stop.seq}</p><h1>Quét mã can</h1><p>{stop.merchant.name}</p></header>
       <section className="qr-target-card"><span>Can cần thu</span><strong>{stop.container_code}</strong><small>{stop.merchant.address ?? ''}</small></section>
@@ -1333,10 +1333,10 @@ function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteStop; onBa
       <section className="manual-qr-card">
         <p className="section-label">Nhập mã can</p>
         <label htmlFor="manual-qr">Bạn có thể nhập hoặc sửa mã can</label>
-        <input id="manual-qr" value={code} onChange={(event) => setCode(event.target.value)} placeholder="ECO-UCO-Q3P7-001" />
+        <input id="manual-qr" className="input" value={code} onChange={(event) => setCode(event.target.value)} placeholder="ECO-UCO-Q3P7-001" />
         <button className="secondary-button" onClick={() => { void lookup(code); }} disabled={busy}>Kiểm tra mã can</button>
       </section>
-      {error ? <div className="error-panel">{error}</div> : null}
+      {error ? <div className="error-panel" role="alert">{error}</div> : null}
       {mismatch ? <div className="warning-panel"><strong>Đây không phải can của điểm này</strong><span>Kiểm tra lại mã QR. Không thể ghi nhận nhầm can.</span></div> : null}
       {container ? (
         <section className="verified-container-card">
@@ -1351,7 +1351,7 @@ function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteStop; onBa
   );
 }
 
-function CollectorEntryScreen({ stop, container, containerCode, onBack, onSuccess }: { stop: RouteStop; container: ContainerLookupResponse; containerCode: string; onBack: () => void; onSuccess: (liters: number, kilograms: number | null, clientUuid: string) => void }) {
+export function CollectorEntryScreen({ stop, container, containerCode, onBack, onSuccess }: { stop: RouteStop; container: ContainerLookupResponse; containerCode: string; onBack: () => void; onSuccess: (liters: number, kilograms: number | null, clientUuid: string) => void }) {
   const [liters, setLiters] = useState(stop.expected_liters > 0 ? stop.expected_liters.toFixed(1) : '');
   const [kilograms, setKilograms] = useState('');
   const [quality, setQuality] = useState<Quality>(Quality.PASS);
@@ -1649,10 +1649,21 @@ function CollectorEntryScreen({ stop, container, containerCode, onBack, onSucces
   }
 
   return (
-    <div className="page-content collector-content">
+    <div className="page-content collector-content collector-entry-screen">
       <button className="back-button" onClick={onBack} disabled={saving}>Quay lại quét mã</button>
        <header className="collector-screen-heading"><p className="eyebrow">GHI NHẬN THU GOM</p><h1>{container.merchant.name}</h1><p>{containerCode}</p></header>
-      <section className="entry-target-card"><span>Số lít quán khai</span><strong>{formatLiters(stop.expected_liters)}</strong>{pickupVolumeForecast ? <div className="entry-volume-forecast"><strong>{pickupVolumeForecast.predictedLiters === null ? 'AI chưa đủ dữ liệu để dự báo sản lượng.' : `AI dự báo: khoảng ${formatPickupVolumeLiters(pickupVolumeForecast.predictedLiters)}`}</strong><small>{pickupVolumeForecast.confidenceLabel}</small>{pickupVolumeForecast.declaredOnly ? <small>AI chưa có đủ lịch sử riêng cho quán này.</small> : null}</div> : null}<small>Mã giao dịch: {clientUuid.slice(0, 8)}…</small>{locationFallback ? <p className="location-banner">Đang dùng vị trí dự phòng là tâm phường, không phải GPS thực tế.</p> : geo ? <p className="field-help">Đã lấy vị trí GPS thực tế.</p> : <p className="field-help">GPS sẽ được lấy khi xác nhận; bạn cũng có thể lấy trước ngay bây giờ.</p>}<button type="button" className="text-button" onClick={() => { void retryGps(); }} disabled={locating || saving}>{locating ? 'Đang lấy GPS…' : 'Lấy lại GPS'}</button></section>
+      <section className="entry-target-card"><span>Số lít quán khai</span><strong>{formatLiters(stop.expected_liters)}</strong>{pickupVolumeForecast ? <div className="entry-volume-forecast"><strong>{pickupVolumeForecast.predictedLiters === null ? 'AI chưa đủ dữ liệu để dự báo sản lượng.' : `AI dự báo: khoảng ${formatPickupVolumeLiters(pickupVolumeForecast.predictedLiters)}`}</strong><small>{pickupVolumeForecast.confidenceLabel}</small>{pickupVolumeForecast.declaredOnly ? <small>AI chưa có đủ lịch sử riêng cho quán này.</small> : null}</div> : null}</section>
+      <section className="liter-entry-card">
+        <label htmlFor="actual-kilograms">Khối lượng (kg đã cân)</label>
+        <div className="large-number-input"><button onClick={() => adjustKilograms(-0.5)} disabled={saving}>−</button><input id="actual-kilograms" aria-describedby="actual-kilograms-help" type="text" inputMode="decimal" value={kilograms} onChange={(event) => setKilograms(event.target.value)} placeholder="0,0" /><span>kg</span><button onClick={() => adjustKilograms(0.5)} disabled={saving}>+</button></div>
+        <p id="actual-kilograms-help" className={invalidKg ? 'error-text' : 'field-help'}>{actualKg === null ? 'Không có số cân? Hệ thống sẽ ước lượng kg từ số lít bên dưới.' : 'SCALE — số kg này là số cân thực tế.'}</p>
+        <label htmlFor="actual-liters">Số lít thực tế</label>
+        <div className="large-number-input"><button onClick={() => adjustLiters(-0.5)} disabled={saving}>−</button><input id="actual-liters" aria-describedby="actual-liters-help" type="text" inputMode="decimal" value={liters} onChange={(event) => setLiters(event.target.value)} placeholder="0,0" /><span>lít</span><button onClick={() => adjustLiters(0.5)} disabled={saving}>+</button></div>
+        <p id="actual-liters-help" className={invalidLiters && (liters || litersDerivedFromKilograms) ? 'error-text' : 'field-help'}>{litersDerivedFromKilograms ? `Số lít ước tính từ khối lượng: ${actualLiters.toFixed(2)} lít · dung tích tối đa ${maxLiters.toFixed(1)} lít` : `Dung tích ${formatLiters(capacity)} · tối đa ${maxLiters.toFixed(1)} lít`}</p>
+        {pickupVolumeDeviation?.level === 'NORMAL' ? <p className="pickup-volume-deviation pickup-volume-deviation-normal">Sản lượng nằm gần mức AI dự báo.</p> : null}
+        {pickupVolumeDeviation?.level === 'REVIEW' ? <p className="pickup-volume-deviation pickup-volume-deviation-review">Số lít đang chênh {formatDeviationPercent(pickupVolumeDeviation.deviation_pct)} so với AI dự báo. Hãy kiểm tra lại số nhập và mức dầu trong can.</p> : null}
+        {pickupVolumeDeviation?.level === 'HIGH' ? <div className="pickup-volume-deviation pickup-volume-deviation-high"><strong>Chênh lệch rất cao so với AI dự báo.</strong><span>AI dự báo {formatPickupVolumeLiters(pickupVolumeDeviation.predicted_liters)}</span><span>Thực tế nhập {formatPickupVolumeLiters(pickupVolumeDeviation.actual_liters)}</span><span>Chênh lệch {formatSignedDeviationLiters(pickupVolumeDeviation.deviation_liters)} ({formatDeviationPercent(pickupVolumeDeviation.deviation_pct)})</span><label className="pickup-volume-ack"><input type="checkbox" checked={highDeviationAcknowledgement === highDeviationKey} onChange={(event) => setHighDeviationAcknowledgement(event.target.checked ? highDeviationKey : null)} disabled={saving} /><span>Tôi đã kiểm tra lại số lít và xác nhận tiếp tục.</span></label></div> : null}
+      </section>
       <section className="quality-card">
         <p className="section-label">Phân hạng dầu</p>
         <OilGradeSelector value={grade} disabled={saving} onChange={(nextGrade) => { setGrade(nextGrade); setOverrideAcknowledged(false); }} />
@@ -1660,17 +1671,6 @@ function CollectorEntryScreen({ stop, container, containerCode, onBack, onSucces
         <p className="field-help">Bật nếu thấy có nước, dầu nhớt hoặc mùi lạ không phải dầu ăn.</p>
         <label className="grade-note-label" htmlFor="grade-note">Ghi chú phân hạng (không bắt buộc)</label>
         <textarea className="grade-note-input" id="grade-note" value={gradeNote} onChange={(event) => setGradeNote(event.target.value)} disabled={saving} placeholder="Ghi chú thêm nếu cần" />
-      </section>
-      <section className="liter-entry-card">
-        <label htmlFor="actual-kilograms">Khối lượng (kg đã cân)</label>
-        <div className="large-number-input"><button onClick={() => adjustKilograms(-0.5)} disabled={saving}>−</button><input id="actual-kilograms" type="text" inputMode="decimal" value={kilograms} onChange={(event) => setKilograms(event.target.value)} placeholder="0,0" /><span>kg</span><button onClick={() => adjustKilograms(0.5)} disabled={saving}>+</button></div>
-        <p className={invalidKg ? 'error-text' : 'field-help'}>{actualKg === null ? 'Không có số cân? Hệ thống sẽ ước lượng kg từ số lít bên dưới.' : 'SCALE — số kg này là số cân thực tế.'}</p>
-        <label htmlFor="actual-liters">Số lít thực tế</label>
-        <div className="large-number-input"><button onClick={() => adjustLiters(-0.5)} disabled={saving}>−</button><input id="actual-liters" type="text" inputMode="decimal" value={liters} onChange={(event) => setLiters(event.target.value)} placeholder="0,0" /><span>lít</span><button onClick={() => adjustLiters(0.5)} disabled={saving}>+</button></div>
-        <p className={invalidLiters && (liters || litersDerivedFromKilograms) ? 'error-text' : 'field-help'}>{litersDerivedFromKilograms ? `Số lít ước tính từ khối lượng: ${actualLiters.toFixed(2)} lít · dung tích tối đa ${maxLiters.toFixed(1)} lít` : `Dung tích ${formatLiters(capacity)} · tối đa ${maxLiters.toFixed(1)} lít`}</p>
-        {pickupVolumeDeviation?.level === 'NORMAL' ? <p className="pickup-volume-deviation pickup-volume-deviation-normal">Sản lượng nằm gần mức AI dự báo.</p> : null}
-        {pickupVolumeDeviation?.level === 'REVIEW' ? <p className="pickup-volume-deviation pickup-volume-deviation-review">Số lít đang chênh {formatDeviationPercent(pickupVolumeDeviation.deviation_pct)} so với AI dự báo. Hãy kiểm tra lại số nhập và mức dầu trong can.</p> : null}
-        {pickupVolumeDeviation?.level === 'HIGH' ? <div className="pickup-volume-deviation pickup-volume-deviation-high"><strong>Chênh lệch rất cao so với AI dự báo.</strong><span>AI dự báo {formatPickupVolumeLiters(pickupVolumeDeviation.predicted_liters)}</span><span>Thực tế nhập {formatPickupVolumeLiters(pickupVolumeDeviation.actual_liters)}</span><span>Chênh lệch {formatSignedDeviationLiters(pickupVolumeDeviation.deviation_liters)} ({formatDeviationPercent(pickupVolumeDeviation.deviation_pct)})</span><label className="pickup-volume-ack"><input type="checkbox" checked={highDeviationAcknowledgement === highDeviationKey} onChange={(event) => setHighDeviationAcknowledgement(event.target.checked ? highDeviationKey : null)} disabled={saving} /><span>Tôi đã kiểm tra lại số lít và xác nhận tiếp tục.</span></label></div> : null}
       </section>
       <section className="quality-card"><p className="section-label">Chất lượng dầu</p><div className="quality-options"><button className={quality === Quality.PASS ? 'quality-option selected' : 'quality-option'} onClick={() => setQuality(Quality.PASS)} disabled={saving}>Đạt</button><button className={quality === Quality.FLAG ? 'quality-option selected flag-selected' : 'quality-option'} onClick={() => setQuality(Quality.FLAG)} disabled={saving}>Cần kiểm tra</button></div></section>
       <GradePhotoPicker photos={photos} busy={takingPhoto} disabled={saving} message={photoNotice} onTakePhoto={() => { void takePhoto(); }} onChooseAlbum={() => { void chooseAlbumPhoto(); }} onChooseFile={(file) => { void choosePhotoFile(file); }} onRemovePhoto={removePhoto} />
@@ -1688,16 +1688,17 @@ function CollectorEntryScreen({ stop, container, containerCode, onBack, onSucces
           {needsImageGradeOverrideAcknowledgement ? <label className="image-grade-override"><input type="checkbox" checked={overrideAcknowledged} onChange={(event) => setOverrideAcknowledged(event.target.checked)} disabled={saving} /><span>Tôi đã kiểm tra và xác nhận giữ phân hạng đã chọn.</span></label> : null}
         </section>
       ) : null}
-      {error ? <div className="error-panel">{error}</div> : null}
-      {submitBlockReasons.length > 0 ? <div className="error-text submit-block-reason"><strong>Còn thiếu:</strong><ul>{submitBlockReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></div> : null}
+      {error ? <div className="error-panel" role="alert">{error}</div> : null}
+      <section className="entry-meta-card"><small>Mã giao dịch: {clientUuid.slice(0, 8)}…</small>{locationFallback ? <p className="location-banner">Đang dùng vị trí dự phòng là tâm phường, không phải GPS thực tế.</p> : geo ? <p className="field-help">Đã lấy vị trí GPS thực tế.</p> : <p className="field-help">GPS sẽ được lấy khi xác nhận; bạn cũng có thể lấy trước ngay bây giờ.</p>}<button type="button" className="text-button" onClick={() => { void retryGps(); }} disabled={locating || saving}>{locating ? 'Đang lấy GPS…' : 'Lấy lại GPS'}</button></section>
+      {submitBlockReasons.length > 0 ? <div className="error-text submit-block-reason" role="alert"><strong>Còn thiếu:</strong><ul>{submitBlockReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></div> : null}
       <button className="submit-collection-button" onClick={() => { void submit(); }} disabled={saving || submitBlockReasons.length > 0}>{saving ? 'Đang lưu trên máy…' : 'Xác nhận thu gom'}</button>
     </div>
   );
 }
 
-function SavedStationReceiptView({ receipt, onBack }: { receipt: StoredStationReceipt; onBack: () => void }) {
+export function SavedStationReceiptView({ receipt, onBack }: { receipt: StoredStationReceipt; onBack: () => void }) {
   return (
-    <div className="page-content collector-content station-page receipt-page">
+    <div className="page-content collector-content station-page receipt-page collector-saved-receipt-screen">
       <button className="back-button" onClick={onBack}>Về tuyến hôm nay</button>
       <header className="collector-screen-heading"><p className="eyebrow">BIÊN NHẬN ĐÃ LƯU</p><h1>{receipt.station_name}</h1><p>Mã phiếu: {receipt.receipt_id}</p></header>
       <section className="receipt-card">
@@ -1715,13 +1716,13 @@ function SavedStationReceiptView({ receipt, onBack }: { receipt: StoredStationRe
   );
 }
 
-function CollectorSummaryScreen({ route, completed, completedCount, totalStops, onBack, onOpenDelivery }: { route: CurrentRouteResponse | undefined; completed: Record<string, CompletedStop>; completedCount: number; totalStops: number; onBack: () => void; onOpenDelivery: () => void }) {
+export function CollectorSummaryScreen({ route, completed, completedCount, totalStops, onBack, onOpenDelivery }: { route: CurrentRouteResponse | undefined; completed: Record<string, CompletedStop>; completedCount: number; totalStops: number; onBack: () => void; onOpenDelivery: () => void }) {
   const totalCollected = Object.values(completed).reduce((sum, item) => sum + item.liters, 0);
   const totalCollectedKg = Object.values(completed).reduce((sum, item) => sum + (item.kilograms ?? item.liters * DEFAULT_DENSITY_KG_PER_LITER), 0);
   const displayedTotalStops = Math.max(totalStops, completedCount);
   const vehicleCapacity = route ? route.total_expected_liters + route.remaining_capacity_l : 0;
   return (
-    <div className="page-content collector-content summary-page">
+    <div className="page-content collector-content summary-page collector-summary-screen">
       <button className="back-button" onClick={onBack}>Về tuyến hôm nay</button>
       <header className="collector-screen-heading"><p className="eyebrow">KẾT QUẢ CA</p><h1>Tóm tắt thu gom</h1></header>
       <div className="summary-hero"><span>Đã thu hôm nay</span><strong>{formatLiters(totalCollected)} (~{totalCollectedKg.toFixed(1)} kg)</strong></div>
@@ -1731,7 +1732,7 @@ function CollectorSummaryScreen({ route, completed, completedCount, totalStops, 
   );
 }
 
-function OutboxQueueScreen({ onBack }: { onBack: () => void }) {
+export function OutboxQueueScreen({ onBack }: { onBack: () => void }) {
   const rows = useOutboxRows();
   const stats = useOutboxStats();
   const [retrying, setRetrying] = useState<string | null>(null);
@@ -1747,7 +1748,7 @@ function OutboxQueueScreen({ onBack }: { onBack: () => void }) {
   }
 
   return (
-    <div className="page-content collector-content outbox-page">
+    <div className="page-content collector-content outbox-page collector-outbox-screen">
       <button className="back-button" onClick={onBack}>Về tuyến hôm nay</button>
       <header className="collector-screen-heading"><p className="eyebrow">AN TOÀN DỮ LIỆU</p><h1>Hàng chờ đồng bộ</h1><p>{formatBytes(stats.bytes)} đang lưu trên máy</p></header>
       <OutboxIssueNotice rows={rows} stats={stats} />

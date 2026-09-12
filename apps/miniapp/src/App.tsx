@@ -38,7 +38,7 @@ const TAB_TITLES: Record<Tab, string> = {
   account: 'Tài khoản',
 };
 
-export function BrandHeader({ title }: { title: string }) {
+function BrandHeader({ title }: { title: string }) {
   return (
     <header className="brand-header">
       <div className="brand-header-inner">

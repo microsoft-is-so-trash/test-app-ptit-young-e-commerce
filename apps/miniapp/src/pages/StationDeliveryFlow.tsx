@@ -19,7 +19,7 @@ import type { PendingStationDeliveryDraft } from '../lib/storage';
 
 type DeliveryScreen = 'select' | 'review' | 'receipt' | 'closeout';
 
-interface DeliveryCandidate extends CompletedStop {
+export interface DeliveryCandidate extends CompletedStop {
   record: OutboxRecord;
   collection: CollectionCreateRequest;
 }
@@ -139,7 +139,7 @@ export function StationDeliveryFlow({ completed, pendingDelivery, collectorId, r
   return <ShiftCloseout candidates={candidates} onFinish={onFinish} />;
 }
 
-function StationSelectScreen({ expectedLiters, expectedKg, waiting, locationDenied, recommendations, loading, status, error, retryingWaiting, retryError, onBack, onRetryWaiting, onChoose, onRetry }: {
+export function StationSelectScreen({ expectedLiters, expectedKg, waiting, locationDenied, recommendations, loading, status, error, retryingWaiting, retryError, onBack, onRetryWaiting, onChoose, onRetry }: {
   expectedLiters: number;
   expectedKg: number;
   waiting: number;
@@ -156,7 +156,7 @@ function StationSelectScreen({ expectedLiters, expectedKg, waiting, locationDeni
   onRetry: () => void;
 }) {
   return (
-    <div className="page-content collector-content station-page">
+    <div className="page-content collector-content station-page collector-station-select-screen">
       <button className="back-button" onClick={onBack}>Về tóm tắt ca</button>
       <header className="collector-screen-heading"><p className="eyebrow">NỘP TRẠM</p><h1>Chọn trạm tiếp nhận</h1><p>Đang mang {formatLiters(expectedLiters)} (~{expectedKg.toFixed(1)} kg) cần đối soát</p></header>
       {locationDenied ? <div className="location-banner">Không lấy được vị trí GPS, đang dùng vị trí trung tâm phường. Giao dịch có thể bị đánh dấu cần kiểm tra.</div> : null}
@@ -177,7 +177,7 @@ function StationCard({ station, liters, onChoose }: { station: StationRecommenda
   return <article className={`station-card ${enough ? '' : 'station-card-unavailable'}`}><div className="station-card-top"><div><h2>{station.name}</h2><p>{station.address ?? 'Chưa có địa chỉ'}</p><small className="station-receiving-status">Đang nhận dầu</small></div><strong>{formatDistance(station.distance_m)}</strong></div><div className="station-capacity-label"><span>Còn lại sau khi nộp</span><b>{formatLiters(Math.max(station.remaining_capacity_l - liters, 0))}</b></div><div className="progress-track station-progress"><span style={{ width: `${fill}%` }} /></div>{!enough ? <p className="station-unavailable-label">Không đủ sức chứa</p> : null}{mapError ? <p className="error-text">{mapError}</p> : null}<div className="station-card-actions"><button className="map-action" onClick={() => { setMapError(null); void zaloClient.openDirections({ lat: station.lat, lng: station.lng }, station.address).catch((error: unknown) => setMapError(error instanceof Error ? error.message : 'Không mở được bản đồ.')); }}>Chỉ đường</button><button className="primary-button" onClick={onChoose} disabled={!enough}>Chọn trạm này</button></div></article>;
 }
 
-function StationDeliveryReview({ station, candidates, expectedLiters, expectedKg, onBack, onSubmitted }: { station: StationRecommendation; candidates: DeliveryCandidate[]; expectedLiters: number; expectedKg: number; onBack: () => void; onSubmitted: (clientUuid: string) => void }) {
+export function StationDeliveryReview({ station, candidates, expectedLiters, expectedKg, onBack, onSubmitted }: { station: StationRecommendation; candidates: DeliveryCandidate[]; expectedLiters: number; expectedKg: number; onBack: () => void; onSubmitted: (clientUuid: string) => void }) {
   const [actual, setActual] = useState(expectedLiters.toFixed(1));
   const [actualKgInput, setActualKgInput] = useState(expectedKg.toFixed(1));
   const [note, setNote] = useState('');
@@ -289,13 +289,13 @@ function StationDeliveryReview({ station, candidates, expectedLiters, expectedKg
   }
 
   return (
-    <div className="page-content collector-content station-page">
+    <div className="page-content collector-content station-page collector-station-review-screen">
       <button className="back-button" onClick={onBack} disabled={saving}>Chọn lại trạm</button>
       <header className="collector-screen-heading"><p className="eyebrow">ĐỐI SOÁT TRƯỚC KHI NỘP</p><h1>{station.name}</h1><p>{station.address ?? ''}</p></header>
       <section className="delivery-transactions-card"><h2>Từng giao dịch sẽ nộp</h2>{candidates.map((item) => <div className="delivery-transaction-row" key={item.clientUuid}><div><strong>{item.stop.merchant.name}</strong><span>{formatTime(item.collection.collected_at ?? item.record.created_at)}</span></div><b>{formatLiters(collectionLiters(item.collection))} · {collectionKilograms(item.collection).toFixed(1)} kg</b></div>)}<div className="delivery-total-row"><span>Tổng server sẽ tự tính</span><strong>{formatLiters(expectedLiters)} (~{expectedKg.toFixed(1)} kg)</strong></div></section>
       <section className="delivery-input-card"><label htmlFor="delivery-kg">Khối lượng thực tế đổ vào trạm (ưu tiên số cân)</label><div className="delivery-liters-input"><input id="delivery-kg" type="text" inputMode="decimal" value={actualKgInput} onChange={(event) => setActualKgInput(event.target.value)} /><span>kg</span></div><p className={flagged ? 'variance-danger' : 'variance-ok'}>{varianceKg >= 0 ? '+' : ''}{varianceKg.toFixed(2)} kg ({(varianceKgPct * 100).toFixed(1)}%)</p><label htmlFor="delivery-liters">Số lít thực tế (để đối chiếu song song)</label><div className="delivery-liters-input"><input id="delivery-liters" type="text" inputMode="decimal" value={actual} onChange={(event) => setActual(event.target.value)} /><span>lít</span></div><p className="variance-help">Ngưỡng đối soát 2% được tính trên kg.</p>{flagged ? <div className="warning-panel"><strong>Chênh lệch vượt 2%, giao dịch sẽ được gắn cờ kiểm tra</strong><span>Vui lòng nhập lý do và chụp ảnh trước khi gửi.</span></div> : null}</section>
       {flagged ? <><section className="delivery-note-card"><label htmlFor="delivery-note">Lý do chênh lệch bắt buộc</label><textarea id="delivery-note" value={note} onChange={(event) => setNote(event.target.value)} placeholder="Ví dụ: dầu còn bám trong can…" /></section><section className="photo-card"><div><strong>Ảnh bằng chứng</strong><p>{photos.length > 0 ? `${photos.length} ảnh thật đã chọn` : 'Cần ít nhất 1 ảnh thật để gửi'}</p></div>{photoNotice ? <p role="status">{photoNotice}</p> : null}<div className="flex flex-wrap gap-2"><button className="secondary-button" onClick={() => { void takePhoto(); }} disabled={takingPhoto || saving}>{takingPhoto ? 'Đang xử lý…' : 'Chụp ảnh'}</button><button className="secondary-button" onClick={() => { void chooseAlbumPhoto(); }} disabled={takingPhoto || saving}>Chọn từ thư viện Zalo</button><label className="secondary-button cursor-pointer">Tải file dự phòng<input className="sr-only" type="file" accept="image/*" onChange={(event) => { void choosePhotoFile(event); }} disabled={takingPhoto || saving} /></label></div></section></> : null}
-      {error ? <div className="error-panel">{error}</div> : null}<p className="server-calculation-note">Expected liters không gửi từ app. Server sẽ tính lại từ các giao dịch đã đồng bộ.</p><button className="submit-collection-button" onClick={() => { void submit(); }} disabled={saving || !canSubmitStationDelivery({ invalid, flagged, note, photoCount: photos.length })}>{saving ? 'Đang lưu phiếu trên máy…' : 'Xác nhận nộp trạm'}</button>
+      {error ? <div className="error-panel" role="alert">{error}</div> : null}<p className="server-calculation-note">Expected liters không gửi từ app. Server sẽ tính lại từ các giao dịch đã đồng bộ.</p><button className="submit-collection-button" onClick={() => { void submit(); }} disabled={saving || !canSubmitStationDelivery({ invalid, flagged, note, photoCount: photos.length })}>{saving ? 'Đang lưu phiếu trên máy…' : 'Xác nhận nộp trạm'}</button>
     </div>
   );
 }
@@ -337,7 +337,7 @@ function buildStationReceipt({ station, clientUuid, collectorId, expectedLiters,
   };
 }
 
-function StationDeliveryReceipt({ station, clientUuid, collectorId, expectedLiters, candidates, rows, onReceiptSaved, onCloseOut, onBack }: { station: StationRecommendation; clientUuid: string; collectorId: string | null; expectedLiters: number; candidates: DeliveryCandidate[]; rows: OutboxRecord[]; onReceiptSaved: (receipt: StoredStationReceipt) => void; onCloseOut: () => Promise<boolean>; onBack: () => void }) {
+export function StationDeliveryReceipt({ station, clientUuid, collectorId, expectedLiters, candidates, rows, onReceiptSaved, onCloseOut, onBack }: { station: StationRecommendation; clientUuid: string; collectorId: string | null; expectedLiters: number; candidates: DeliveryCandidate[]; rows: OutboxRecord[]; onReceiptSaved: (receipt: StoredStationReceipt) => void; onCloseOut: () => Promise<boolean>; onBack: () => void }) {
   const row = rows.find((item) => item.client_uuid === clientUuid);
   const response = row?.server_response as StationDeliveryResponse | undefined;
   const actual = response?.actual_liters ?? Number((row?.payload as StationDeliveryCreateRequest | undefined)?.actual_liters ?? 0);
@@ -431,7 +431,7 @@ function StationDeliveryReceipt({ station, clientUuid, collectorId, expectedLite
   const canCloseOut = row?.status === 'synced' && Boolean(response);
   const receiptStatus = flagged ? 'Có chênh lệch, cần kiểm tra' : row?.status === 'synced' ? 'Server đã đối soát' : 'Đang chờ đồng bộ server';
   return (
-    <div className="page-content collector-content station-page receipt-page">
+    <div className="page-content collector-content station-page receipt-page collector-station-receipt-screen">
       <header className="collector-screen-heading"><p className="eyebrow">BIÊN NHẬN NỘP TRẠM</p><h1>{flagged ? 'Đã ghi nhận có chênh lệch' : 'Đã lưu phiếu nộp trạm'}</h1><p>{station.name}</p></header>
       <section className="receipt-card">
         <div className={`receipt-status receipt-status-${response?.status ?? row?.status ?? 'pending'}`}>{receiptStatus}</div>
@@ -446,7 +446,7 @@ function StationDeliveryReceipt({ station, clientUuid, collectorId, expectedLite
       </section>
       {receiptSaveState === 'saving' ? <p className="field-help" role="status">Đang lưu biên nhận…</p> : null}
       {receiptSaveState === 'saved' ? <p className="field-help" role="status">Đã lưu biên nhận trên máy.</p> : null}
-      {row?.status === 'failed' ? <><div className="error-panel">{deliveryErrorMessage(row.last_error ?? '')}</div><button className="secondary-button" onClick={() => { void retryDelivery(); }} disabled={retrying}>{retrying ? 'Đang thử lại…' : 'Thử lại nộp trạm'}</button></> : null}
+      {row?.status === 'failed' ? <><div className="error-panel" role="alert">{deliveryErrorMessage(row.last_error ?? '')}</div><button className="secondary-button" onClick={() => { void retryDelivery(); }} disabled={retrying}>{retrying ? 'Đang thử lại…' : 'Thử lại nộp trạm'}</button></> : null}
       {receiptError ? <div className="error-panel" role="alert">{receiptError}</div> : null}
       {imageNotice ? <p className="field-help" role="status">{imageNotice}</p> : null}
       <div className="receipt-actions"><button className="secondary-button" onClick={saveReceiptImage}>Lưu ảnh biên nhận</button><button className="primary-button" onClick={() => { void closeOut(); }} disabled={!canCloseOut || receiptSaveState === 'saving' || closing}>{closing ? 'Đang kết ca…' : receiptSaveState === 'saving' ? 'Đang lưu biên nhận…' : canCloseOut ? 'Kết ca' : 'Đang chờ giao trạm thành công…'}</button></div>
@@ -455,9 +455,9 @@ function StationDeliveryReceipt({ station, clientUuid, collectorId, expectedLite
   );
 }
 
-function ShiftCloseout({ candidates, onFinish }: { candidates: DeliveryCandidate[]; onFinish: () => void }) {
+export function ShiftCloseout({ candidates, onFinish }: { candidates: DeliveryCandidate[]; onFinish: () => void }) {
   const total = candidates.reduce((sum, item) => sum + collectionLiters(item.collection), 0);
-  return <div className="page-content collector-content summary-page"><header className="collector-screen-heading"><p className="eyebrow">KẾT CA</p><h1>Ca làm đã khép lại</h1></header><div className="summary-hero"><span>Tổng lít đã thu</span><strong>{formatLiters(total)}</strong></div><section className="summary-grid"><div><span>Số điểm đã thu</span><strong>{candidates.length}</strong></div><div><span>Số phiếu nộp trạm</span><strong>1</strong></div></section><section className="closeout-money"><span>Tổng tiền ước tính</span><strong>{formatCurrency(total * PRICE_PER_LITER)}</strong><small>Đơn giá thử nghiệm: {formatCurrency(PRICE_PER_LITER)} / lít</small></section><button className="primary-button closeout-button" onClick={onFinish}>Kết thúc ca</button></div>;
+  return <div className="page-content collector-content summary-page collector-shift-closeout-screen"><header className="collector-screen-heading"><p className="eyebrow">KẾT CA</p><h1>Ca làm đã khép lại</h1></header><div className="summary-hero"><span>Tổng lít đã thu</span><strong>{formatLiters(total)}</strong></div><section className="summary-grid"><div><span>Số điểm đã thu</span><strong>{candidates.length}</strong></div><div><span>Số phiếu nộp trạm</span><strong>1</strong></div></section><section className="closeout-money"><span>Tổng tiền ước tính</span><strong>{formatCurrency(total * PRICE_PER_LITER)}</strong><small>Đơn giá thử nghiệm: {formatCurrency(PRICE_PER_LITER)} / lít</small></section><button className="primary-button closeout-button" onClick={onFinish}>Kết thúc ca</button></div>;
 }
 
 function getCandidates(entries: CompletedStop[], rows: OutboxRecord[]): DeliveryCandidate[] {
