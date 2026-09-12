@@ -194,6 +194,15 @@ export class PaymentsService {
     return rows.map((row) => this.serializePrice(row));
   }
 
+  /** Đơn giá đang hiệu lực (effectiveTo = null) — dùng cho box "Giá dầu hôm nay" phía Merchant. */
+  async getCurrentOilPrice() {
+    const current = await this.prisma.oilPrice.findFirst({
+      where: { effectiveTo: null },
+      orderBy: { effectiveFrom: 'desc' },
+    });
+    return current ? this.serializePrice(current) : null;
+  }
+
   async createOilPrice(input: OilPriceCreateInput, actorUserId: string) {
     const effectiveFrom = input.effective_from ?? new Date();
     try {

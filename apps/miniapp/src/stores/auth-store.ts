@@ -5,6 +5,7 @@ import { authUserStorage, tokenStorage } from '../lib/storage';
 import { setOutboxOwner } from '../lib/outbox-db';
 import { isValidAuthSession, isValidAuthUser } from '../components/login-screen-logic';
 import { consumeZaloOAuthCode } from '../lib/oauth-callback';
+import { DEMO_MERCHANT_USER, isDemoOfflineMode } from '../lib/demo-fixtures';
 
 interface AuthState {
   user: AuthUser | null;
@@ -16,6 +17,7 @@ interface AuthState {
   loginWithZalo: (accessToken: string) => Promise<void>;
   acceptCollectorInvite: (code: string) => Promise<void>;
   signOut: () => Promise<void>;
+  patchUser: (patch: Partial<AuthUser>) => void;
 }
 
 function applyUserScope(user: AuthUser | null): void {
@@ -72,6 +74,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   error: null,
   hydrate: () => {
     if (hydratePromise) return hydratePromise;
+    if (isDemoOfflineMode()) {
+      applyUserScope(DEMO_MERCHANT_USER);
+      set({ user: DEMO_MERCHANT_USER, hydrated: true, busy: false, error: null });
+      hydratePromise = Promise.resolve();
+      return hydratePromise;
+    }
     set({ hydrated: false, busy: true, error: null });
     hydratePromise = (async () => {
       const cachedUser = authUserStorage.load();
@@ -206,6 +214,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     clearSession();
     set({ user: null, busy: false, error: null, hydrated: true });
+  },
+  patchUser: (patch) => {
+    set((state) => {
+      if (!state.user) return state;
+      const updated = { ...state.user, ...patch };
+      persistUser(updated);
+      return { user: updated };
+    });
   },
 }));
 

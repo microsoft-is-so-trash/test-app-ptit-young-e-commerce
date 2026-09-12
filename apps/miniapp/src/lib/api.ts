@@ -12,9 +12,11 @@ import type {
   CollectionRouteCancelResponse,
   GeoPoint,
   MerchantDashboardResponse,
+  MerchantGreenJourneyResponse,
   MerchantTransaction,
   MerchantRegistrationRequest,
   MerchantOnboardingRequest,
+  OilPriceRecord,
   PagedResponse,
   PaymentListResponse,
   SyncBatchResponse,
@@ -24,6 +26,16 @@ import type {
 } from '@eco-oil/shared-types';
 import { tokenStorage } from './storage';
 import { resolveApiBaseUrl } from './api-base-url';
+import {
+  DEMO_DASHBOARD,
+  DEMO_GREEN_JOURNEY,
+  DEMO_OIL_PRICE,
+  DEMO_ORDERS,
+  DEMO_PAYMENTS,
+  DEMO_TRANSACTIONS,
+  demoReadyOrder,
+  isDemoOfflineMode,
+} from './demo-fixtures';
 
 export const API_BASE_URL = resolveApiBaseUrl(import.meta.env?.MODE ?? 'test', import.meta.env?.VITE_API_BASE_URL);
 
@@ -195,7 +207,9 @@ export const api = {
     request<{ status: string; merchant: unknown }>('/merchants/register', { method: 'POST', body: payload, retry: false }),
   registrationWards: () => request<AdminWardSummary[]>('/merchants/register/wards', { retry: false }),
   updateMerchant: (id: string, payload: Partial<MerchantRegistrationRequest>) =>
-    request<unknown>(`/merchants/${id}`, { method: 'PATCH', body: payload }),
+    isDemoOfflineMode()
+      ? Promise.resolve({ status: 'ok', merchant: { id, ...payload } })
+      : request<unknown>(`/merchants/${id}`, { method: 'PATCH', body: payload }),
   loginSeed: (zaloId: string, phone: string) =>
     request<AuthSession>('/auth/zalo', {
       method: 'POST',
@@ -229,25 +243,52 @@ export const api = {
     }),
   logout: (refreshToken?: string) => request<{ success: true }>('/auth/logout', { method: 'POST', ...(refreshToken ? { body: { refresh_token: refreshToken } } : {}), retry: false }),
   me: () => request<AuthUser>('/auth/me'),
-  dashboard: () => request<MerchantDashboardResponse>('/merchants/me/dashboard'),
+  dashboard: () =>
+    isDemoOfflineMode() ? Promise.resolve(DEMO_DASHBOARD) : request<MerchantDashboardResponse>('/merchants/me/dashboard'),
+  greenJourney: () =>
+    isDemoOfflineMode() ? Promise.resolve(DEMO_GREEN_JOURNEY) : request<MerchantGreenJourneyResponse>('/merchants/me/green-journey'),
+  currentOilPrice: () =>
+    isDemoOfflineMode() ? Promise.resolve(DEMO_OIL_PRICE) : request<OilPriceRecord | null>('/merchants/me/oil-price'),
   createReadyOrder: (expectedLiters?: number) =>
-    request<CollectionOrderResponse>('/orders/ready', {
-      method: 'POST',
-      body: expectedLiters === undefined ? {} : { expected_liters: expectedLiters },
-    }),
+    isDemoOfflineMode()
+      ? Promise.resolve(demoReadyOrder(expectedLiters))
+      : request<CollectionOrderResponse>('/orders/ready', {
+          method: 'POST',
+          body: expectedLiters === undefined ? {} : { expected_liters: expectedLiters },
+        }),
   transactions: (page: number, limit = 10, from?: string, to?: string) => {
+    if (isDemoOfflineMode()) {
+      const filtered = from || to
+        ? DEMO_TRANSACTIONS.filter((txn) => (!from || txn.collected_at >= from) && (!to || txn.collected_at <= to))
+        : DEMO_TRANSACTIONS;
+      return Promise.resolve({ data: filtered, meta: { page, limit, total: filtered.length } });
+    }
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (from) params.set('from', from);
     if (to) params.set('to', to);
     return request<PagedResponse<MerchantTransaction>>(`/merchants/me/transactions?${params.toString()}`);
   },
   payments: (period?: string, page = 1, limit = 50) => {
+    if (isDemoOfflineMode()) {
+      const data = period ? DEMO_PAYMENTS.data.filter((payment) => payment.period === period) : DEMO_PAYMENTS.data;
+      return Promise.resolve({
+        data,
+        meta: { page: 1, limit: data.length, total: data.length },
+        totals: {
+          liters: data.reduce((sum, payment) => sum + payment.liters, 0),
+          amount: data.reduce((sum, payment) => sum + payment.amount, 0),
+        },
+      });
+    }
     const params = new URLSearchParams({ page: String(page), limit: String(limit) });
     if (period) params.set('period', period);
     return request<PaymentListResponse>(`/merchants/me/payments?${params.toString()}`);
   },
-  orders: () => request<PagedResponse<CollectionOrderResponse>>('/orders/me?page=1&limit=50'),
-  cancelOrder: (orderId: string) => request<CollectionOrderResponse>(`/orders/${orderId}/cancel`, { method: 'POST' }),
+  orders: () => (isDemoOfflineMode() ? Promise.resolve(DEMO_ORDERS) : request<PagedResponse<CollectionOrderResponse>>('/orders/me?page=1&limit=50')),
+  cancelOrder: (orderId: string) =>
+    isDemoOfflineMode()
+      ? Promise.resolve({ ...DEMO_ORDERS.data[0], id: orderId, status: 'CANCELLED' as CollectionOrderResponse['status'], cancelled_at: new Date().toISOString() })
+      : request<CollectionOrderResponse>(`/orders/${orderId}/cancel`, { method: 'POST' }),
   currentRoute: (location?: GeoPoint) => {
     const query = location ? `?lat=${location.lat}&lng=${location.lng}` : '';
     return request<CurrentRouteResponse>(`/routes/current${query}`);

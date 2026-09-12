@@ -9,6 +9,24 @@ import { WebZaloLoginLink } from './WebZaloLoginLink';
 import { COLLECTOR_INVITE_PARAM, getStoredCollectorInvite } from '../lib/collector-invite';
 import { Icon } from './Icon';
 
+const ONBOARDING_STEPS = [
+  {
+    icon: 'inventory_2',
+    title: 'Nhận can chứa dầu',
+    description: 'ECOllect giao can chuẩn ISCC-EU miễn phí đến tận quán để bắt đầu lưu trữ dầu ăn đã qua sử dụng.',
+  },
+  {
+    icon: 'propane_tank',
+    title: 'Lưu trữ dầu đã qua sử dụng',
+    description: 'Đổ dầu thải vào can sau mỗi lần chế biến, đậy kín và để nơi khô ráo chờ đến lịch thu gom.',
+  },
+  {
+    icon: 'local_shipping',
+    title: 'Gọi Eco Oil đến thu gom',
+    description: 'Báo "Sẵn sàng thu gom" ngay trên app khi can gần đầy, đội thu gom sẽ đến cân và thanh toán minh bạch.',
+  },
+];
+
 export function LoginScreen() {
   const demoModeEnabled = import.meta.env.VITE_DEMO_MODE === 'true';
   const [selectedId, setSelectedId] = useState('');
@@ -22,6 +40,8 @@ export function LoginScreen() {
   const loginWithZalo = useAuthStore((state) => state.loginWithZalo);
   const hydrate = useAuthStore((state) => state.hydrate);
   const [registering, setRegistering] = useState(false);
+  const [onboardingDone, setOnboardingDone] = useState(false);
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [registerForm, setRegisterForm] = useState({
     zalo_id: 'zalo_merchant_new_01',
@@ -236,13 +256,79 @@ export function LoginScreen() {
 
       {/* Registration Toggle */}
       {demoModeEnabled ? (
-        <button className="btn-ghost" style={{ margin: '12px auto 0', display: 'flex' }} onClick={() => setRegistering(!registering)}>
+        <button
+          className="btn-ghost"
+          style={{ margin: '12px auto 0', display: 'flex' }}
+          onClick={() => {
+            const next = !registering;
+            setRegistering(next);
+            setOnboardingStep(0);
+            setOnboardingDone(false);
+          }}
+        >
           {registering ? 'Quay lại đăng nhập' : 'Đăng ký quán mới'}
         </button>
       ) : null}
 
+      {/* Onboarding: 3-step welcome before registration */}
+      {demoModeEnabled && registering && !onboardingDone && (
+        <section className="dev-login-card approval-form">
+          <p className="section-label">Chào mừng đến ECOllect</p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '8px 0 4px' }}>
+            <div style={{
+              width: 64,
+              height: 64,
+              borderRadius: '50%',
+              background: 'var(--primary-container, rgba(15, 92, 31, 0.12))',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--primary)',
+            }}>
+              <Icon name={ONBOARDING_STEPS[onboardingStep].icon} size={32} />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>
+                Bước {onboardingStep + 1}/{ONBOARDING_STEPS.length}
+              </span>
+              <h3 style={{ margin: '4px 0', fontFamily: 'var(--font-label)', fontWeight: 700 }}>
+                {ONBOARDING_STEPS[onboardingStep].title}
+              </h3>
+              <p className="text-body-sm" style={{ color: 'var(--on-surface-variant)' }}>
+                {ONBOARDING_STEPS[onboardingStep].description}
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              {ONBOARDING_STEPS.map((step, index) => (
+                <span
+                  key={step.title}
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: index === onboardingStep ? 'var(--primary)' : 'var(--surface-container)',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          <button
+            className="btn btn-primary btn-full"
+            onClick={() => {
+              if (onboardingStep < ONBOARDING_STEPS.length - 1) {
+                setOnboardingStep(onboardingStep + 1);
+              } else {
+                setOnboardingDone(true);
+              }
+            }}
+          >
+            {onboardingStep < ONBOARDING_STEPS.length - 1 ? 'Tiếp tục' : 'Bắt đầu đăng ký'}
+          </button>
+        </section>
+      )}
+
       {/* Registration Form */}
-      {demoModeEnabled && registering && (
+      {demoModeEnabled && registering && onboardingDone && (
         <section className="dev-login-card approval-form">
           <p className="section-label">Đăng ký quán</p>
           <label className="form-label">

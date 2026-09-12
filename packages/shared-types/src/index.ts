@@ -203,6 +203,18 @@ export interface MerchantDashboardResponse {
   last_collected_at: string | null;
 }
 
+/** Dữ liệu cho tab "Hành trình xanh": xếp hạng ẩn danh + tổng lít/số lần thu gom trọn đời. */
+export interface MerchantGreenJourneyResponse {
+  joined_at: string;
+  total_liters: number;
+  total_collections: number;
+  liters_this_month: number;
+  rank: number;
+  total_merchants: number;
+  /** Số bậc tăng (dương)/giảm (âm) so với tháng trước; null nếu tháng trước chưa có dữ liệu. */
+  rank_change: number | null;
+}
+
 export interface PaymentRecord {
   id: string;
   merchant_id: string;

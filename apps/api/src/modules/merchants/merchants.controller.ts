@@ -43,6 +43,12 @@ export class MerchantsController {
   }
 
   @Roles(Role.MERCHANT)
+  @Get('me/green-journey')
+  greenJourney(@CurrentUser() user: AccessTokenPayload) {
+    return this.service.greenJourney(user);
+  }
+
+  @Roles(Role.MERCHANT)
   @Get('me/transactions')
   transactions(@CurrentUser() user: AccessTokenPayload, @Query() query: Record<string, unknown>) {
     return this.service.transactions(user, collectionListQuerySchema.parse(query));

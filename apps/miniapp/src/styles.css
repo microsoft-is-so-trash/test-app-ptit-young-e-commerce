@@ -254,6 +254,42 @@ h1, h2, h3, h4, h5, h6, p { margin: 0; }
   background: var(--surface-container-high);
   color: var(--on-surface);
 }
+.notification-trigger { position: relative; }
+.notification-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  border-radius: var(--radius-full);
+  background: var(--error, #b3261e);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.notification-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--surface-container-lowest);
+  cursor: pointer;
+}
+.notification-row.read { opacity: 0.6; }
+.notification-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  margin-top: 4px;
+  flex-shrink: 0;
+}
 .header-avatar {
   width: 34px;
   height: 34px;

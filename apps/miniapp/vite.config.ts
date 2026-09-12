@@ -18,6 +18,9 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_DEVICE_CLIENT_MODE': JSON.stringify(
         env.VITE_DEVICE_CLIENT_MODE || '',
       ),
+      'import.meta.env.VITE_DEMO_OFFLINE_MERCHANT': JSON.stringify(
+        env.VITE_DEMO_OFFLINE_MERCHANT || 'false',
+      ),
     },
     resolve: {
       alias: {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DEFAULT_DENSITY_KG_PER_LITER } from '@eco-oil/shared-types';
+import { DEFAULT_DENSITY_KG_PER_LITER, PriceUnit } from '@eco-oil/shared-types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from '../lib/api';
 import { currentVietnamWeek, fillPercent, formatCurrency, formatDate, formatLiters } from '../lib/formatters';
@@ -18,6 +18,7 @@ export function HomePage() {
   const [showMoney, setShowMoney] = useState(true);
   const identityKey = user?.id ?? 'unknown';
   const dashboard = useQuery({ queryKey: ['merchant-dashboard', identityKey], queryFn: api.dashboard });
+  const oilPrice = useQuery({ queryKey: ['merchant-oil-price', identityKey], queryFn: api.currentOilPrice });
   const week = currentVietnamWeek();
   const weeklyPayments = useQuery({ queryKey: ['merchant-payments', identityKey, week.period], queryFn: () => api.payments(week.period) });
   const weeklyTransactions = useQuery({ queryKey: ['merchant-transactions', identityKey, week.period], queryFn: () => api.transactions(1, 100, week.from, week.to) });
@@ -125,6 +126,34 @@ export function HomePage() {
           Cloudflare GPS Relay: <strong className="gps-banner-status">Kết nối ổn định</strong>
         </span>
       </div>
+
+      {/* Today's Oil Price */}
+      {oilPrice.data ? (
+        <div className="info-card">
+          <div className="section-heading">
+            <div className="section-heading-left">
+              <div className="section-icon">
+                <Icon name="price_check" size={20} />
+              </div>
+              <h3 className="section-title">Giá dầu hôm nay</h3>
+            </div>
+          </div>
+          <div className="sub-card" style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span className="text-headline-md" style={{ color: 'var(--primary)' }}>
+                {formatCurrency(oilPrice.data.unit_price)}
+                <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)', fontWeight: 400 }}>
+                  {oilPrice.data.unit === PriceUnit.PER_KG ? '/kg' : '/lít'}
+                </span>
+              </span>
+              <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>
+                Cập nhật: {formatDate(oilPrice.data.effective_from)}
+              </span>
+            </div>
+            <span className="badge badge-success">Minh bạch</span>
+          </div>
+        </div>
+      ) : null}
 
       {/* Container Section */}
       <div className="info-card">

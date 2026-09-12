@@ -61,3 +61,14 @@ export class MerchantPaymentsController {
     return this.service.listMerchant(user, merchantPaymentListQuerySchema.parse(query));
   }
 }
+
+@Controller('merchants/me/oil-price')
+export class MerchantOilPriceController {
+  constructor(@Inject(PaymentsService) private readonly service: PaymentsService) {}
+
+  @Roles(Role.MERCHANT)
+  @Get()
+  current() {
+    return this.service.getCurrentOilPrice();
+  }
+}

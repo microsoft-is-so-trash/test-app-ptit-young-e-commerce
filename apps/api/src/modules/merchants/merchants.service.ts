@@ -11,6 +11,7 @@ import type {
 } from '@eco-oil/validation';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { AccessTokenPayload } from '../auth/auth.types';
+import { computeMerchantRanking, type MerchantLitersEntry } from './merchant-ranking';
 
 @Injectable()
 export class MerchantsService {
@@ -92,6 +93,71 @@ export class MerchantsService {
       container_count: 0,
       collector_count: 0,
     }));
+  }
+
+  /**
+   * Dữ liệu cho tab "Hành trình xanh": ngày tham gia, tổng lít/số lần thu gom trọn đời của
+   * chính quán, và xếp hạng ẩn danh so với các quán khác (chỉ số thứ hạng + tổng số quán,
+   * không lộ tên hay số liệu của quán khác) — tính theo lít thu gom trong tháng hiện tại.
+   */
+  async greenJourney(user: AccessTokenPayload) {
+    const merchant = await this.prisma.merchant.findUnique({ where: { userId: user.sub } });
+    if (!merchant || merchant.status === EntityStatus.INACTIVE) {
+      throw new NotFoundException('Merchant profile not found');
+    }
+    this.ensureApproved(merchant.approvalStatus);
+
+    const now = new Date();
+    const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    const previousMonthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+
+    const [activeMerchants, currentMonthGroups, previousMonthGroups, lifetime] = await Promise.all([
+      this.prisma.merchant.findMany({
+        where: { status: EntityStatus.ACTIVE, approvalStatus: MerchantApprovalStatus.APPROVED, deletedAt: null },
+        select: { id: true },
+      }),
+      this.prisma.collectionTransaction.groupBy({
+        by: ['merchantId'],
+        where: { collectedAt: { gte: monthStart }, deletedAt: null },
+        _sum: { actualLiters: true },
+      }),
+      this.prisma.collectionTransaction.groupBy({
+        by: ['merchantId'],
+        where: { collectedAt: { gte: previousMonthStart, lt: monthStart }, deletedAt: null },
+        _sum: { actualLiters: true },
+      }),
+      this.prisma.collectionTransaction.aggregate({
+        where: { merchantId: merchant.id, deletedAt: null },
+        _sum: { actualLiters: true },
+        _count: true,
+      }),
+    ]);
+
+    const currentByMerchant = new Map(currentMonthGroups.map((row) => [row.merchantId, Number(row._sum.actualLiters ?? 0)]));
+    const currentEntries: MerchantLitersEntry[] = activeMerchants.map((row) => ({
+      merchant_id: row.id,
+      liters: currentByMerchant.get(row.id) ?? 0,
+    }));
+    if (!currentEntries.some((entry) => entry.merchant_id === merchant.id)) {
+      // Phòng trường hợp trạng thái quán vừa đổi ngay lúc tính — luôn đảm bảo chính quán có mặt.
+      currentEntries.push({ merchant_id: merchant.id, liters: currentByMerchant.get(merchant.id) ?? 0 });
+    }
+    const previousEntries: MerchantLitersEntry[] = previousMonthGroups.map((row) => ({
+      merchant_id: row.merchantId,
+      liters: Number(row._sum.actualLiters ?? 0),
+    }));
+
+    const ranking = computeMerchantRanking(currentEntries, previousEntries, merchant.id);
+
+    return {
+      joined_at: merchant.createdAt.toISOString(),
+      total_liters: lifetime._sum.actualLiters === null ? 0 : Number(lifetime._sum.actualLiters),
+      total_collections: lifetime._count,
+      liters_this_month: ranking.liters_this_month,
+      rank: ranking.rank,
+      total_merchants: ranking.total,
+      rank_change: ranking.rank_change,
+    };
   }
 
   async me(user: AccessTokenPayload) {

@@ -5,6 +5,11 @@ import { useAuthStore } from '../stores/auth-store';
 import { StatusView } from '../components/StatusView';
 import { Icon } from '../components/Icon';
 import { fillPercent } from '../lib/formatters';
+import { EditMerchantInfoSheet } from '../components/EditMerchantInfoSheet';
+import { RequestContainerSheet } from '../components/RequestContainerSheet';
+import { MockPaymentQr } from '../components/MockPaymentQr';
+import { DEMO_REFERRAL_STATS, isDemoOfflineMode } from '../lib/demo-fixtures';
+import { buildReferralShareText, deriveReferralCode } from '../lib/referral';
 
 export function AccountPage() {
   const user = useAuthStore((state) => state.user);
@@ -14,6 +19,9 @@ export function AccountPage() {
 
   const [toggleOA, setToggleOA] = useState(true);
   const [toggleCap, setToggleCap] = useState(true);
+  const [editingInfo, setEditingInfo] = useState(false);
+  const [requestingContainer, setRequestingContainer] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
   if (dashboard.isPending) return <StatusView title="Đang tải thông tin tài khoản…" />;
   if (dashboard.isError) return <StatusView title="Chưa tải được dữ liệu" message="Kiểm tra kết nối rồi thử lại nhé." action={{ label: 'Thử lại', onClick: () => { void dashboard.refetch(); } }} />;
@@ -21,6 +29,27 @@ export function AccountPage() {
   const data = dashboard.data;
   const container = data.containers[0];
   const percentage = container ? fillPercent(container.estimated_liters, container.capacity_l) : 0;
+  const referralCode = user ? deriveReferralCode(user.id) : '';
+  const referralStats = isDemoOfflineMode() ? DEMO_REFERRAL_STATS : { invitedCount: 0, redeemedCount: 0 };
+
+  async function handleShareReferral() {
+    const text = buildReferralShareText(referralCode);
+    const shareApi = navigator.share as ((data: { title?: string; text?: string }) => Promise<void>) | undefined;
+    if (shareApi) {
+      try {
+        await shareApi({ title: 'ECOllect', text });
+        return;
+      } catch {
+        // User cancelled the native share sheet; fall through to clipboard copy.
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setNotice('Đã sao chép nội dung mời vào bộ nhớ tạm');
+    } catch {
+      setNotice(`Mã giới thiệu của bạn: ${referralCode}`);
+    }
+  }
 
   return (
     <div className="page-content">
@@ -35,6 +64,13 @@ export function AccountPage() {
         </div>
         <h1 className="page-title">Cài đặt & Hồ sơ</h1>
       </div>
+
+      {notice ? (
+        <div className="notice notice-success" role="status">
+          <Icon name="check_circle" size={18} />
+          <span>{notice}</span>
+        </div>
+      ) : null}
 
       {/* Hero Profile Card */}
       <div className="account-hero">
@@ -71,7 +107,7 @@ export function AccountPage() {
           </div>
 
           {/* Edit button */}
-          <button className="btn btn-surface btn-full" style={{ marginTop: 4 }}>
+          <button className="btn btn-surface btn-full" style={{ marginTop: 4 }} onClick={() => setEditingInfo(true)}>
             <span>Chỉnh sửa thông tin cơ sở</span>
             <Icon name="arrow_forward" size={18} />
           </button>
@@ -129,7 +165,7 @@ export function AccountPage() {
           </div>
         )}
 
-        <button className="btn btn-secondary btn-full" style={{ fontSize: 12 }}>
+        <button className="btn btn-secondary btn-full" style={{ fontSize: 12 }} onClick={() => setRequestingContainer(true)}>
           <Icon name="add_circle" size={18} />
           <span>Đăng ký cấp thêm can chuẩn (Yêu cầu trạm)</span>
         </button>
@@ -170,11 +206,43 @@ export function AccountPage() {
             <Icon name="flash_on" size={18} style={{ color: 'var(--secondary)' }} />
             <span>Hỗ trợ VietQR 247 & Ví ZaloPay Merchant (Quyết toán tức thì).</span>
           </div>
+
+          <MockPaymentQr accountName={user?.name ?? 'Quán của bạn'} />
         </div>
 
         <button className="btn btn-secondary btn-full" style={{ fontSize: 12 }}>
           <Icon name="credit_card" size={18} />
           <span>Thay đổi tài khoản thụ hưởng</span>
+        </button>
+      </div>
+
+      {/* Referral */}
+      <div className="info-card">
+        <div className="section-heading">
+          <div className="section-heading-left">
+            <div className="section-icon">
+              <Icon name="group_add" size={20} />
+            </div>
+            <h3 className="section-title">Mời bạn bè tham gia ECOllect</h3>
+          </div>
+        </div>
+        <div className="sub-card">
+          <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>
+            Giới thiệu quán ăn khác tham gia ECOllect để cùng thu gom dầu minh bạch.
+          </span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--surface-container-lowest)' }}>
+            <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--primary)', letterSpacing: '0.05em' }}>{referralCode}</span>
+            <span className="badge badge-surface">Mã của bạn</span>
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>
+              Đã mời <strong style={{ color: 'var(--on-surface)' }}>{referralStats.invitedCount}</strong> quán · Đã tham gia <strong style={{ color: 'var(--on-surface)' }}>{referralStats.redeemedCount}</strong> quán
+            </span>
+          </div>
+        </div>
+        <button className="btn btn-primary btn-full" style={{ fontSize: 12 }} onClick={() => void handleShareReferral()}>
+          <Icon name="share" size={18} />
+          <span>Chia sẻ mã mời</span>
         </button>
       </div>
 
@@ -259,6 +327,29 @@ export function AccountPage() {
           <span>ĐĂNG XUẤT TÀI KHOẢN QUÁN</span>
         </button>
       </div>
+
+      {editingInfo && user?.merchantId ? (
+        <EditMerchantInfoSheet
+          merchantId={user.merchantId}
+          initialName={user.name ?? ''}
+          initialPhone={user.phone ?? ''}
+          onClose={() => setEditingInfo(false)}
+          onSaved={() => {
+            setEditingInfo(false);
+            setNotice('Đã lưu thông tin cơ sở');
+          }}
+        />
+      ) : null}
+
+      {requestingContainer ? (
+        <RequestContainerSheet
+          onClose={() => setRequestingContainer(false)}
+          onSubmitted={(quantity) => {
+            setRequestingContainer(false);
+            setNotice(`Đã gửi yêu cầu cấp thêm ${quantity} can. ECOllect sẽ liên hệ trong 1-2 ngày làm việc.`);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
