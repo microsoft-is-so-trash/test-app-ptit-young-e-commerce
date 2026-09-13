@@ -165,6 +165,25 @@ export const merchantPaymentListQuerySchema = paginationSchema.extend({
 });
 export type MerchantPaymentListQueryInput = z.infer<typeof merchantPaymentListQuerySchema>;
 
+/** Người thu gom tự sửa hồ sơ của mình. Địa bàn và trạng thái vẫn do admin quản lý. */
+export const collectorSelfUpdateSchema = z
+  .object({
+    display_name: z.string().trim().min(1).max(200).optional(),
+    contact_phone: phoneSchema.nullable().optional(),
+    vehicle_type: z.string().trim().min(1).max(120).nullable().optional(),
+    max_capacity_l: z.number().finite().positive().max(10000).optional(),
+  })
+  .refine((value) => Object.keys(value).length > 0, { message: 'Không có thông tin nào để cập nhật' });
+export type CollectorSelfUpdateInput = z.infer<typeof collectorSelfUpdateSchema>;
+
+/** Các điểm READY quanh người thu gom: giới hạn theo phường phụ trách và bán kính. */
+export const collectorNearbyOrdersQuerySchema = z.object({
+  lat: vietnamLatitudeSchema.optional(),
+  lng: vietnamLongitudeSchema.optional(),
+  radius_m: z.coerce.number().int().positive().max(50000).default(5000),
+});
+export type CollectorNearbyOrdersQueryInput = z.infer<typeof collectorNearbyOrdersQuerySchema>;
+
 export const oilPriceCreateSchema = z.object({
   unit_price: z.number().finite().positive().max(1_000_000_000),
   unit: z.nativeEnum(PriceUnit).default(PriceUnit.PER_LITER),

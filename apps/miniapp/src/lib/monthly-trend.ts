@@ -11,8 +11,11 @@ function monthKeyOf(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 }
 
+/** Chỉ cần thời điểm thu và số lít, nên dùng được cho cả giao dịch của quán lẫn của người thu gom. */
+type MonthlyTrendInput = Pick<MerchantTransaction, 'collected_at' | 'actual_liters'>;
+
 export function buildMonthlyTrend(
-  transactions: MerchantTransaction[],
+  transactions: MonthlyTrendInput[],
   monthsBack: number,
   co2KgPerLiter: number,
   now = new Date(),

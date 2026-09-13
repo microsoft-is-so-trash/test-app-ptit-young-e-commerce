@@ -1,6 +1,8 @@
 import { ContainerState, DeliveryStatus, EntityStatus, MassSource, OilGrade, Quality } from '@eco-oil/shared-types';
 import type {
   CollectionCreateRequest,
+  CollectorNearbyOrder,
+  CollectorProfileResponse,
   CollectionTransactionResponse,
   ContainerLookupResponse,
   CurrentRouteResponse,
@@ -302,7 +304,9 @@ export function demoCollectorHistory(): CollectionTransactionResponse[] {
     const stop = DEMO_STOPS[entry.stop];
     const collectedAt = new Date(Date.now() - entry.daysAgo * 86_400_000 - index * 3_600_000).toISOString();
     const grade = index % 4 === 3 ? OilGrade.B : OilGrade.A;
-    return demoCollectionResponse({
+    // Mỗi ngày làm việc tương ứng một ca, dùng để đếm số ca ở tab Thống kê.
+    return {
+      ...demoCollectionResponse({
       client_uuid: `demo-history-${index + 1}`,
       order_id: stop.order_id,
       container_code: stop.container_code,
@@ -314,6 +318,88 @@ export function demoCollectorHistory(): CollectionTransactionResponse[] {
       geo: { lat: stop.merchant.lat, lng: stop.merchant.lng },
       photos: [],
       collected_at: collectedAt,
-    });
+      }),
+      route_id: `demo-route-${entry.daysAgo}`,
+    };
   });
+}
+
+/** Hồ sơ demo, cho phép sửa tại chỗ để xem luồng chỉnh sửa mà không cần backend. */
+const demoProfiles = new Map<string, CollectorProfileResponse>();
+
+function baseProfile(collectorId: string | null): CollectorProfileResponse {
+  const isSecond = collectorId === 'demo-collector-002';
+  return {
+    id: collectorId ?? 'demo-collector-001',
+    display_name: isSecond ? 'Trần Thị Hằng' : 'Nguyễn Văn Thu',
+    contact_phone: isSecond ? '0976543210' : '0987654321',
+    vehicle_type: isSecond ? 'Xe máy có thùng' : 'Xe tải nhỏ 500kg',
+    max_capacity_l: VEHICLE_CAPACITY_LITERS,
+    status: EntityStatus.ACTIVE,
+    last_seen_at: new Date().toISOString(),
+    wards: [{ id: 'demo-ward-01', code: '00091', name: 'Phường Hàng Bài', district: 'Hoàn Kiếm' }],
+  };
+}
+
+export function demoCollectorProfile(collectorId: string | null): CollectorProfileResponse {
+  const key = collectorId ?? 'demo-collector-001';
+  const existing = demoProfiles.get(key);
+  if (existing) return existing;
+  const fresh = baseProfile(collectorId);
+  demoProfiles.set(key, fresh);
+  return fresh;
+}
+
+export function demoUpdateCollectorProfile(
+  collectorId: string | null,
+  patch: Partial<Pick<CollectorProfileResponse, 'display_name' | 'contact_phone' | 'vehicle_type' | 'max_capacity_l'>>,
+): CollectorProfileResponse {
+  const key = collectorId ?? 'demo-collector-001';
+  const updated = { ...demoCollectorProfile(collectorId), ...patch };
+  demoProfiles.set(key, updated);
+  return updated;
+}
+
+/** Điểm chờ thu quanh địa bàn: gồm cả điểm trong tuyến và điểm ngoài tuyến. */
+export function demoNearbyOrders(collectorId: string | null): CollectorNearbyOrder[] {
+  const inRoute = collectorId !== 'demo-collector-002';
+  const extras: Array<{ name: string; address: string; liters: number; latOffset: number; lngOffset: number; distance: number }> = [
+    { name: 'Lẩu nướng Bà Tư', address: '9 Lý Thường Kiệt, Hoàn Kiếm, Hà Nội', liters: 16, latOffset: 0.0051, lngOffset: 0.0037, distance: 1620 },
+    { name: 'Cháo sườn Hàng Bồ', address: '31 Hàng Bồ, Hoàn Kiếm, Hà Nội', liters: 7, latOffset: -0.0063, lngOffset: 0.0014, distance: 2380 },
+    { name: 'Bánh mì Hoà Mã', address: '53 Hàng Bài, Hoàn Kiếm, Hà Nội', liters: 11, latOffset: 0.0019, lngOffset: -0.0071, distance: 3110 },
+  ];
+
+  const routeStops: CollectorNearbyOrder[] = inRoute
+    ? DEMO_STOPS.map((stop) => ({
+        order_id: stop.order_id,
+        merchant_name: stop.merchant.name,
+        address: stop.merchant.address,
+        phone: stop.merchant.phone ?? null,
+        lat: stop.merchant.lat,
+        lng: stop.merchant.lng,
+        expected_liters: stop.expected_liters,
+        container_code: stop.container_code,
+        requested_at: new Date(Date.now() - stop.seq * 3_600_000).toISOString(),
+        distance_m: stop.distance_m,
+        in_current_route: true,
+        ward: { id: 'demo-ward-01', name: 'Phường Hàng Bài', district: 'Hoàn Kiếm' },
+      }))
+    : [];
+
+  const outside: CollectorNearbyOrder[] = extras.map((entry, index) => ({
+    order_id: `demo-nearby-${index + 1}`,
+    merchant_name: entry.name,
+    address: entry.address,
+    phone: null,
+    lat: WARD_CENTER.lat + entry.latOffset,
+    lng: WARD_CENTER.lng + entry.lngOffset,
+    expected_liters: entry.liters,
+    container_code: null,
+    requested_at: new Date(Date.now() - (index + 5) * 3_600_000).toISOString(),
+    distance_m: entry.distance,
+    in_current_route: false,
+    ward: { id: 'demo-ward-01', name: 'Phường Hàng Bài', district: 'Hoàn Kiếm' },
+  }));
+
+  return [...routeStops, ...outside].sort((a, b) => (a.distance_m ?? 0) - (b.distance_m ?? 0));
 }

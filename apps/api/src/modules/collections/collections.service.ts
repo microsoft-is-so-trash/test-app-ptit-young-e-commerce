@@ -424,11 +424,16 @@ export class CollectionsService {
     const from = query.from ?? null;
     const to = query.to ?? null;
     const [rows, countRows] = await Promise.all([
-      this.prisma.$queryRaw<CollectionRow[]>`
+      this.prisma.$queryRaw<Array<CollectionRow & { route_id: string | null }>>`
         SELECT ct."id", ct."client_uuid", ct."order_id", ct."container_id", ct."merchant_id", ct."collector_id",
           ct."actual_liters"::float8 AS "actual_liters", ct."actual_kg"::float8 AS "actual_kg", ct."mass_source"::text AS "mass_source", ct."density_factor"::float8 AS "density_factor", ct."grade"::text AS "grade", ct."grade_photo_url", ct."grade_note", ct."suspected_adulteration", ct."image_grade_suggestion"::text AS "image_grade_suggestion", ct."image_grade_confidence"::text AS "image_grade_confidence", ct."image_grade_model_version", ct."image_grade_analysis", ct."grade_decision_source"::text AS "grade_decision_source", ct."grade_ai_override_acknowledged", ct."quality"::text AS "quality", ct."photos",
           ct."collected_at", ct."created_at", c."qr_code" AS "container_code",
-          ST_Y(ct."geo_point"::geometry)::float8 AS "geo_lat", ST_X(ct."geo_point"::geometry)::float8 AS "geo_lng"
+          ST_Y(ct."geo_point"::geometry)::float8 AS "geo_lat", ST_X(ct."geo_point"::geometry)::float8 AS "geo_lng",
+          (
+            SELECT rs."route_id" FROM "collection_route_stops" rs
+            WHERE rs."order_id" = ct."order_id"
+            ORDER BY rs."created_at" DESC LIMIT 1
+          ) AS "route_id"
         FROM "collection_transactions" ct
         JOIN "containers" c ON c."id" = ct."container_id"
         WHERE ct."collector_id" = ${collector.id}::uuid
@@ -447,7 +452,10 @@ export class CollectionsService {
           AND (${to}::timestamptz IS NULL OR ct."collected_at" <= ${to})
       `,
     ]);
-    return { data: rows.map((row) => this.serialize(row)), meta: { page: query.page, limit: query.limit, total: countRows[0]?.total ?? 0 } };
+    return {
+      data: rows.map((row) => ({ ...this.serialize(row), route_id: row.route_id })),
+      meta: { page: query.page, limit: query.limit, total: countRows[0]?.total ?? 0 },
+    };
   }
 
   private async loadByClientUuid(tx: Prisma.TransactionClient, clientUuid: string, collectorId?: string): Promise<CollectionRow | null> {

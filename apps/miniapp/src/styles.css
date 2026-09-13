@@ -1865,6 +1865,134 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 }
 .collector-notice-danger .collector-notice-icon { color: var(--error); }
 
+/* ----- Các tab mới của Collector: Lịch, Thống kê, Tài khoản, Bản đồ ----- */
+.collector-schedule-list, .collector-map-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.schedule-day-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: var(--space-sm) 0 6px;
+  font-size: 12px;
+  color: var(--on-surface-variant);
+}
+.schedule-day-heading strong { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); }
+.schedule-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-sm);
+  margin-bottom: 8px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-lowest);
+}
+.schedule-row-seq {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--on-primary);
+  background: var(--primary);
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 700;
+}
+.schedule-row-icon { color: var(--primary); display: flex; }
+.schedule-row-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.schedule-row-body strong { font-family: var(--font-label); font-size: 14px; color: var(--on-surface); }
+.schedule-row-body span { font-size: 12px; color: var(--on-surface-variant); }
+.schedule-row-meta { color: var(--primary); font-weight: 600; }
+
+.collector-stats-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  color: var(--on-primary);
+  background: var(--primary);
+}
+.collector-stats-hero span { font-size: 12px; opacity: 0.85; }
+.collector-stats-hero strong { font-family: var(--font-headline); font-size: 32px; line-height: 40px; }
+.collector-stats-hero small { font-size: 11px; opacity: 0.85; }
+.collector-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+.collector-stat-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-md);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-lowest);
+}
+.collector-stat-cell-top { display: flex; align-items: center; gap: 6px; color: var(--on-surface-variant); font-size: 11px; }
+.collector-stat-cell strong { font-family: var(--font-headline); font-size: 22px; color: var(--on-surface); }
+.collector-stat-cell small { font-size: 11px; color: var(--on-surface-variant); }
+.collector-stats-note p { margin: 0; font-size: 12px; color: var(--on-surface-variant); }
+
+.collector-profile-list { display: flex; flex-direction: column; gap: 2px; margin: 0; }
+.collector-profile-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 9px 0;
+  border-bottom: 1px solid var(--surface-container);
+  font-size: 12px;
+}
+.collector-profile-row:last-child { border-bottom: 0; }
+.collector-profile-row dt { color: var(--on-surface-variant); }
+.collector-profile-row dd { margin: 0; font-family: var(--font-label); font-weight: 700; color: var(--on-surface); text-align: right; }
+.collector-ward-list { display: flex; flex-direction: column; gap: 6px; }
+.collector-ward-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--surface-container-low);
+}
+.collector-ward-row strong { font-family: var(--font-label); font-size: 13px; color: var(--on-surface); }
+.collector-ward-row span { font-size: 11px; color: var(--on-surface-variant); }
+
+.collector-map-canvas {
+  width: 100%;
+  height: 260px;
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  z-index: 0;
+}
+.collector-map-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--outline-variant);
+  border-left: 3px solid var(--outline-variant);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-lowest);
+}
+.collector-map-row-in-route { border-left-color: var(--primary); }
+.collector-map-row-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.collector-map-row-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm); }
+.collector-map-row-top strong { font-family: var(--font-label); font-size: 14px; color: var(--on-surface); }
+.collector-map-row-top span { font-size: 12px; font-weight: 700; color: var(--primary); }
+.collector-map-row-body span { font-size: 12px; color: var(--on-surface-variant); }
+.collector-map-row-meta { color: var(--primary) !important; font-weight: 600; }
+.collector-map-row-actions { display: flex; gap: var(--space-sm); }
+.collector-map-row-actions .btn { flex: 1; min-height: 44px; font-size: 12px; }
+
 /* Collector shell — nền đồng nhất cho toàn nhánh Collector, cô lập khỏi Merchant.
    Chỉ đổi nền (surface/background), không đụng bảng màu của các màn Collector khác. */
 .collector-shell {

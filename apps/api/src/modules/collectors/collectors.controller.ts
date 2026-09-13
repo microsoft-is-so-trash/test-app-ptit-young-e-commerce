@@ -1,12 +1,39 @@
 import { Body, Controller, Get, Inject, Param, Patch, Post, Query } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { adminPersonCreateSchema, adminPersonPatchSchema, entityStatusSchema, personListQuerySchema } from '@eco-oil/validation';
+import {
+  adminPersonCreateSchema,
+  adminPersonPatchSchema,
+  collectorNearbyOrdersQuerySchema,
+  collectorSelfUpdateSchema,
+  entityStatusSchema,
+  personListQuerySchema,
+} from '@eco-oil/validation';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
+import type { AccessTokenPayload } from '../auth/auth.types';
 import { CollectorsService } from './collectors.service';
 
 @Controller('collectors')
 export class CollectorsController {
   constructor(@Inject(CollectorsService) private readonly service: CollectorsService) {}
+
+  @Roles(Role.COLLECTOR)
+  @Get('me')
+  findMine(@CurrentUser() user: AccessTokenPayload) {
+    return this.service.findMine(user);
+  }
+
+  @Roles(Role.COLLECTOR)
+  @Patch('me')
+  updateMine(@CurrentUser() user: AccessTokenPayload, @Body() body: unknown) {
+    return this.service.updateMine(user, collectorSelfUpdateSchema.parse(body));
+  }
+
+  @Roles(Role.COLLECTOR)
+  @Get('me/nearby-orders')
+  nearbyOrders(@CurrentUser() user: AccessTokenPayload, @Query() query: Record<string, unknown>) {
+    return this.service.nearbyOrders(user, collectorNearbyOrdersQuerySchema.parse(query));
+  }
 
   @Roles(Role.ADMIN)
   @Post()

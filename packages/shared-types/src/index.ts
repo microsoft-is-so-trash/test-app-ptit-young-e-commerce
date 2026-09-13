@@ -215,6 +215,35 @@ export interface MerchantGreenJourneyResponse {
   rank_change: number | null;
 }
 
+/** Hồ sơ người thu gom tự xem và tự sửa được. */
+export interface CollectorProfileResponse {
+  id: string;
+  display_name: string;
+  contact_phone: string | null;
+  vehicle_type: string | null;
+  max_capacity_l: number;
+  status: EntityStatus;
+  last_seen_at: string | null;
+  wards: Array<{ id: string; code: string; name: string; district: string }>;
+}
+
+/** Điểm đang chờ thu quanh địa bàn, dùng cho bản đồ của người thu gom. */
+export interface CollectorNearbyOrder {
+  order_id: string;
+  merchant_name: string;
+  address: string | null;
+  phone: string | null;
+  lat: number;
+  lng: number;
+  expected_liters: number | null;
+  container_code: string | null;
+  requested_at: string;
+  distance_m: number | null;
+  /** Điểm này đã nằm trong tuyến đang chạy của người thu gom hay chưa. */
+  in_current_route: boolean;
+  ward: { id: string; name: string; district: string };
+}
+
 export interface PaymentRecord {
   id: string;
   merchant_id: string;
@@ -469,6 +498,8 @@ export interface CollectionTransactionResponse extends Omit<
   image_grade_analysis: OilImageAnalysisPayload | null;
   grade_decision_source: GradeDecisionSource | null;
   grade_ai_override_acknowledged: boolean;
+  /** Chỉ có ở danh sách lịch sử của người thu gom, dùng để đếm số ca đã chạy. */
+  route_id?: string | null;
 }
 
 export interface SyncBatchResult {

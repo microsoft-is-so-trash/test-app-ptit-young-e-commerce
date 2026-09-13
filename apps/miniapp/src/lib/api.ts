@@ -12,6 +12,8 @@ import type {
   CollectionRouteCancelResponse,
   GeoPoint,
   MerchantDashboardResponse,
+  CollectorNearbyOrder,
+  CollectorProfileResponse,
   MerchantGreenJourneyResponse,
   MerchantTransaction,
   MerchantRegistrationRequest,
@@ -44,6 +46,9 @@ import {
   demoRouteForCollector,
   demoStartedRoute,
   demoStationDelivery,
+  demoCollectorProfile,
+  demoNearbyOrders,
+  demoUpdateCollectorProfile,
   demoSyncBatchResponse,
 } from './demo-collector-fixtures';
 import { demoDevAccounts, findDemoAccount } from './demo-accounts';
@@ -360,5 +365,24 @@ export const api = {
     if (from) params.set('from', from);
     if (to) params.set('to', to);
     return request<PagedResponse<CollectionTransactionResponse>>(`/collections/me?${params.toString()}`);
+  },
+  /** Hồ sơ của chính người thu gom, xem và sửa được. */
+  collectorProfile: () =>
+    isDemoOfflineMode()
+      ? Promise.resolve(demoCollectorProfile(demoCollectorId()))
+      : request<CollectorProfileResponse>('/collectors/me'),
+  updateCollectorProfile: (payload: Partial<Pick<CollectorProfileResponse, 'display_name' | 'contact_phone' | 'vehicle_type' | 'max_capacity_l'>>) =>
+    isDemoOfflineMode()
+      ? Promise.resolve(demoUpdateCollectorProfile(demoCollectorId(), payload))
+      : request<CollectorProfileResponse>('/collectors/me', { method: 'PATCH', body: payload }),
+  /** Điểm đang chờ thu quanh địa bàn phụ trách, dùng cho bản đồ. */
+  nearbyOrders: (location?: GeoPoint, radiusM = 5000) => {
+    if (isDemoOfflineMode()) return Promise.resolve(demoNearbyOrders(demoCollectorId()));
+    const params = new URLSearchParams({ radius_m: String(radiusM) });
+    if (location) {
+      params.set('lat', String(location.lat));
+      params.set('lng', String(location.lng));
+    }
+    return request<CollectorNearbyOrder[]>(`/collectors/me/nearby-orders?${params.toString()}`);
   },
 };

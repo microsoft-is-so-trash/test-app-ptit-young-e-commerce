@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { BrandHeader } from '../../components/BrandHeader';
 import { Icon } from '../../components/Icon';
-import { StatusView } from '../../components/StatusView';
 import { CollectorFlow } from '../CollectorFlow';
+import { CollectorMapPage } from './CollectorMapPage';
+import { CollectorSchedulePage } from './CollectorSchedulePage';
+import { CollectorStatsPage } from './CollectorStatsPage';
+import { CollectorAccountPage } from './CollectorAccountPage';
 
 export type CollectorTab = 'route' | 'map' | 'history' | 'stats' | 'account';
 
 const TAB_CONFIG: { key: CollectorTab; icon: string; label: string; title: string }[] = [
   { key: 'route', icon: 'route', label: 'Tuyến', title: 'Tuyến hôm nay' },
   { key: 'map', icon: 'map', label: 'Bản đồ', title: 'Bản đồ điểm thu' },
-  { key: 'history', icon: 'history', label: 'Lịch sử', title: 'Lịch sử thu gom' },
+  { key: 'history', icon: 'event_note', label: 'Lịch', title: 'Lịch thu gom' },
   { key: 'stats', icon: 'insights', label: 'Thống kê', title: 'Thống kê của tôi' },
   { key: 'account', icon: 'manage_accounts', label: 'Tài khoản', title: 'Tài khoản' },
 ];
@@ -45,30 +48,10 @@ export function CollectorShell({ userId, onSignOut }: CollectorShellProps) {
               onScreenChange={(screen) => setFocusedScreen(FOCUSED_SCREENS.has(screen))}
             />
           ) : null}
-          {tab === 'map' ? (
-            <StatusView
-              title="Bản đồ điểm thu gom"
-              message="Sắp có: xem các điểm cần thu quanh địa bàn bạn phụ trách ngay trên bản đồ."
-            />
-          ) : null}
-          {tab === 'history' ? (
-            <StatusView
-              title="Lịch sử thu gom"
-              message="Sắp có: toàn bộ giao dịch bạn đã thu, lọc theo ngày và xem chi tiết từng can."
-            />
-          ) : null}
-          {tab === 'stats' ? (
-            <StatusView
-              title="Thống kê của tôi"
-              message="Sắp có: tổng lít đã thu, số điểm, số ca và lượng CO₂ quy đổi."
-            />
-          ) : null}
-          {tab === 'account' ? (
-            <StatusView
-              title="Tài khoản"
-              message="Sắp có: thông tin cá nhân, địa bàn phụ trách và sức chứa xe."
-            />
-          ) : null}
+          {tab === 'map' ? <CollectorMapPage key={userId} /> : null}
+          {tab === 'history' ? <CollectorSchedulePage key={userId} /> : null}
+          {tab === 'stats' ? <CollectorStatsPage key={userId} /> : null}
+          {tab === 'account' ? <CollectorAccountPage key={userId} onSignOut={onSignOut} /> : null}
         </div>
       </main>
       {!focusedScreen ? <CollectorTabBar activeTab={tab} onTabChange={setTab} /> : null}
