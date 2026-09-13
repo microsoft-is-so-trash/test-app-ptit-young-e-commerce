@@ -7,10 +7,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../lib/auth';
 import { api } from '../lib/api';
 import { isAdminUser } from '../lib/dashboard-utils';
+import { DEMO_OFFLINE } from '../lib/demo-mode';
 import { Skeleton } from './ui';
 
 const links = [
   ['/', 'Tổng quan', 'dashboard'],
+  ['/operations-map', 'Bản đồ vận hành', 'pin_drop'],
   ['/payments', 'Thanh toán', 'account_balance_wallet'],
   ['/reconciliation', 'Đối soát', 'compare_arrows'],
   ['/ai-performance', 'Hiệu quả AI', 'psychology'],
@@ -30,7 +32,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const pending = useQuery({
     queryKey: ['pending-merchants-count'],
     queryFn: () => api.merchants({ status: 'PENDING' }),
-    enabled: Boolean(user),
+    enabled: Boolean(user) && !DEMO_OFFLINE,
   });
   useEffect(() => {
     if (!loading && !isAdminUser(user)) router.replace('/login');

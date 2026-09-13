@@ -4,6 +4,7 @@ import type { AuthUser } from '@eco-oil/shared-types';
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { api } from './api';
 import { browserTokenStorage } from './storage';
+import { DEMO_ADMIN_USER, DEMO_OFFLINE } from './demo-mode';
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -21,6 +22,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Chế độ demo không có API để hỏi, vào thẳng bằng tài khoản quản trị mẫu.
+    if (DEMO_OFFLINE) {
+      setUser(DEMO_ADMIN_USER as AuthUser);
+      setLoading(false);
+      return;
+    }
     api.me().then((nextUser) => {
       if (nextUser.role === 'ADMIN') setUser(nextUser);
       else browserTokenStorage.clear();
@@ -32,6 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     error,
     loginAdmin: async () => {
+      if (DEMO_OFFLINE) {
+        setUser(DEMO_ADMIN_USER as AuthUser);
+        return;
+      }
       setLoading(true);
       setError(null);
       try {

@@ -338,6 +338,13 @@ export const adminWardListQuerySchema = z.object({
 });
 export type AdminWardListQueryInput = z.infer<typeof adminWardListQuerySchema>;
 
+export const adminOperationsMapQuerySchema = z.object({
+  ward_id: uuidSchema.optional(),
+  /** Bỏ qua quán chưa đủ dữ liệu để chấm điểm, dùng khi chỉ muốn soi điểm nóng. */
+  only_at_risk: z.coerce.boolean().default(false),
+});
+export type AdminOperationsMapQueryInput = z.infer<typeof adminOperationsMapQuerySchema>;
+
 export const orderReadySchema = z.object({
   container_id: uuidSchema.optional(),
   expected_liters: z.number().finite().positive().max(100000).optional(),

@@ -843,3 +843,109 @@ export interface AdminCollectorPerformance {
   variance_pct: number;
   status: 'OK' | 'FLAGGED';
 }
+
+/* ── Bản đồ vận hành (admin) ── */
+
+export type MerchantEfficiencyLevel = 'HEALTHY' | 'WATCH' | 'AT_RISK' | 'INSUFFICIENT_DATA';
+
+export interface AdminOperationsMapMerchant {
+  id: string;
+  name: string;
+  address: string | null;
+  ward_id: string;
+  ward_code: string | null;
+  ward_name: string | null;
+  lat: number;
+  lng: number;
+  efficiency_level: MerchantEfficiencyLevel;
+  efficiency_score: number;
+  efficiency_reasons: string[];
+  /** Đơn READY nếu quán đã báo sẵn sàng, ngược lại là số AI dự báo. */
+  expected_liters: number | null;
+  expected_liters_source: 'READY_ORDER' | 'FORECAST' | 'NONE';
+  forecast_confidence: MerchantPickupVolumeConfidence | null;
+  avg_daily_liters: number | null;
+  last_collected_at: string | null;
+  open_alert_count: number;
+  distance_m: number | null;
+}
+
+export type MerchantPickupVolumeConfidence = 'HIGH' | 'MEDIUM' | 'LOW' | 'INSUFFICIENT_DATA';
+
+export interface AdminOperationsMapWard {
+  id: string;
+  code: string;
+  name: string;
+  district: string;
+  center_lat: number | null;
+  center_lng: number | null;
+  merchant_count: number;
+  /** ready_order_liters + forecast_liters */
+  expected_liters: number;
+  ready_order_liters: number;
+  forecast_liters: number;
+  efficiency_level: MerchantEfficiencyLevel;
+  at_risk_count: number;
+  watch_count: number;
+  healthy_count: number;
+  scored_count: number;
+}
+
+export interface AdminOperationsMapStation {
+  id: string;
+  name: string;
+  address: string | null;
+  ward_id: string;
+  lat: number | null;
+  lng: number | null;
+  current_volume_l: number;
+  capacity_l: number;
+  fill_pct: number;
+}
+
+export interface AdminActiveRouteStop {
+  order_id: string;
+  sequence: number;
+  status: CollectionRouteStopStatus;
+  merchant_name: string;
+  lat: number | null;
+  lng: number | null;
+  expected_liters: number | null;
+}
+
+export type CollectionRouteStopStatus = 'PENDING' | 'COLLECTED' | 'SKIPPED';
+
+export interface AdminActiveRoute {
+  id: string;
+  collector_id: string;
+  collector_name: string;
+  started_at: string;
+  origin_lat: number | null;
+  origin_lng: number | null;
+  vehicle_capacity_l: number;
+  total_expected_liters: number;
+  remaining_capacity_l: number;
+  stop_count: number;
+  completed_stop_count: number;
+  stops: AdminActiveRouteStop[];
+}
+
+export interface AdminActiveRoutesResponse {
+  data: AdminActiveRoute[];
+}
+
+export interface AdminOperationsMapResponse {
+  generated_at: string;
+  totals: {
+    merchants_mapped: number;
+    expected_liters: number;
+    ready_order_liters: number;
+    forecast_liters: number;
+    active_routes: number;
+    at_risk_merchants: number;
+  };
+  merchants: AdminOperationsMapMerchant[];
+  wards: AdminOperationsMapWard[];
+  stations: AdminOperationsMapStation[];
+  routes: AdminActiveRoute[];
+}

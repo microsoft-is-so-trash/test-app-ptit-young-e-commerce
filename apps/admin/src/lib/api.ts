@@ -8,7 +8,9 @@ import type {
   AdminCollectorPerformance,
   AdminCollectorSummary,
   AdminCollectorInviteResponse,
+  AdminActiveRoutesResponse,
   AdminMerchantSummary,
+  AdminOperationsMapResponse,
   AdminOverviewResponse,
   AdminPickupForecastPerformanceResponse,
   AdminImageGradingPerformanceResponse,
@@ -25,6 +27,8 @@ import type {
   PaymentRunResponse,
 } from '@eco-oil/shared-types';
 import { browserTokenStorage } from './storage';
+import { DEMO_OFFLINE } from './demo-mode';
+import { demoActiveRoutes, demoOperationsMap } from './demo-operations-map';
 
 export { ApiError };
 
@@ -90,6 +94,14 @@ export const api = {
     }),
   overview: (from?: string, to?: string) =>
     client.request<AdminOverviewResponse>(`/admin/overview${query({ from, to })}`),
+  operationsMap: (params: { ward_id?: string; only_at_risk?: boolean } = {}) =>
+    DEMO_OFFLINE
+      ? Promise.resolve(demoOperationsMap(params.ward_id, params.only_at_risk))
+      : client.request<AdminOperationsMapResponse>(`/admin/operations-map${query(params)}`),
+  activeRoutes: () =>
+    DEMO_OFFLINE
+      ? Promise.resolve({ data: demoActiveRoutes() })
+      : client.request<AdminActiveRoutesResponse>('/admin/routes'),
   pickupForecastPerformance: (windowDays: 30 | 90 | 180 = 90) =>
     client.request<AdminPickupForecastPerformanceResponse>(
       `/admin/ai-performance/pickup-forecast${query({ window_days: windowDays })}`,

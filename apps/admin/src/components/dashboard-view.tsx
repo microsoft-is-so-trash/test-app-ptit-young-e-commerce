@@ -243,7 +243,7 @@ export function DashboardView() {
       </div>
 
       <p className="mt-5 text-xs text-on-surface-variant">
-        Dữ liệu biểu đồ: {dateDaysAgo(13)} đến {today}. Không sử dụng bản đồ ở MVP.
+        Dữ liệu biểu đồ: {dateDaysAgo(13)} đến {today}. Xem phân bố theo khu vực ở tab Bản đồ vận hành.
       </p>
     </AdminShell>
   );

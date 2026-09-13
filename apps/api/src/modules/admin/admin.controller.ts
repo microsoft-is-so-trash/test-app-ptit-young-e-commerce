@@ -24,21 +24,38 @@ import {
   adminWardCreateSchema,
   adminWardPatchSchema,
   adminWardListQuerySchema,
+  adminOperationsMapQuerySchema,
   merchantApprovalSchema,
 } from '@eco-oil/validation';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import type { AccessTokenPayload } from '../auth/auth.types';
 import { AdminService } from './admin.service';
+import { OperationsMapService } from './operations-map.service';
 
 @Controller('admin')
 export class AdminController {
-  constructor(@Inject(AdminService) private readonly service: AdminService) {}
+  constructor(
+    @Inject(AdminService) private readonly service: AdminService,
+    @Inject(OperationsMapService) private readonly operationsMap: OperationsMapService,
+  ) {}
 
   @Roles(Role.ADMIN)
   @Get('overview')
   overview(@Query() query: Record<string, unknown>) {
     return this.service.overview(adminOverviewQuerySchema.parse(query));
+  }
+
+  @Roles(Role.ADMIN)
+  @Get('operations-map')
+  operationsMapOverview(@Query() query: Record<string, unknown>) {
+    return this.operationsMap.operationsMap(adminOperationsMapQuerySchema.parse(query));
+  }
+
+  @Roles(Role.ADMIN)
+  @Get('routes')
+  activeRoutes() {
+    return this.operationsMap.activeRoutes();
   }
 
   @Roles(Role.ADMIN)
