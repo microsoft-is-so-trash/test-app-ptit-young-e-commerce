@@ -12,7 +12,7 @@ import type { PhotoAsset } from '../lib/zalo-client';
 import { compressImageBlob } from '../lib/zalo-client';
 import { pickZaloPhoto } from '../lib/media-picker';
 import { StatusView } from '../components/StatusView';
-import type { CompletedStop } from './CollectorFlow';
+import type { CompletedStop } from '../lib/collector-metrics';
 import { canSubmitStationDelivery, loadStationRecommendations, resolveStationSearchLocation, retryStationDeliverySync } from '../lib/station-delivery';
 import { parseLocalizedDecimal } from '../lib/collection-entry-validation';
 import type { PendingStationDeliveryDraft } from '../lib/storage';

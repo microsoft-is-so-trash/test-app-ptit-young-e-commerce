@@ -5,26 +5,16 @@ import {
   getCollectionSubmitBlockReasons,
   parseLocalizedDecimal,
 } from '../src/lib/collection-entry-validation';
-import { resolve } from 'node:path';
-import { createServer } from 'vite';
 import { isValidGeoPoint } from '../src/lib/zalo-client';
 import { formatLiters } from '../src/lib/formatters';
 import { ApiError } from '../src/lib/api';
 import { canUseOfflineCache } from '../src/lib/offline-cache';
+import * as collectorMetrics from '../src/lib/collector-metrics';
+import * as collectorRuntime from '../src/lib/collector-runtime';
 
-type PickupPriorityHelpers = typeof import('../src/pages/CollectorFlow');
-
-async function loadPickupPriorityHelpers(): Promise<PickupPriorityHelpers> {
-  const server = await createServer({
-    root: process.cwd(),
-    configFile: resolve('vite.config.ts'),
-    server: { middlewareMode: true },
-  });
-  try {
-    return await server.ssrLoadModule('/src/pages/CollectorFlow.tsx') as PickupPriorityHelpers;
-  } finally {
-    await server.close();
-  }
+/** Các helper thuần của luồng Collector, nay nằm ở lib nên import trực tiếp được. */
+async function loadPickupPriorityHelpers() {
+  return { ...collectorMetrics, ...collectorRuntime };
 }
 
 function stop(overrides: Record<string, unknown> = {}) {

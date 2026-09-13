@@ -13,7 +13,7 @@ import type {
   RouteStop,
   StationRecommendation,
 } from '@eco-oil/shared-types';
-import type { CompletedStop } from '../pages/CollectorFlow';
+import type { CompletedStop } from '../lib/collector-metrics';
 import type { OutboxRecord, OutboxStats, StoredStationReceipt } from '../lib/outbox-db';
 
 function makeStop(

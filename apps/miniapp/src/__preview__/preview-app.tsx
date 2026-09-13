@@ -14,14 +14,12 @@
 import { StrictMode, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
-import {
-  CollectorEntryScreen,
-  CollectorQrScreen,
-  CollectorRouteScreen,
-  CollectorSummaryScreen,
-  OutboxQueueScreen,
-  SavedStationReceiptView,
-} from '../pages/CollectorFlow';
+import { CollectorEntryScreen } from '../pages/collector/CollectorEntryScreen';
+import { CollectorQrScreen } from '../pages/collector/CollectorQrScreen';
+import { CollectorRouteScreen } from '../pages/collector/CollectorRouteScreen';
+import { CollectorSummaryScreen } from '../pages/collector/CollectorSummaryScreen';
+import { OutboxQueueScreen } from '../pages/collector/OutboxQueueScreen';
+import { SavedStationReceiptView } from '../pages/collector/SavedStationReceiptView';
 import {
   ShiftCloseout,
   StationDeliveryReceipt,
