@@ -4,6 +4,7 @@ import type { ContainerLookupResponse, RouteStop } from '@eco-oil/shared-types';
 import { ApiError } from '../../lib/api';
 import { formatTime } from '../../lib/collector-format';
 import { formatLiters } from '../../lib/formatters';
+import { CollectorNotice } from '../../components/CollectorNotice';
 import { lookupContainerWithCache } from '../../lib/offline-cache';
 import { submitContainerCode } from '../../lib/container-code';
 import { isZaloPermissionDenied, zaloClient } from '../../lib/zalo-client';
@@ -74,7 +75,11 @@ export function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteSto
         <button className="secondary-button" onClick={() => { void lookup(code); }} disabled={busy}>Kiểm tra mã can</button>
       </section>
       {error ? <div className="error-panel" role="alert">{error}</div> : null}
-      {mismatch ? <div className="warning-panel"><strong>Đây không phải can của điểm này</strong><span>Kiểm tra lại mã QR. Không thể ghi nhận nhầm can.</span></div> : null}
+      {mismatch ? (
+        <CollectorNotice tone="danger" icon="qr_code_scanner" title="Đây không phải can của điểm này">
+          Kiểm tra lại mã QR, không thể ghi nhận nhầm can.
+        </CollectorNotice>
+      ) : null}
       {container ? (
         <section className="verified-container-card">
           <span className="verified-badge">Đã đối chiếu</span>

@@ -9,6 +9,7 @@ import { syncOutbox } from '../../lib/outbox-sync';
 import { outboxErrorMessage } from '../../lib/outbox-errors';
 import { OutboxIssueNotice } from './CollectorRouteScreen';
 import { StatusView } from '../../components/StatusView';
+import { CollectorNotice } from '../../components/CollectorNotice';
 
 export function OutboxQueueScreen({ onBack }: { onBack: () => void }) {
   const rows = useOutboxRows();
@@ -30,7 +31,11 @@ export function OutboxQueueScreen({ onBack }: { onBack: () => void }) {
       <button className="back-button" onClick={onBack}>Về tuyến hôm nay</button>
       <header className="collector-screen-heading"><p className="eyebrow">AN TOÀN DỮ LIỆU</p><h1>Hàng chờ đồng bộ</h1><p>{formatBytes(stats.bytes)} đang lưu trên máy</p></header>
       <OutboxIssueNotice rows={rows} stats={stats} />
-      {stats.over_limit ? <div className="warning-panel"><strong>Hàng chờ đang vượt 50MB</strong><span>Hãy bật mạng để đồng bộ bớt dữ liệu ảnh.</span></div> : null}
+      {stats.over_limit ? (
+        <CollectorNotice tone="warning" icon="storage" title="Hàng chờ đang vượt 50MB">
+          Hãy bật mạng để đồng bộ bớt dữ liệu ảnh.
+        </CollectorNotice>
+      ) : null}
       {rows.length === 0 ? <StatusView title="Hàng chờ đang trống" message="Mọi giao dịch đã được đồng bộ hoặc chưa phát sinh." /> : <section className="outbox-list">{rows.map((row) => <OutboxRow key={row.client_uuid} row={row} retrying={retrying === row.client_uuid} onRetry={() => { void retry(row.client_uuid); }} />)}</section>}
     </div>
   );

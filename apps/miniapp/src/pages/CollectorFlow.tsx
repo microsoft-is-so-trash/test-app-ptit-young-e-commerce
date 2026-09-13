@@ -21,6 +21,7 @@ import {
 } from '../lib/collector-runtime';
 import { useAuthStore } from '../stores/auth-store';
 import { StatusView } from '../components/StatusView';
+import { CollectorNotice } from '../components/CollectorNotice';
 import { CollectorRouteScreen } from './collector/CollectorRouteScreen';
 import { CollectorQrScreen } from './collector/CollectorQrScreen';
 import { CollectorEntryScreen } from './collector/CollectorEntryScreen';
@@ -361,7 +362,11 @@ export function CollectorFlow() {
 
   return (
     <div className="collector-flow-root">
-      {!online ? <div className="offline-banner">Đang ngoại tuyến — dữ liệu vẫn được lưu an toàn trên máy.</div> : null}
+      {!online ? (
+        <CollectorNotice tone="warning" icon="wifi_off" title="Đang ngoại tuyến">
+          Dữ liệu vẫn được lưu an toàn trên máy và sẽ tự gửi khi có mạng.
+        </CollectorNotice>
+      ) : null}
       {content}
     </div>
   );

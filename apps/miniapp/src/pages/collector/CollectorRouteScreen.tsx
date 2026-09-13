@@ -20,6 +20,8 @@ import type { useOutboxStats } from '../../lib/outbox-hooks';
 import { outboxErrorMessage } from '../../lib/outbox-errors';
 import type { RouteLoadResult } from '../../lib/offline-cache';
 import { isValidGeoPoint, normalizeVietnamesePhone, copyPhoneNumber, zaloClient } from '../../lib/zalo-client';
+import { CollectorNotice } from '../../components/CollectorNotice';
+import { Icon } from '../../components/Icon';
 import { StatusView } from '../../components/StatusView';
 
 interface CollectorRouteScreenProps {
@@ -65,14 +67,57 @@ export function CollectorRouteScreen({ stops, route, location, locationDenied, c
           <button type="button" className={`round-action ${refreshing ? 'round-action-loading' : ''}`} onClick={onRefresh} disabled={refreshing} aria-busy={refreshing ? 'true' : 'false'}>{refreshing ? 'Đang tải' : locationDenied ? 'Lấy lại GPS' : 'Tải lại'}</button>
         </div>
       </header>
-      {refreshNotice ? <div className={`route-refresh-notice route-refresh-notice-${refreshNotice.kind}`} role={refreshNotice.kind === 'error' ? 'alert' : 'status'}>{refreshNotice.message}</div> : null}
-      {loadError ? <div className="route-refresh-notice route-refresh-notice-error" role="alert">Không tải được bản tuyến mới; dữ liệu đã lưu vẫn được giữ. <button className="text-button" onClick={onRefresh}>Thử lại</button></div> : null}
-      {!location && !locationDenied ? <div className="location-banner">Đang xin quyền vị trí để tính tuyến gần nhất…</div> : null}
-      {locationDenied ? <div className="location-banner">Không lấy được vị trí GPS, đang dùng vị trí trung tâm phường. Giao dịch có thể bị đánh dấu cần kiểm tra.</div> : null}
-      {route.fromCache ? <div className="offline-cache-banner">Đang dùng dữ liệu lúc {formatTime(route.cachedAt)}</div> : null}
-      {lastReceipt ? <section className="receipt-saved-banner" role="status"><strong>Đã lưu biên nhận trên máy</strong><span>Mã phiếu: {lastReceipt.receipt_id}</span><button className="text-button" onClick={onOpenLastReceipt}>Xem lại biên nhận</button></section> : null}
+      {refreshNotice ? (
+        <CollectorNotice
+          tone={refreshNotice.kind === 'error' ? 'danger' : refreshNotice.kind === 'success' ? 'success' : 'warning'}
+          title={refreshNotice.kind === 'error' ? 'Không tải lại được tuyến' : refreshNotice.kind === 'cache' ? 'Đang dùng tuyến đã lưu' : refreshNotice.kind === 'warning' ? 'Chưa lấy được GPS' : 'Đã cập nhật tuyến'}
+        >
+          {refreshNotice.message}
+        </CollectorNotice>
+      ) : null}
+      {loadError ? (
+        <CollectorNotice tone="danger" title="Không tải được bản tuyến mới" action={{ label: 'Thử lại', onClick: onRefresh }}>
+          Dữ liệu tuyến đã lưu trên máy vẫn được giữ nguyên.
+        </CollectorNotice>
+      ) : null}
+      {!location && !locationDenied ? (
+        <CollectorNotice icon="my_location" title="Đang lấy vị trí">Để sắp xếp các điểm gần bạn trước.</CollectorNotice>
+      ) : null}
+      {locationDenied ? (
+        <CollectorNotice tone="warning" icon="location_off" title="Đang dùng vị trí tâm phường">
+          Chưa lấy được GPS nên giao dịch có thể bị gắn cờ kiểm tra.
+        </CollectorNotice>
+      ) : null}
+      {route.fromCache ? (
+        <CollectorNotice tone="warning" icon="cloud_off" title={`Dữ liệu lúc ${formatTime(route.cachedAt)}`}>
+          Chưa kết nối được máy chủ để lấy bản mới.
+        </CollectorNotice>
+      ) : null}
+      {lastReceipt ? (
+        <CollectorNotice
+          tone="success"
+          icon="receipt_long"
+          title="Đã lưu biên nhận trên máy"
+          action={{ label: 'Xem lại biên nhận', onClick: onOpenLastReceipt }}
+        >
+          Mã phiếu: {lastReceipt.receipt_id}
+        </CollectorNotice>
+      ) : null}
       <OutboxIssueNotice rows={outboxRows} stats={outboxStats} onOpen={onOpenOutbox} />
-      {!shiftStarted ? <button className="start-shift-button" onClick={onStartShift} disabled={prefetching}>{prefetching ? 'Đang lưu tuyến và mã QR…' : 'Bắt đầu ca, lưu tuyến để dùng ngoại tuyến'}</button> : <div className="shift-ready-note"><strong>Tuyến đã sẵn sàng khi mất sóng.</strong>{route.route.started_at ? ` Bắt đầu lúc ${formatTime(route.route.started_at)}.` : ''} <button className="text-button" onClick={onCancelShift} disabled={prefetching || Object.keys(completed).length > 0}>Hủy ca</button></div>}
+      {!shiftStarted ? (
+        <button className="start-shift-button" onClick={onStartShift} disabled={prefetching}>
+          {prefetching ? 'Đang lưu tuyến và mã QR…' : 'Bắt đầu ca thu gom'}
+        </button>
+      ) : (
+        <CollectorNotice
+          tone="success"
+          icon="cloud_done"
+          title="Tuyến đã sẵn sàng khi mất sóng"
+          action={{ label: 'Hủy ca', onClick: onCancelShift, disabled: prefetching || Object.keys(completed).length > 0 }}
+        >
+          {route.route.started_at ? `Bắt đầu lúc ${formatTime(route.route.started_at)}.` : 'Tuyến và mã QR đã lưu trên máy.'}
+        </CollectorNotice>
+      )}
       {shiftError ? <p className="error-text" role="alert">{shiftError}</p> : null}
       <section className="route-capacity-card">
         <div className="route-capacity-top"><span>Tổng lít dự kiến</span><strong>{formatLiters(route.route.total_expected_liters)} / {formatLiters(vehicleCapacity)}</strong></div>
@@ -112,8 +157,16 @@ export function CollectorRouteScreen({ stops, route, location, locationDenied, c
 }
 function OutboxBadge({ stats, onClick }: { stats: ReturnType<typeof useOutboxStats>; onClick: () => void }) {
   const waiting = stats.pending + stats.syncing + stats.failed;
-  const label = waiting > 0 ? `${waiting} giao dịch chưa đồng bộ` : 'Hàng chờ: 0';
-  return <button className={`outbox-badge ${stats.failed > 0 ? 'outbox-badge-failed' : ''}`} onClick={onClick}>{label}</button>;
+  return (
+    <button
+      className={`outbox-badge ${stats.failed > 0 ? 'outbox-badge-failed' : ''}`}
+      onClick={onClick}
+      aria-label={waiting > 0 ? `${waiting} giao dịch chưa đồng bộ, mở hàng chờ` : 'Mở hàng chờ đồng bộ'}
+    >
+      <Icon name={waiting > 0 ? 'sync_problem' : 'cloud_done'} size={18} />
+      <span>Hàng chờ {waiting}</span>
+    </button>
+  );
 }
 
 export function OutboxIssueNotice({ rows, stats, onOpen }: { rows: OutboxRecord[]; stats: ReturnType<typeof useOutboxStats>; onOpen?: () => void }) {
@@ -122,14 +175,14 @@ export function OutboxIssueNotice({ rows, stats, onOpen }: { rows: OutboxRecord[
   if (unsynced === 0 && !latestError) return null;
   const hasError = Boolean(latestError);
   return (
-    <div
-      className={`outbox-issue-banner ${hasError ? 'outbox-issue-banner-error' : 'outbox-issue-banner-pending'}`}
-      role={hasError ? 'alert' : 'status'}
+    <CollectorNotice
+      tone={hasError ? 'danger' : 'info'}
+      icon={hasError ? 'sync_problem' : 'cloud_upload'}
+      title={`${unsynced} giao dịch chưa đồng bộ`}
+      action={onOpen ? { label: 'Xem hàng chờ đồng bộ', onClick: onOpen } : undefined}
     >
-      <strong>{unsynced} giao dịch chưa đồng bộ</strong>
-      <span>{latestError ? outboxErrorMessage(latestError) : 'Đang gửi dữ liệu, vui lòng giữ mạng và không xoá hàng chờ.'}</span>
-      {onOpen ? <button className="text-button" onClick={onOpen}>Xem hàng chờ đồng bộ</button> : null}
-    </div>
+      {latestError ? outboxErrorMessage(latestError) : 'Đang gửi dữ liệu, hãy giữ mạng và không xoá hàng chờ.'}
+    </CollectorNotice>
   );
 }
 function CollectorStopCard({ stop, outboxRow, onOpenQr }: { stop: RouteStop; outboxRow: OutboxRecord | undefined; onOpenQr: () => void }) {

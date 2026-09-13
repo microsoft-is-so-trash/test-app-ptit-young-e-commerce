@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { Role } from '@eco-oil/shared-types';
 import { useAuthStore } from './stores/auth-store';
 import { ApiError } from './lib/api';
@@ -42,7 +43,14 @@ const TAB_TITLES: Record<Tab, string> = {
   payments: 'Thanh toán ví',
 };
 
-function BrandHeader({ title, withNotifications = false }: { title: string; withNotifications?: boolean }) {
+interface BrandHeaderProps {
+  title: string;
+  withNotifications?: boolean;
+  /** Hành động thay cho chuông thông báo, dùng cho vai trò chưa có trung tâm thông báo. */
+  action?: ReactNode;
+}
+
+function BrandHeader({ title, withNotifications = false, action }: BrandHeaderProps) {
   return (
     <header className="brand-header">
       <div className="brand-header-inner">
@@ -56,13 +64,13 @@ function BrandHeader({ title, withNotifications = false }: { title: string; with
           </div>
         </div>
         <div className="brand-header-right">
-          {withNotifications ? (
+          {action ?? (withNotifications ? (
             <NotificationBell />
           ) : (
             <button className="header-icon-btn" aria-label="Thông báo">
               <Icon name="notifications" size={22} />
             </button>
-          )}
+          ))}
           <div className="header-avatar">
             <Icon name="person" size={18} />
           </div>
@@ -208,15 +216,16 @@ export function App() {
     }
     return (
       <div className="app-shell collector-shell">
-        <BrandHeader title="Tuyến hôm nay" />
+        <BrandHeader
+          title="Tuyến hôm nay"
+          action={
+            <button className="header-signout" onClick={() => void handleCollectorSignOut()}>
+              Thoát
+            </button>
+          }
+        />
         <main className="main-area">
-          <div className="page-content" style={{ paddingTop: 24, paddingBottom: 32 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <div />
-              <button className="header-signout" onClick={() => void handleCollectorSignOut()}>
-                Thoát
-              </button>
-            </div>
+          <div className="page-content" style={{ paddingTop: 16, paddingBottom: 32 }}>
             <CollectorFlow key={user.id} />
           </div>
         </main>

@@ -1817,6 +1817,54 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
    ============================================ */
 .collector-content { min-height: 100vh; background: var(--background); }
 
+/* Thông báo dùng chung cho mọi màn Collector.
+   Phân cấp bằng biểu tượng + viền trái, giữ nền trắng của Hướng A. */
+.collector-notice {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--outline-variant);
+  border-left: 3px solid var(--outline);
+  border-radius: var(--radius-md);
+  background: var(--surface-container-lowest);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.collector-notice-icon { color: var(--on-surface-variant); }
+.collector-notice-body { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.collector-notice-body strong {
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+.collector-notice-body span { color: var(--on-surface-variant); }
+.collector-notice-action {
+  align-self: flex-start;
+  margin-top: 4px;
+  min-height: 44px;
+  padding: 0;
+  color: var(--primary);
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 700;
+  background: none;
+  text-align: left;
+}
+.collector-notice-action:disabled { color: var(--outline); }
+.collector-notice-success { border-left-color: var(--primary); }
+.collector-notice-success .collector-notice-icon { color: var(--primary); }
+.collector-notice-warning { border-left-color: #b7791f; }
+.collector-notice-warning .collector-notice-icon { color: #b7791f; }
+.collector-notice-danger {
+  border-left-color: var(--error);
+  background: color-mix(in srgb, var(--error) 5%, white);
+}
+.collector-notice-danger .collector-notice-icon { color: var(--error); }
+
 /* Collector shell — nền đồng nhất cho toàn nhánh Collector, cô lập khỏi Merchant.
    Chỉ đổi nền (surface/background), không đụng bảng màu của các màn Collector khác. */
 .collector-shell {
@@ -2425,7 +2473,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .summary-grid strong { font-size: 15px; }
 .station-button { display: grid; gap: 2px; margin-top: 18px; }
 .station-button small { color: inherit; font-size: 12px; font-weight: 600; }
-.outbox-badge { min-height: 44px; max-width: 150px; padding: 0 10px; border: 1px solid var(--outline-variant); border-radius: var(--radius-sm); color: var(--primary); background: var(--surface-container-lowest); font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+.outbox-badge { min-height: 44px; max-width: 150px; padding: 0 12px; gap: 6px; border: 1px solid var(--outline-variant); border-radius: var(--radius-full); color: var(--on-surface-variant); background: var(--surface-container-lowest); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap; }
 .outbox-badge-failed { color: var(--error); border-color: rgba(179,38,30,0.35); background: var(--error-container); }
 .outbox-row { padding: 15px; border: 1px solid var(--outline-variant); border-radius: var(--radius-md); background: var(--surface-container-lowest); box-shadow: var(--shadow-xs); }
 .outbox-row-top { display: flex; align-items: center; gap: 8px; }
@@ -2494,10 +2542,14 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .pickup-priority { padding: 10px 11px; }
 .pickup-volume-forecast-heading, .pickup-priority-heading { font-size: 11px; font-weight: 750; }
 .pickup-volume-forecast > strong { font-size: 13px; }
-.start-shift-button { width: 100%; margin-bottom: 14px; min-height: 48px; border: 1px solid var(--outline-variant); border-radius: var(--radius-md); color: var(--primary); background: var(--surface-container-lowest); font-weight: 700; }
+/* Hành động chính của màn tuyến: tô đặc để tách khỏi các khối thông tin nền trắng. */
+.start-shift-button { width: 100%; margin-bottom: 14px; min-height: 52px; border: 1px solid var(--primary); border-radius: var(--radius-md); color: var(--on-primary); background: var(--primary); box-shadow: var(--shadow-xs); font-family: var(--font-label); font-size: 14px; font-weight: 700; }
+.start-shift-button:disabled { border-color: var(--outline-variant); color: var(--outline); background: var(--surface-container-high); box-shadow: none; }
 .shift-ready-note { margin: 0 0 14px; padding: 13px 15px; border: 1px solid rgba(76,103,15,0.35); border-radius: var(--radius-md); color: var(--secondary); background: var(--secondary-container); font-size: 13px; font-weight: 700; line-height: 1.45; }
 .shift-ready-note .text-button { margin-left: 4px; color: var(--error); min-height: 36px; padding: 0; border: none; background: transparent; font-size: 12px; font-weight: 700; cursor: pointer; }
 .text-button, .back-button { min-height: 40px; padding: 0; border: 0; color: var(--primary); background: transparent; font-size: 12px; font-weight: 700; cursor: pointer; }
+/* Nút quay lại luôn nằm sát mép trái để mắt bắt được ngay, thay vì trôi ra giữa màn. */
+.collector-content .back-button { align-self: flex-start; margin-bottom: 4px; text-align: left; }
 .text-button:hover:not(:disabled), .back-button:hover:not(:disabled) { text-decoration: underline; }
 .primary-button, .secondary-button, .danger-button { min-height: 48px; padding: 0 18px; border-radius: var(--radius-md); font-weight: 700; transition: all 0.15s; }
 .primary-button { border: 1px solid var(--primary); color: var(--on-primary); background: var(--primary); box-shadow: var(--shadow-xs); }
@@ -2520,8 +2572,9 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 
 @media (max-width: 420px) {
   .collector-page-header { align-items: stretch; flex-direction: column; }
-  .collector-header-actions { width: 100%; }
-  .collector-header-actions .outbox-badge { flex: 1; max-width: none; }
+  /* Hàng chờ là trạng thái, không phải hành động chính: giữ dạng chip gọn,
+     nhường chỗ nhấn cho nút tải lại bên phải. */
+  .collector-header-actions { width: 100%; justify-content: space-between; }
   .round-action { flex: 0 0 auto; }
   .station-card-actions, .delivery-total-row { align-items: stretch; grid-template-columns: 1fr; }
   .delivery-total-row { display: grid; }
