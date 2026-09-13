@@ -36,6 +36,18 @@ import {
   demoReadyOrder,
   isDemoOfflineMode,
 } from './demo-fixtures';
+import {
+  DEMO_STATIONS,
+  demoCollectionResponse,
+  demoCollectorHistory,
+  demoContainerByQr,
+  demoRouteForCollector,
+  demoStartedRoute,
+  demoStationDelivery,
+  demoSyncBatchResponse,
+} from './demo-collector-fixtures';
+import { demoDevAccounts, findDemoAccount } from './demo-accounts';
+import { demoAccountStorage } from './storage';
 
 export const API_BASE_URL = resolveApiBaseUrl(import.meta.env?.MODE ?? 'test', import.meta.env?.VITE_API_BASE_URL);
 
@@ -201,8 +213,14 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return payload as T;
 }
 
+/** Người thu gom đang chọn ở chế độ demo, dùng để trả đúng tuyến mẫu. */
+function demoCollectorId(): string | null {
+  return findDemoAccount(demoAccountStorage.load())?.user.collectorId ?? null;
+}
+
 export const api = {
-  devAccounts: () => request<DevAccount[]>('/auth/dev-accounts', { retry: false }),
+  devAccounts: () =>
+    isDemoOfflineMode() ? Promise.resolve(demoDevAccounts()) : request<DevAccount[]>('/auth/dev-accounts', { retry: false }),
   registerMerchant: (payload: MerchantRegistrationRequest) =>
     request<{ status: string; merchant: unknown }>('/merchants/register', { method: 'POST', body: payload, retry: false }),
   registrationWards: () => request<AdminWardSummary[]>('/merchants/register/wards', { retry: false }),
@@ -290,25 +308,57 @@ export const api = {
       ? Promise.resolve({ ...DEMO_ORDERS.data[0], id: orderId, status: 'CANCELLED' as CollectionOrderResponse['status'], cancelled_at: new Date().toISOString() })
       : request<CollectionOrderResponse>(`/orders/${orderId}/cancel`, { method: 'POST' }),
   currentRoute: (location?: GeoPoint) => {
+    if (isDemoOfflineMode()) return Promise.resolve(demoRouteForCollector(demoCollectorId()));
     const query = location ? `?lat=${location.lat}&lng=${location.lng}` : '';
     return request<CurrentRouteResponse>(`/routes/current${query}`);
   },
-  startRoute: (clientUuid: string, location?: GeoPoint) => request<CurrentRouteResponse>('/routes/start', {
-    method: 'POST',
-    body: { client_uuid: clientUuid, ...(location ? { lat: location.lat, lng: location.lng } : {}) },
-  }),
-  completeCurrentRoute: () => request<CurrentRouteResponse>('/routes/current/complete', { method: 'POST' }),
-  cancelCurrentRoute: (reason?: string) => request<CollectionRouteCancelResponse>('/routes/current/cancel', {
-    method: 'POST',
-    body: reason ? { reason } : {},
-  }),
-  containerByQr: (code: string) => request<ContainerLookupResponse>(`/containers/by-qr/${encodeURIComponent(code)}`),
+  startRoute: (clientUuid: string, location?: GeoPoint) =>
+    isDemoOfflineMode()
+      ? Promise.resolve(demoStartedRoute(demoRouteForCollector(demoCollectorId()), clientUuid))
+      : request<CurrentRouteResponse>('/routes/start', {
+          method: 'POST',
+          body: { client_uuid: clientUuid, ...(location ? { lat: location.lat, lng: location.lng } : {}) },
+        }),
+  completeCurrentRoute: () =>
+    isDemoOfflineMode()
+      ? Promise.resolve(demoRouteForCollector(demoCollectorId()))
+      : request<CurrentRouteResponse>('/routes/current/complete', { method: 'POST' }),
+  cancelCurrentRoute: (reason?: string) =>
+    isDemoOfflineMode()
+      ? Promise.resolve({ route_id: 'demo-route-cancelled', status: 'CANCELLED' as const })
+      : request<CollectionRouteCancelResponse>('/routes/current/cancel', {
+          method: 'POST',
+          body: reason ? { reason } : {},
+        }),
+  containerByQr: (code: string) =>
+    isDemoOfflineMode()
+      ? Promise.resolve(demoContainerByQr(code))
+      : request<ContainerLookupResponse>(`/containers/by-qr/${encodeURIComponent(code)}`),
   createCollection: (payload: CollectionCreateRequest) =>
-    request<CollectionTransactionResponse>('/collections', { method: 'POST', body: payload }),
+    isDemoOfflineMode()
+      ? Promise.resolve(demoCollectionResponse(payload))
+      : request<CollectionTransactionResponse>('/collections', { method: 'POST', body: payload }),
   syncBatch: (items: CollectionCreateRequest[]) =>
-    request<SyncBatchResponse>('/sync/batch', { method: 'POST', body: { items } }),
+    isDemoOfflineMode()
+      ? Promise.resolve(demoSyncBatchResponse(items))
+      : request<SyncBatchResponse>('/sync/batch', { method: 'POST', body: { items } }),
   recommendStations: (location: GeoPoint, liters: number) =>
-    request<StationRecommendation[]>(`/stations/recommend?lat=${location.lat}&lng=${location.lng}&liters=${liters}`),
+    isDemoOfflineMode()
+      ? Promise.resolve(DEMO_STATIONS)
+      : request<StationRecommendation[]>(`/stations/recommend?lat=${location.lat}&lng=${location.lng}&liters=${liters}`),
   createStationDelivery: (payload: StationDeliveryCreateRequest) =>
-    request<StationDeliveryResponse>('/station-deliveries', { method: 'POST', body: payload }),
+    isDemoOfflineMode()
+      ? Promise.resolve(demoStationDelivery(payload))
+      : request<StationDeliveryResponse>('/station-deliveries', { method: 'POST', body: payload }),
+  /** Lịch sử thu gom của chính người thu gom đang đăng nhập. */
+  myCollections: (page = 1, limit = 50, from?: string, to?: string) => {
+    if (isDemoOfflineMode()) {
+      const data = demoCollectorHistory();
+      return Promise.resolve({ data, meta: { page, limit, total: data.length } });
+    }
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (from) params.set('from', from);
+    if (to) params.set('to', to);
+    return request<PagedResponse<CollectionTransactionResponse>>(`/collections/me?${params.toString()}`);
+  },
 };

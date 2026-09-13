@@ -5,7 +5,7 @@ import { authUserStorage, tokenStorage } from '../lib/storage';
 import { setOutboxOwner } from '../lib/outbox-db';
 import { isValidAuthSession, isValidAuthUser } from '../components/login-screen-logic';
 import { consumeZaloOAuthCode } from '../lib/oauth-callback';
-import { DEMO_MERCHANT_USER, isDemoOfflineMode } from '../lib/demo-fixtures';
+import { findDemoAccount, forgetDemoAccount, isDemoOfflineMode, rememberDemoAccount, resolveActiveDemoAccount } from '../lib/demo-accounts';
 
 interface AuthState {
   user: AuthUser | null;
@@ -18,6 +18,7 @@ interface AuthState {
   acceptCollectorInvite: (code: string) => Promise<void>;
   signOut: () => Promise<void>;
   patchUser: (patch: Partial<AuthUser>) => void;
+  loginDemoAccount: (accountId: string) => void;
 }
 
 function applyUserScope(user: AuthUser | null): void {
@@ -75,8 +76,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   hydrate: () => {
     if (hydratePromise) return hydratePromise;
     if (isDemoOfflineMode()) {
-      applyUserScope(DEMO_MERCHANT_USER);
-      set({ user: DEMO_MERCHANT_USER, hydrated: true, busy: false, error: null });
+      const demoUser = resolveActiveDemoAccount()?.user ?? null;
+      applyUserScope(demoUser);
+      set({ user: demoUser, hydrated: true, busy: false, error: null });
       hydratePromise = Promise.resolve();
       return hydratePromise;
     }
@@ -204,6 +206,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
   signOut: async () => {
+    if (isDemoOfflineMode()) {
+      forgetDemoAccount();
+      hydratePromise = null;
+      applyUserScope(null);
+      set({ user: null, busy: false, error: null, hydrated: true });
+      return;
+    }
     const refreshToken = tokenStorage.getRefreshToken();
     if (refreshToken) {
       try {
@@ -214,6 +223,14 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     clearSession();
     set({ user: null, busy: false, error: null, hydrated: true });
+  },
+  loginDemoAccount: (accountId) => {
+    const account = findDemoAccount(accountId);
+    if (!account) return;
+    rememberDemoAccount(account.id);
+    hydratePromise = null;
+    applyUserScope(account.user);
+    set({ user: account.user, busy: false, error: null, hydrated: true });
   },
   patchUser: (patch) => {
     set((state) => {

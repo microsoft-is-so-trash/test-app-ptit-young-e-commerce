@@ -6,8 +6,6 @@ import {
   PaymentStatus,
   PriceUnit,
   Quality,
-  Role,
-  MerchantApprovalStatus,
   type AuthUser,
   type CollectionOrderResponse,
   type MerchantDashboardResponse,
@@ -18,10 +16,9 @@ import {
   type PaymentListResponse,
 } from '@eco-oil/shared-types';
 import { currentVietnamWeek } from './formatters';
+import { DEMO_ACCOUNTS, isDemoOfflineMode } from './demo-accounts';
 
-export function isDemoOfflineMode(): boolean {
-  return import.meta.env?.VITE_DEMO_OFFLINE_MERCHANT === 'true';
-}
+export { isDemoOfflineMode };
 
 function isoDaysAgo(days: number): string {
   return new Date(Date.now() - days * 86_400_000).toISOString();
@@ -41,17 +38,8 @@ function isoMonthsAgoOnDay(months: number, day: number): string {
   return date.toISOString();
 }
 
-export const DEMO_MERCHANT_USER: AuthUser = {
-  id: 'demo-merchant-001',
-  zalo_id: 'zalo_demo_merchant',
-  phone: '0908123456',
-  name: 'Quán ăn Cô Ba',
-  role: Role.MERCHANT,
-  merchantId: 'demo-merchant-001',
-  collectorId: null,
-  merchantApprovalStatus: MerchantApprovalStatus.APPROVED,
-  merchantRejectionReason: null,
-};
+/** Quán mẫu đã được duyệt; toàn bộ dữ liệu Merchant bên dưới thuộc về tài khoản này. */
+export const DEMO_MERCHANT_USER: AuthUser = DEMO_ACCOUNTS[0].user;
 
 export const DEMO_DASHBOARD: MerchantDashboardResponse = {
   containers: [

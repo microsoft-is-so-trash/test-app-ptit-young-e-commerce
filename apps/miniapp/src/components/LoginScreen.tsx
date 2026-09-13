@@ -7,6 +7,7 @@ import { useAuthStore } from '../stores/auth-store';
 import { getSeedLoginCredentials, shouldShowDevelopmentLogin } from './login-screen-logic';
 import { WebZaloLoginLink } from './WebZaloLoginLink';
 import { COLLECTOR_INVITE_PARAM, getStoredCollectorInvite } from '../lib/collector-invite';
+import { isDemoOfflineMode } from '../lib/demo-accounts';
 import { Icon } from './Icon';
 
 const ONBOARDING_STEPS = [
@@ -29,6 +30,7 @@ const ONBOARDING_STEPS = [
 
 export function LoginScreen() {
   const demoModeEnabled = import.meta.env.VITE_DEMO_MODE === 'true';
+  const demoOffline = isDemoOfflineMode();
   const [selectedId, setSelectedId] = useState('');
   const [devAccounts, setDevAccounts] = useState<DevAccount[]>([]);
   const [devAccountsError, setDevAccountsError] = useState<string | null>(null);
@@ -38,6 +40,7 @@ export function LoginScreen() {
   const error = useAuthStore((state) => state.error);
   const loginSeed = useAuthStore((state) => state.loginSeed);
   const loginWithZalo = useAuthStore((state) => state.loginWithZalo);
+  const loginDemoAccount = useAuthStore((state) => state.loginDemoAccount);
   const hydrate = useAuthStore((state) => state.hydrate);
   const [registering, setRegistering] = useState(false);
   const [onboardingDone, setOnboardingDone] = useState(false);
@@ -116,6 +119,10 @@ export function LoginScreen() {
   }
 
   async function handleSeedLogin() {
+    if (isDemoOfflineMode()) {
+      loginDemoAccount(selectedId);
+      return;
+    }
     const credentials = getSeedLoginCredentials(devAccounts, selectedId);
     const account = devAccounts.find((item) => item.zalo_id === selectedId);
     if (!credentials || !account) return;
@@ -153,6 +160,7 @@ export function LoginScreen() {
 
   return (
     <main className="login-page">
+      <section className="login-card">
       {/* Brand Section */}
       <div className="login-brand">
         <div className="login-brand-pill">
@@ -161,7 +169,7 @@ export function LoginScreen() {
             ECOllect Platform
           </span>
         </div>
-        <h1>BẮT ĐẦU VỚI ECOLLECT</h1>
+        <h1>Bắt đầu với ECOllect</h1>
         <p>Thu gom dầu minh bạch, thuận tiện. Đăng nhập để quản lý thu gom, theo dõi giao dịch.</p>
       </div>
 
@@ -170,37 +178,25 @@ export function LoginScreen() {
         <button
           className="login-cta"
           onClick={() => void handleZaloLogin()}
-          disabled={busy || showDevelopmentLogin}
+          disabled={busy}
         >
-          {showDevelopmentLogin
-            ? 'Chọn tài khoản thử nghiệm để tiếp tục'
-            : busy
-              ? 'Đang đăng nhập…'
-              : <>
-                  <Icon name="login" size={20} />
-                  Đăng nhập bằng Zalo
-                </>}
-        </button>
-      ) : showDevelopmentLogin ? (
-        <button className="login-cta" disabled>
-          Chọn tài khoản thử nghiệm để tiếp tục
+          {busy
+            ? 'Đang đăng nhập…'
+            : <>
+                <Icon name="login" size={20} />
+                Đăng nhập bằng Zalo
+              </>}
         </button>
       ) : (
         <WebZaloLoginLink href={zaloOAuthStartUrl} />
       )}
 
-      {showDevelopmentLogin ? (
-        <p className="error-text" style={{ textAlign: 'center' }}>
-          Backend đang ở môi trường phát triển. Chọn tài khoản thử nghiệm để tiếp tục.
-        </p>
-      ) : null}
       {oauthStartError ? <p className="error-text" style={{ textAlign: 'center' }}>{oauthStartError}</p> : null}
 
       {/* Dev Login */}
       {showDevelopmentLogin ? (
-        <section className="dev-login-card">
-          <p className="section-label">Môi trường phát triển</p>
-          <label htmlFor="seed-account">Chọn tài khoản thử nghiệm</label>
+        <section className="dev-login-block">
+          <p className="section-label">Môi trường phát triển (localhost)</p>
           <select
             id="seed-account"
             className="input"
@@ -239,13 +235,13 @@ export function LoginScreen() {
             onClick={() => void handleSeedLogin()}
             disabled={busy || !selectedId}
           >
-            Vào bản thử nghiệm
+            Chọn vai trò &amp; vào bản thử nghiệm
           </button>
         </section>
       ) : null}
 
-      {/* Error Panel */}
-      {error ? (
+      {/* Error Panel — ẩn ở chế độ demo vì không có máy chủ để gọi lại */}
+      {error && !demoOffline ? (
         <div className="error-panel" role="alert">
           <p>{error}</p>
           <button className="btn btn-secondary" onClick={() => { void hydrate(); }} disabled={busy}>
@@ -255,7 +251,7 @@ export function LoginScreen() {
       ) : null}
 
       {/* Registration Toggle */}
-      {demoModeEnabled ? (
+      {demoModeEnabled && !demoOffline ? (
         <button
           className="btn-ghost"
           style={{ margin: '12px auto 0', display: 'flex' }}
@@ -414,12 +410,13 @@ export function LoginScreen() {
       )}
 
       {/* Trust Footer */}
-      <div className="login-footer" style={{ marginTop: 'auto', paddingTop: 32 }}>
+      <div className="login-footer">
         <Icon name="verified_user" size={18} style={{ color: 'var(--secondary)' }} />
         <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>
-          Tuân thủ chuẩn ISCC-EU & EUDR Traceability
+          Tuân thủ chuẩn ISCC-EU &amp; EUDR Traceability
         </span>
       </div>
+      </section>
     </main>
   );
 }

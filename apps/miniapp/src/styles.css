@@ -1057,10 +1057,23 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .login-page {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-height: 100dvh;
-  padding: var(--space-md) var(--margin-mobile);
-  padding-top: calc(72px + env(safe-area-inset-top, 0px));
-  padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px));
+  padding: var(--space-lg) var(--margin-mobile);
+  padding-top: calc(32px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
 }
 .login-brand {
   display: flex;
@@ -1094,11 +1107,11 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 }
 .login-brand h1 {
   font-family: var(--font-headline);
-  font-size: 26px;
-  line-height: 34px;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  max-width: 280px;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  max-width: 300px;
 }
 .login-brand p {
   font-family: var(--font-body);
@@ -1379,6 +1392,24 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
   font-weight: 600;
 }
 .dev-login-card select, .dev-login-card input { width: 100%; }
+
+/* Khối chọn tài khoản thử nghiệm nằm trong thẻ đăng nhập, ngăn bằng một đường kẻ. */
+.dev-login-block {
+  width: 100%;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--outline-variant);
+  text-align: left;
+}
+.dev-login-block .section-label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--on-surface-variant);
+}
+.dev-login-block select { width: 100%; }
 
 /* Error Panel */
 .error-panel {
@@ -2474,7 +2505,7 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
 .primary-button:disabled { background: var(--surface-container-high); color: var(--outline); border-color: var(--surface-container-high); box-shadow: none; }
 .secondary-button { border: 1px solid var(--outline-variant); color: var(--primary); background: var(--surface-container-lowest); }
 .danger-button { border: 1px solid var(--error); color: var(--on-error); background: var(--error); }
-.login-oauth-link { display: flex; align-items: center; justify-content: center; text-decoration: none; width: min(390px, 100%); min-height: 48px; padding: 0 18px; border-radius: var(--radius-md); border: 1px solid var(--primary); color: var(--on-primary); background: var(--primary); box-shadow: var(--shadow-xs); font-weight: 700; }
+.login-oauth-link { display: flex; align-items: center; justify-content: center; gap: var(--space-xs); text-decoration: none; width: min(390px, 100%); min-height: 48px; padding: 0 18px; border-radius: var(--radius-md); border: 1px solid var(--primary); color: var(--on-primary); background: var(--primary); box-shadow: var(--shadow-xs); font-weight: 700; }
 .round-action-loading { color: var(--outline); background: var(--surface-container-high); }
 
 /* ============================================

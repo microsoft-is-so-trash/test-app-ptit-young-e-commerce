@@ -5,6 +5,7 @@ const ACCESS_TOKEN_KEY = 'eco_oil.access_token';
 const REFRESH_TOKEN_KEY = 'eco_oil.refresh_token';
 const AUTH_USER_KEY = 'eco_oil.auth_user';
 const PENDING_STATION_DELIVERY_KEY_PREFIX = 'eco_oil.pending_station_delivery.';
+const DEMO_ACCOUNT_KEY = 'eco_oil.demo_account';
 
 type NativeStorageApi = typeof ZaloNativeStorage;
 
@@ -150,6 +151,19 @@ export const authUserStorage = {
   },
   clear(): void {
     persistentStorage.remove(AUTH_USER_KEY);
+  },
+};
+
+/** Ghi nhớ tài khoản thử nghiệm đã chọn, chỉ dùng cho chế độ demo ngoại tuyến. */
+export const demoAccountStorage = {
+  load(): string | null {
+    return persistentStorage.read(DEMO_ACCOUNT_KEY);
+  },
+  save(accountId: string): void {
+    persistentStorage.write(DEMO_ACCOUNT_KEY, accountId);
+  },
+  clear(): void {
+    persistentStorage.remove(DEMO_ACCOUNT_KEY);
   },
 };
 
