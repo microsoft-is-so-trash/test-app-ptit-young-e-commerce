@@ -38,7 +38,12 @@ type CollectorScreen =
   | { name: 'station-delivery' }
   | { name: 'receipt-view' }
   | { name: 'outbox' };
-export function CollectorFlow() {
+interface CollectorFlowProps {
+  /** Báo cho vỏ ngoài biết đang ở màn nào để ẩn thanh tab khi thao tác dở dang. */
+  onScreenChange?: (screen: CollectorScreen['name']) => void;
+}
+
+export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
   const queryClient = useQueryClient();
   const collectorStorageId = useAuthStore((state) => state.user?.collectorId ?? state.user?.id ?? null);
   const [restoredShift] = useState(() => collectorStorageId ? pendingStationDeliveryStorage.load(collectorStorageId) : null);
@@ -62,6 +67,10 @@ export function CollectorFlow() {
   const routeDataRef = useRef<RouteLoadResult | undefined>(undefined);
   const locationRef = useRef<GeoPoint | null>(null);
   const online = useOnlineStatus();
+
+  useEffect(() => {
+    onScreenChange?.(screen.name);
+  }, [onScreenChange, screen.name]);
   const outboxStats = useOutboxStats();
   const outboxRows = useOutboxRows();
 

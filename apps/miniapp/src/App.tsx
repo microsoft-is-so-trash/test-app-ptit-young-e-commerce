@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
 import { Role } from '@eco-oil/shared-types';
 import { useAuthStore } from './stores/auth-store';
 import { ApiError } from './lib/api';
@@ -15,13 +14,13 @@ import { OrdersPage } from './pages/OrdersPage';
 import { GreenJourneyPage } from './pages/GreenJourneyPage';
 import { PaymentsPage } from './pages/PaymentsPage';
 import { AccountPage } from './pages/AccountPage';
-import { CollectorFlow } from './pages/CollectorFlow';
+import { CollectorShell } from './pages/collector/CollectorShell';
 import { StatusView } from './components/StatusView';
 import { MerchantApprovalView } from './components/MerchantApprovalView';
 import { startOutboxSyncWorker } from './lib/outbox-sync';
 import { useOutboxStats } from './lib/outbox-hooks';
 import { Icon } from './components/Icon';
-import { NotificationBell } from './components/NotificationBell';
+import { BrandHeader } from './components/BrandHeader';
 
 type Tab = 'home' | 'history' | 'orders' | 'green-journey' | 'account' | 'payments';
 
@@ -43,42 +42,6 @@ const TAB_TITLES: Record<Tab, string> = {
   payments: 'Thanh toán ví',
 };
 
-interface BrandHeaderProps {
-  title: string;
-  withNotifications?: boolean;
-  /** Hành động thay cho chuông thông báo, dùng cho vai trò chưa có trung tâm thông báo. */
-  action?: ReactNode;
-}
-
-function BrandHeader({ title, withNotifications = false, action }: BrandHeaderProps) {
-  return (
-    <header className="brand-header">
-      <div className="brand-header-inner">
-        <div className="brand-header-left">
-          <div className="brand-logo">
-            <span style={{ lineHeight: 1 }}>E</span>
-          </div>
-          <div className="brand-text">
-            <span className="brand-name">ECOllect</span>
-            <span className="brand-title">{title}</span>
-          </div>
-        </div>
-        <div className="brand-header-right">
-          {action ?? (withNotifications ? (
-            <NotificationBell />
-          ) : (
-            <button className="header-icon-btn" aria-label="Thông báo">
-              <Icon name="notifications" size={22} />
-            </button>
-          ))}
-          <div className="header-avatar">
-            <Icon name="person" size={18} />
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 function FloatingNav({ activeTab, onTabChange }: { activeTab: Tab; onTabChange: (tab: Tab) => void }) {
   return (
@@ -214,23 +177,7 @@ export function App() {
       // Deliberately keep IndexedDB outbox rows; logout only clears auth state and tokens.
       await signOut();
     }
-    return (
-      <div className="app-shell collector-shell">
-        <BrandHeader
-          title="Tuyến hôm nay"
-          action={
-            <button className="header-signout" onClick={() => void handleCollectorSignOut()}>
-              Thoát
-            </button>
-          }
-        />
-        <main className="main-area">
-          <div className="page-content" style={{ paddingTop: 16, paddingBottom: 32 }}>
-            <CollectorFlow key={user.id} />
-          </div>
-        </main>
-      </div>
-    );
+    return <CollectorShell userId={user.id} onSignOut={() => { void handleCollectorSignOut(); }} />;
   }
 
   if (user.role !== Role.MERCHANT) {
