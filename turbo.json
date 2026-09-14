@@ -3,7 +3,19 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**"],
+      "env": [
+        "VITE_API_BASE_URL",
+        "VITE_DEMO_MODE",
+        "VITE_DEMO_OFFLINE",
+        "VITE_ADMIN_URL",
+        "VITE_ESTIMATED_PRICE_PER_LITER",
+        "NEXT_PUBLIC_API_BASE_URL",
+        "NEXT_PUBLIC_ADMIN_ZALO_ID",
+        "NEXT_PUBLIC_ADMIN_PHONE",
+        "NEXT_PUBLIC_DEMO_OFFLINE",
+        "NEXT_PUBLIC_LOGIN_GATE_URL"
+      ]
     },
     "dev": {
       "cache": false,
