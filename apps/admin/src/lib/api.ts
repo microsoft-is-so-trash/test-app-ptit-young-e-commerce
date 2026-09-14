@@ -29,6 +29,47 @@ import type {
 import { browserTokenStorage } from './storage';
 import { DEMO_OFFLINE } from './demo-mode';
 import { demoActiveRoutes, demoOperationsMap } from './demo-operations-map';
+import { demoOverview } from './demo-admin-overview';
+import {
+  demoAiAnomalies,
+  demoAnomalyPerformance,
+  demoImageGradingPerformance,
+  demoPickupForecastPerformance,
+  demoReconciliation,
+  demoReconciliationCsv,
+  demoUpdateAnomalyFeedback,
+} from './demo-admin-ai';
+import {
+  demoAlertList,
+  demoApproveMerchant,
+  demoAssignContainer,
+  demoCancelContainerTransit,
+  demoCollectorPerformance,
+  demoCollectors,
+  demoContainers,
+  demoCreateCollector,
+  demoCreateContainer,
+  demoCreateOilPrice,
+  demoCreateStation,
+  demoCreateWard,
+  demoMarkPaymentPaid,
+  demoMerchants,
+  demoOilPrices,
+  demoPayments,
+  demoRegenerateCollectorInvite,
+  demoRejectMerchant,
+  demoResolveAlert,
+  demoReturnContainerToMerchant,
+  demoRunPayments,
+  demoStations,
+  demoUnassignContainer,
+  demoUpdateCollector,
+  demoUpdateMerchant,
+  demoUpdateStation,
+  demoUpdateStationStatus,
+  demoUpdateWard,
+  demoWards,
+} from './demo-admin-store';
 
 export { ApiError };
 
@@ -74,6 +115,9 @@ const query = (params: Record<string, string | number | boolean | undefined>) =>
   return result ? `?${result}` : '';
 };
 
+/** Ở chế độ demo mọi lời gọi đều trả dữ liệu mẫu, không chạm tới mạng. */
+const demo = <T>(build: () => T): Promise<T> => Promise.resolve(build());
+
 export const api = {
   loginSeed: (zaloId: string, phone: string) =>
     client.request<{ access_token: string; refresh_token: string; user: AuthUser }>('/auth/zalo', {
@@ -93,7 +137,9 @@ export const api = {
       ...(refreshToken ? { body: { refresh_token: refreshToken } } : {}),
     }),
   overview: (from?: string, to?: string) =>
-    client.request<AdminOverviewResponse>(`/admin/overview${query({ from, to })}`),
+    DEMO_OFFLINE
+      ? demo(() => demoOverview(from, to))
+      : client.request<AdminOverviewResponse>(`/admin/overview${query({ from, to })}`),
   operationsMap: (params: { ward_id?: string; only_at_risk?: boolean } = {}) =>
     DEMO_OFFLINE
       ? Promise.resolve(demoOperationsMap(params.ward_id, params.only_at_risk))
@@ -103,11 +149,15 @@ export const api = {
       ? Promise.resolve({ data: demoActiveRoutes() })
       : client.request<AdminActiveRoutesResponse>('/admin/routes'),
   pickupForecastPerformance: (windowDays: 30 | 90 | 180 = 90) =>
-    client.request<AdminPickupForecastPerformanceResponse>(
+    DEMO_OFFLINE
+      ? demo(() => demoPickupForecastPerformance(windowDays))
+      : client.request<AdminPickupForecastPerformanceResponse>(
       `/admin/ai-performance/pickup-forecast${query({ window_days: windowDays })}`,
     ),
   imageGradingPerformance: (windowDays: 30 | 90 | 180 = 90) =>
-    client.request<AdminImageGradingPerformanceResponse>(
+    DEMO_OFFLINE
+      ? demo(() => demoImageGradingPerformance(windowDays))
+      : client.request<AdminImageGradingPerformanceResponse>(
       `/admin/ai-performance/image-grading${query({ window_days: windowDays })}`,
     ),
   aiAnomalies: (
@@ -119,30 +169,45 @@ export const api = {
       limit?: number;
     } = {},
   ) =>
-    client.request<AdminAiAnomaliesResponse>(
-      `/admin/ai-anomalies${query({ window_days: 90, page: 1, limit: 100, ...params })}`,
-    ),
+    DEMO_OFFLINE
+      ? demo(() => demoAiAnomalies(params))
+      : client.request<AdminAiAnomaliesResponse>(
+          `/admin/ai-anomalies${query({ window_days: 90, page: 1, limit: 100, ...params })}`,
+        ),
   updateAiAnomalyFeedback: (
     transactionId: string,
     body: { verdict: AnomalyFeedbackVerdict; note?: string },
   ) =>
-    client.request<AdminAnomalyFeedback>(`/admin/ai-anomalies/${transactionId}/feedback`, {
-      method: 'PUT',
-      body,
-    }),
+    DEMO_OFFLINE
+      ? demo(() => demoUpdateAnomalyFeedback(transactionId, body))
+      : client.request<AdminAnomalyFeedback>(`/admin/ai-anomalies/${transactionId}/feedback`, {
+          method: 'PUT',
+          body,
+        }),
   aiAnomalyPerformance: (windowDays: 30 | 90 | 180 = 90) =>
-    client.request<AdminAiAnomalyPerformanceResponse>(
+    DEMO_OFFLINE
+      ? demo(() => demoAnomalyPerformance(windowDays))
+      : client.request<AdminAiAnomalyPerformanceResponse>(
       `/admin/ai-performance/anomaly-detection${query({ window_days: windowDays })}`,
     ),
   reconciliation: (date: string) =>
-    client.request<AdminReconciliationResponse>(`/admin/reconciliation?date=${date}`),
+    DEMO_OFFLINE
+      ? demo(() => demoReconciliation(date))
+      : client.request<AdminReconciliationResponse>(`/admin/reconciliation?date=${date}`),
   reconciliationCsv: (date: string) =>
-    client.request<string>(`/admin/reconciliation/export?date=${date}`),
+    DEMO_OFFLINE
+      ? demo(() => demoReconciliationCsv(date))
+      : client.request<string>(`/admin/reconciliation/export?date=${date}`),
   alerts: (params: { type?: string; resolved?: boolean; page?: number; limit?: number }) =>
-    client.request<PagedResponse<AdminAlert>>(`/admin/alerts${query(params)}`),
+    DEMO_OFFLINE
+      ? demo(() => demoAlertList(params))
+      : client.request<PagedResponse<AdminAlert>>(`/admin/alerts${query(params)}`),
   resolveAlert: (id: string) =>
-    client.request<AdminAlert>(`/admin/alerts/${id}/resolve`, { method: 'PATCH' }),
+    DEMO_OFFLINE
+      ? demo(() => demoResolveAlert(id))
+      : client.request<AdminAlert>(`/admin/alerts/${id}/resolve`, { method: 'PATCH' }),
   stations: async (): Promise<PagedResponse<StationSummaryWithForecast>> => {
+    if (DEMO_OFFLINE) return demoStations();
     const response = await client.request<
       PagedResponse<Omit<StationSummaryWithForecast, 'fill_pct'> & { fill_pct?: number }>
     >('/stations?page=1&limit=100&include_inactive=true');
@@ -164,7 +229,10 @@ export const api = {
     lat: number;
     lng: number;
     status: 'ACTIVE' | 'INACTIVE';
-  }) => client.request<StationSummaryWithForecast>('/stations', { method: 'POST', body }),
+  }) =>
+    DEMO_OFFLINE
+      ? demo(() => demoCreateStation(body))
+      : client.request<StationSummaryWithForecast>('/stations', { method: 'POST', body }),
   updateStation: (
     id: string,
     body: {
@@ -175,16 +243,23 @@ export const api = {
       lat?: number;
       lng?: number;
     },
-  ) => client.request<StationSummaryWithForecast>(`/stations/${id}`, { method: 'PATCH', body }),
+  ) =>
+    DEMO_OFFLINE
+      ? demo(() => demoUpdateStation(id, body))
+      : client.request<StationSummaryWithForecast>(`/stations/${id}`, { method: 'PATCH', body }),
   updateStationStatus: (id: string, status: 'ACTIVE' | 'INACTIVE') =>
-    client.request<StationSummaryWithForecast>(`/stations/${id}/status`, {
-      method: 'PATCH',
-      body: { status },
-    }),
+    DEMO_OFFLINE
+      ? demo(() => demoUpdateStationStatus(id, status))
+      : client.request<StationSummaryWithForecast>(`/stations/${id}/status`, {
+          method: 'PATCH',
+          body: { status },
+        }),
   merchants: (params: { search?: string; anomaly?: boolean; status?: string }) =>
-    client.request<PagedResponse<AdminMerchantSummary>>(
-      `/admin/merchants${query({ page: 1, limit: 100, ...params })}`,
-    ),
+    DEMO_OFFLINE
+      ? demo(() => demoMerchants(params))
+      : client.request<PagedResponse<AdminMerchantSummary>>(
+          `/admin/merchants${query({ page: 1, limit: 100, ...params })}`,
+        ),
   updateMerchant: (
     id: string,
     body: {
@@ -196,36 +271,58 @@ export const api = {
       lat?: number;
       lng?: number;
     },
-  ) => client.request(`/merchants/${id}`, { method: 'PATCH', body }),
+  ) =>
+    DEMO_OFFLINE
+      ? demo(() => demoUpdateMerchant(id, body))
+      : client.request(`/merchants/${id}`, { method: 'PATCH', body }),
   collectors: () =>
-    client.request<PagedResponse<AdminCollectorSummary>>(
-      '/admin/collectors?page=1&limit=100&include_inactive=true',
-    ),
+    DEMO_OFFLINE
+      ? demo(() => demoCollectors())
+      : client.request<PagedResponse<AdminCollectorSummary>>(
+          '/admin/collectors?page=1&limit=100&include_inactive=true',
+        ),
   collectorPerformance: (id: string) =>
-    client.request<AdminCollectorPerformance>(`/admin/collectors/${id}/performance`),
+    DEMO_OFFLINE
+      ? demo(() => demoCollectorPerformance(id))
+      : client.request<AdminCollectorPerformance>(`/admin/collectors/${id}/performance`),
   approveMerchant: (id: string, body: { lat: number; lng: number }) =>
-    client.request(`/admin/merchants/${id}/approve`, { method: 'POST', body }),
+    DEMO_OFFLINE
+      ? demo(() => demoApproveMerchant(id, body))
+      : client.request(`/admin/merchants/${id}/approve`, { method: 'POST', body }),
   rejectMerchant: (id: string, reason: string) =>
-    client.request(`/admin/merchants/${id}/reject`, { method: 'POST', body: { reason } }),
+    DEMO_OFFLINE
+      ? demo(() => demoRejectMerchant(id, reason))
+      : client.request(`/admin/merchants/${id}/reject`, { method: 'POST', body: { reason } }),
   createCollector: (body: {
     name: string;
     phone: string;
     vehicle_type: string;
     max_capacity_l: number;
     ward_ids: string[];
-  }) => client.request<AdminCollectorInviteResponse>('/admin/collectors', { method: 'POST', body }),
+  }) =>
+    DEMO_OFFLINE
+      ? demo(() => demoCreateCollector(body))
+      : client.request<AdminCollectorInviteResponse>('/admin/collectors', { method: 'POST', body }),
   regenerateCollectorInvite: (id: string) =>
-    client.request<AdminCollectorInviteResponse>('/admin/collectors/' + id + '/invite', {
-      method: 'POST',
-    }),
+    DEMO_OFFLINE
+      ? demo(() => demoRegenerateCollectorInvite(id))
+      : client.request<AdminCollectorInviteResponse>('/admin/collectors/' + id + '/invite', {
+          method: 'POST',
+        }),
   updateCollector: (id: string, body: Record<string, unknown>) =>
-    client.request(`/admin/collectors/${id}`, { method: 'PATCH', body }),
+    DEMO_OFFLINE
+      ? demo(() => demoUpdateCollector(id, body))
+      : client.request(`/admin/collectors/${id}`, { method: 'PATCH', body }),
   containers: (params: { state?: string; merchant_id?: string; unassigned?: boolean } = {}) =>
-    client.request<PagedResponse<AdminContainerSummary>>(
-      `/admin/containers${query({ page: 1, limit: 100, ...params })}`,
-    ),
+    DEMO_OFFLINE
+      ? demo(() => demoContainers(params))
+      : client.request<PagedResponse<AdminContainerSummary>>(
+          `/admin/containers${query({ page: 1, limit: 100, ...params })}`,
+        ),
   wards: (includeInactive = false) =>
-    client.request<AdminWardSummary[]>(`/admin/wards?include_inactive=${includeInactive}`),
+    DEMO_OFFLINE
+      ? demo(() => demoWards())
+      : client.request<AdminWardSummary[]>(`/admin/wards?include_inactive=${includeInactive}`),
   createWard: (body: {
     code: string;
     name: string;
@@ -233,50 +330,79 @@ export const api = {
     city: string;
     center_lat?: number;
     center_lng?: number;
-  }) => client.request<AdminWardSummary>('/admin/wards', { method: 'POST', body }),
+  }) =>
+    DEMO_OFFLINE
+      ? demo(() => demoCreateWard(body))
+      : client.request<AdminWardSummary>('/admin/wards', { method: 'POST', body }),
   updateWard: (id: string, body: Record<string, unknown>) =>
-    client.request<AdminWardSummary>(`/admin/wards/${id}`, { method: 'PATCH', body }),
+    DEMO_OFFLINE
+      ? demo(() => demoUpdateWard(id, body))
+      : client.request<AdminWardSummary>(`/admin/wards/${id}`, { method: 'PATCH', body }),
   createContainer: (body: {
     ward_id?: string;
     ward_code?: string;
     capacity_liters: number;
     qr_code?: string;
-  }) => client.request<AdminContainerSummary>('/admin/containers', { method: 'POST', body }),
+  }) =>
+    DEMO_OFFLINE
+      ? demo(() => demoCreateContainer(body))
+      : client.request<AdminContainerSummary>('/admin/containers', { method: 'POST', body }),
   assignContainer: (id: string, merchant_id: string) =>
-    client.request<AdminContainerSummary>(`/admin/containers/${id}/assign`, {
-      method: 'POST',
-      body: { merchant_id },
-    }),
+    DEMO_OFFLINE
+      ? demo(() => demoAssignContainer(id, merchant_id))
+      : client.request<AdminContainerSummary>(`/admin/containers/${id}/assign`, {
+          method: 'POST',
+          body: { merchant_id },
+        }),
   unassignContainer: (id: string) =>
-    client.request<AdminContainerSummary>(`/admin/containers/${id}/unassign`, { method: 'POST' }),
+    DEMO_OFFLINE
+      ? demo(() => demoUnassignContainer(id))
+      : client.request<AdminContainerSummary>(`/admin/containers/${id}/unassign`, { method: 'POST' }),
   returnContainerToMerchant: (id: string, body: AdminContainerReturnRequest) =>
-    client.request<AdminContainerSummary>(`/admin/containers/${id}/return-to-merchant`, {
-      method: 'POST',
-      body,
-    }),
+    DEMO_OFFLINE
+      ? demo(() => demoReturnContainerToMerchant(id))
+      : client.request<AdminContainerSummary>(`/admin/containers/${id}/return-to-merchant`, {
+          method: 'POST',
+          body,
+        }),
   cancelContainerTransit: (id: string, body: { note?: string }) =>
-    client.request<AdminContainerSummary & { affected_transaction_ids: string[] }>(
-      `/admin/containers/${id}/cancel-transit`,
-      { method: 'POST', body },
-    ),
+    DEMO_OFFLINE
+      ? demo(() => demoCancelContainerTransit(id))
+      : client.request<AdminContainerSummary & { affected_transaction_ids: string[] }>(
+          `/admin/containers/${id}/cancel-transit`,
+          { method: 'POST', body },
+        ),
   payments: (params: {
     period?: string;
     merchant_id?: string;
     status?: string;
     page?: number;
     limit?: number;
-  }) => client.request<PaymentListResponse>(`/admin/payments${query(params)}`),
+  }) =>
+    DEMO_OFFLINE
+      ? demo(() => demoPayments(params))
+      : client.request<PaymentListResponse>(`/admin/payments${query(params)}`),
   runPayments: (period: string) =>
-    client.request<PaymentRunResponse>(`/admin/payments/run?period=${encodeURIComponent(period)}`, {
-      method: 'POST',
-    }),
+    DEMO_OFFLINE
+      ? demo(() => demoRunPayments(period))
+      : client.request<PaymentRunResponse>(`/admin/payments/run?period=${encodeURIComponent(period)}`, {
+          method: 'POST',
+        }),
   markPaymentPaid: (id: string) =>
-    client.request<PaymentRecord>(`/admin/payments/${id}/mark-paid`, { method: 'POST' }),
-  oilPrices: () => client.request<OilPriceRecord[]>('/admin/oil-prices'),
+    DEMO_OFFLINE
+      ? demo(() => demoMarkPaymentPaid(id))
+      : client.request<PaymentRecord>(`/admin/payments/${id}/mark-paid`, { method: 'POST' }),
+  oilPrices: () =>
+    DEMO_OFFLINE
+      ? demo(() => demoOilPrices())
+      : client.request<OilPriceRecord[]>('/admin/oil-prices'),
   createOilPrice: (body: {
     unit_price: number;
     unit?: 'PER_LITER' | 'PER_KG';
     effective_from?: string;
     note?: string;
-  }) => client.request<OilPriceRecord>('/admin/oil-prices', { method: 'POST', body }),
+  }) =>
+    DEMO_OFFLINE
+      ? demo(() => demoCreateOilPrice(body))
+      : client.request<OilPriceRecord>('/admin/oil-prices', { method: 'POST', body }),
 };

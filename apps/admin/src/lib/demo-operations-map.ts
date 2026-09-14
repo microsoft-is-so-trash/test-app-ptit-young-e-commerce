@@ -1,3 +1,4 @@
+import { MerchantApprovalStatus } from '@eco-oil/shared-types';
 import type {
   AdminActiveRoute,
   AdminOperationsMapMerchant,
@@ -6,107 +7,199 @@ import type {
   AdminOperationsMapWard,
   MerchantEfficiencyLevel,
 } from '@eco-oil/shared-types';
+import {
+  DEMO_TRANSACTIONS,
+  collectorById,
+  isoHoursAgo,
+  type DemoMerchant,
+} from './demo-dataset';
+import {
+  demoCurrentMerchants,
+  demoCurrentStations,
+  demoCurrentWards,
+  demoOpenAlertCountByMerchant,
+} from './demo-admin-store';
 
 /**
- * Dữ liệu mẫu cho chế độ demo của bản đồ vận hành.
- * Bốn phường dưới đây trùng với seed thật ở apps/api/src/demo/seed-demo-wards.ts
- * nên bản demo và bản chạy dữ liệu thật nhìn giống nhau.
+ * Bản đồ vận hành ở chế độ demo. Dùng chung đúng các quán, phường, trạm và
+ * người thu gom với miniapp qua demo-dataset, nên mở bảng quản trị và mở app
+ * của người thu gom sẽ thấy cùng một địa bàn.
+ *
+ * Cách chấm điểm ở đây phải khớp với apps/api/src/modules/admin/merchant-efficiency-risk.ts
+ * để bản demo không nói khác bản chạy dữ liệu thật.
  */
 
-const WARDS = [
-  { id: 'w-hang-bac', code: 'HB-HK-DEMO', name: 'Phường Hàng Bạc', district: 'Quận Hoàn Kiếm', lat: 21.0333, lng: 105.85 },
-  { id: 'w-cong-vi', code: 'CV-BD-DEMO', name: 'Phường Cống Vị', district: 'Quận Ba Đình', lat: 21.0358, lng: 105.8118 },
-  { id: 'w-nguyen-du', code: 'NT-HBT-DEMO', name: 'Phường Nguyễn Du', district: 'Quận Hai Bà Trưng', lat: 21.0181, lng: 105.8469 },
-  { id: 'w-trung-tu', code: 'TD-DD-DEMO', name: 'Phường Trung Tự', district: 'Quận Đống Đa', lat: 21.0104, lng: 105.8291 },
-] as const;
+const VERY_LOW_YIELD_LITERS = 5;
+const LOW_YIELD_LITERS = 10;
+const FAR_FROM_STATION_KM = 15;
+const WARD_AT_RISK_SHARE = 1 / 3;
+const WARD_WATCH_SHARE = 0.2;
 
-type DemoMerchantSeed = {
-  name: string;
-  ward: number;
-  dLat: number;
-  dLng: number;
-  level: MerchantEfficiencyLevel;
-  score: number;
-  reasons: string[];
-  liters: number | null;
-  ready: boolean;
-  avgDaily: number | null;
-  daysAgo: number | null;
-  alerts: number;
-  distanceM: number | null;
-};
-
-const MERCHANTS: DemoMerchantSeed[] = [
-  // Hàng Bạc — khu phố cổ, quán đông, vận hành tốt
-  { name: 'Bún Chả Phố Cổ', ward: 0, dLat: 0.0008, dLng: -0.0011, level: 'HEALTHY', score: 0, reasons: [], liters: 24, ready: true, avgDaily: 3.4, daysAgo: 2, alerts: 0, distanceM: 2400 },
-  { name: 'Nem Rán Hàng Bạc', ward: 0, dLat: -0.0014, dLng: 0.0009, level: 'HEALTHY', score: 0, reasons: [], liters: 18.5, ready: true, avgDaily: 2.8, daysAgo: 1, alerts: 0, distanceM: 2650 },
-  { name: 'Chả Cá Lã Vọng', ward: 0, dLat: 0.0021, dLng: 0.0015, level: 'HEALTHY', score: 10, reasons: ['DUE_NOW'], liters: 31.2, ready: false, avgDaily: 4.1, daysAgo: 8, alerts: 0, distanceM: 2100 },
-  { name: 'Xôi Gà Hàng Đào', ward: 0, dLat: -0.0019, dLng: -0.0022, level: 'WATCH', score: 30, reasons: ['VERY_LOW_YIELD'], liters: 4.2, ready: false, avgDaily: 0.6, daysAgo: 4, alerts: 0, distanceM: 2800 },
-  { name: 'Cà Phê Trứng Giảng', ward: 0, dLat: 0.0031, dLng: -0.0004, level: 'HEALTHY', score: 0, reasons: [], liters: 12.8, ready: false, avgDaily: 1.9, daysAgo: 3, alerts: 0, distanceM: 2250 },
-
-  // Cống Vị — vận hành trung bình, có vài điểm cần để mắt
-  { name: 'Lẩu Nướng Cống Vị', ward: 1, dLat: 0.0012, dLng: 0.0018, level: 'HEALTHY', score: 0, reasons: [], liters: 42.5, ready: true, avgDaily: 6.2, daysAgo: 2, alerts: 0, distanceM: 3100 },
-  { name: 'Cơm Bình Dân Đội Cấn', ward: 1, dLat: -0.0023, dLng: 0.0011, level: 'WATCH', score: 32, reasons: ['OVERDUE', 'OPEN_ALERT'], liters: 27.4, ready: true, avgDaily: 3.8, daysAgo: 12, alerts: 1, distanceM: 3400 },
-  { name: 'Bánh Mì Chảo Liễu Giai', ward: 1, dLat: 0.0027, dLng: -0.0016, level: 'HEALTHY', score: 0, reasons: [], liters: 15.6, ready: false, avgDaily: 2.2, daysAgo: 3, alerts: 0, distanceM: 2900 },
-  { name: 'Quán Nhậu Vạn Bảo', ward: 1, dLat: -0.0009, dLng: -0.0028, level: 'WATCH', score: 48, reasons: ['SEVERELY_OVERDUE', 'LOW_YIELD'], liters: 8.9, ready: false, avgDaily: 1.1, daysAgo: 26, alerts: 0, distanceM: 3600 },
-  { name: 'Phở Gà Ngọc Hà', ward: 1, dLat: 0.0035, dLng: 0.0007, level: 'HEALTHY', score: 0, reasons: [], liters: 21.3, ready: true, avgDaily: 3.1, daysAgo: 1, alerts: 0, distanceM: 3250 },
-  { name: 'Quán Mới Khai Trương', ward: 1, dLat: -0.0031, dLng: 0.0024, level: 'INSUFFICIENT_DATA', score: 0, reasons: ['NO_COLLECTION_HISTORY'], liters: null, ready: false, avgDaily: null, daysAgo: null, alerts: 0, distanceM: 3800 },
-
-  // Nguyễn Du — khu vực có vấn đề, nhiều điểm đỏ
-  { name: 'Nhà Hàng Nguyễn Du', ward: 2, dLat: 0.0016, dLng: 0.0013, level: 'AT_RISK', score: 72, reasons: ['SEVERELY_OVERDUE', 'VERY_LOW_YIELD', 'OPEN_ALERT'], liters: 3.8, ready: false, avgDaily: 0.4, daysAgo: 34, alerts: 2, distanceM: 6200 },
-  { name: 'Quán Ốc Trần Nhân Tông', ward: 2, dLat: -0.0018, dLng: 0.0021, level: 'AT_RISK', score: 63, reasons: ['SUSPECTED_ADULTERATION', 'OVERDUE', 'LOW_YIELD'], liters: 9.4, ready: false, avgDaily: 1.3, daysAgo: 17, alerts: 3, distanceM: 5900 },
-  { name: 'Bia Hơi Nguyễn Bỉnh Khiêm', ward: 2, dLat: 0.0029, dLng: -0.0019, level: 'AT_RISK', score: 65, reasons: ['SEVERELY_OVERDUE', 'VERY_LOW_YIELD'], liters: 4.6, ready: false, avgDaily: 0.5, daysAgo: 41, alerts: 0, distanceM: 16400 },
-  { name: 'Cháo Sườn Tuệ Tĩnh', ward: 2, dLat: -0.0025, dLng: -0.0012, level: 'WATCH', score: 38, reasons: ['OVERDUE', 'LOW_YIELD'], liters: 7.2, ready: false, avgDaily: 1.0, daysAgo: 15, alerts: 0, distanceM: 6050 },
-  { name: 'Cơm Văn Phòng Thái Phiên', ward: 2, dLat: 0.0011, dLng: 0.0032, level: 'HEALTHY', score: 0, reasons: [], liters: 19.8, ready: true, avgDaily: 2.9, daysAgo: 2, alerts: 0, distanceM: 5700 },
-
-  // Trung Tự — vận hành ổn
-  { name: 'Bún Đậu Trung Tự', ward: 3, dLat: 0.0014, dLng: 0.0016, level: 'HEALTHY', score: 0, reasons: [], liters: 33.7, ready: true, avgDaily: 4.8, daysAgo: 1, alerts: 0, distanceM: 4100 },
-  { name: 'Gà Rán Phạm Ngọc Thạch', ward: 3, dLat: -0.0021, dLng: 0.0008, level: 'HEALTHY', score: 0, reasons: [], liters: 51.2, ready: true, avgDaily: 7.4, daysAgo: 2, alerts: 0, distanceM: 4350 },
-  { name: 'Quán Bia Kim Liên', ward: 3, dLat: 0.0026, dLng: -0.0023, level: 'WATCH', score: 30, reasons: ['VERY_LOW_YIELD'], liters: 4.9, ready: false, avgDaily: 0.7, daysAgo: 5, alerts: 0, distanceM: 4600 },
-  { name: 'Miến Lươn Đặng Văn Ngữ', ward: 3, dLat: -0.0013, dLng: -0.0017, level: 'HEALTHY', score: 0, reasons: [], liters: 16.4, ready: false, avgDaily: 2.4, daysAgo: 3, alerts: 0, distanceM: 4250 },
-  { name: 'Nướng Ngói Xã Đàn', ward: 3, dLat: 0.0033, dLng: 0.0011, level: 'HEALTHY', score: 0, reasons: [], liters: 28.1, ready: true, avgDaily: 4.0, daysAgo: 2, alerts: 0, distanceM: 3950 },
-];
-
-const STATIONS: AdminOperationsMapStation[] = [
-  { id: 's-hoan-kiem', name: 'Trạm Hoàn Kiếm', address: '42 Trần Quang Khải, Hoàn Kiếm', ward_id: 'w-hang-bac', lat: 21.0361, lng: 105.8572, current_volume_l: 1840, capacity_l: 2500, fill_pct: 73.6 },
-  { id: 's-dong-da', name: 'Trạm Đống Đa', address: '128 Tây Sơn, Đống Đa', ward_id: 'w-trung-tu', lat: 21.0067, lng: 105.8236, current_volume_l: 2210, capacity_l: 2400, fill_pct: 92.1 },
-];
-
-function isoDaysAgo(days: number): string {
-  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+interface MerchantHistory {
+  pickupCount: number;
+  totalLiters: number;
+  adulterationCount: number;
 }
 
-function buildMerchants(): AdminOperationsMapMerchant[] {
-  return MERCHANTS.map((seed, index) => {
-    const ward = WARDS[seed.ward];
-    return {
-      id: `demo-merchant-${index + 1}`,
-      name: seed.name,
-      address: `${ward.name}, ${ward.district}, Hà Nội`,
-      ward_id: ward.id,
-      ward_code: ward.code,
-      ward_name: ward.name,
-      lat: ward.lat + seed.dLat,
-      lng: ward.lng + seed.dLng,
-      efficiency_level: seed.level,
-      efficiency_score: seed.score,
-      efficiency_reasons: seed.reasons,
-      expected_liters: seed.liters,
-      expected_liters_source: seed.liters === null ? 'NONE' : seed.ready ? 'READY_ORDER' : 'FORECAST',
-      forecast_confidence: seed.liters === null ? null : seed.ready ? null : 'MEDIUM',
-      avg_daily_liters: seed.avgDaily,
-      last_collected_at: seed.daysAgo === null ? null : isoDaysAgo(seed.daysAgo),
-      open_alert_count: seed.alerts,
-      distance_m: seed.distanceM,
-    };
+function historyFor(merchantId: string): MerchantHistory {
+  const rows = DEMO_TRANSACTIONS.filter((txn) => txn.merchant_id === merchantId);
+  return {
+    pickupCount: rows.length,
+    totalLiters: rows.reduce((sum, txn) => sum + txn.liters, 0),
+    adulterationCount: rows.filter((txn) => txn.suspected_adulteration).length,
+  };
+}
+
+function distanceKm(merchant: DemoMerchant): number | null {
+  const stations = demoCurrentStations();
+  if (stations.length === 0) return null;
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const distances = stations.map((station) => {
+    const dLat = toRad(station.lat - merchant.lat);
+    const dLng = toRad(station.lng - merchant.lng);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(merchant.lat)) * Math.cos(toRad(station.lat)) * Math.sin(dLng / 2) ** 2;
+    return 2 * 6371 * Math.asin(Math.sqrt(a));
   });
+  return Math.min(...distances);
+}
+
+interface RiskResult {
+  score: number;
+  level: MerchantEfficiencyLevel;
+  reasons: string[];
+}
+
+/** Cùng thang điểm với backend: quá hạn 35 · sản lượng 30 · cảnh báo 25 · khoảng cách 10. */
+function scoreMerchant(merchant: DemoMerchant, openAlerts: number): RiskResult {
+  const history = historyFor(merchant.id);
+  const daysSince = merchant.last_collected_days_ago;
+
+  if (history.pickupCount === 0 && daysSince === null && openAlerts === 0 && history.adulterationCount === 0) {
+    return { score: 0, level: 'INSUFFICIENT_DATA', reasons: ['NO_COLLECTION_HISTORY'] };
+  }
+
+  const reasons: string[] = [];
+  let score = 0;
+
+  // Quá hạn: mốc suy ra từ sức chứa can chia sản lượng mỗi ngày.
+  if (daysSince !== null) {
+    const refillDays =
+      merchant.avg_daily_liters && merchant.container_capacity_l
+        ? merchant.container_capacity_l / merchant.avg_daily_liters
+        : null;
+    if (refillDays === null) {
+      reasons.push('NO_CADENCE_BASELINE');
+      if (daysSince >= 21) {
+        score += 35;
+        reasons.push('SEVERELY_OVERDUE');
+      } else if (daysSince >= 14) {
+        score += 20;
+        reasons.push('OVERDUE');
+      }
+    } else {
+      const ratio = daysSince / refillDays;
+      if (ratio >= 2) {
+        score += 35;
+        reasons.push('SEVERELY_OVERDUE');
+      } else if (ratio >= 1.25) {
+        score += 20;
+        reasons.push('OVERDUE');
+      } else if (ratio >= 1) {
+        score += 10;
+        reasons.push('DUE_NOW');
+      }
+    }
+  }
+
+  if (history.pickupCount > 0) {
+    const perPickup = history.totalLiters / history.pickupCount;
+    if (perPickup < VERY_LOW_YIELD_LITERS) {
+      score += 30;
+      reasons.push('VERY_LOW_YIELD');
+    } else if (perPickup < LOW_YIELD_LITERS) {
+      score += 18;
+      reasons.push('LOW_YIELD');
+    }
+  }
+
+  if (history.adulterationCount > 0) {
+    score += 25;
+    reasons.push('SUSPECTED_ADULTERATION');
+  } else if (openAlerts >= 3) {
+    score += 20;
+    reasons.push('MULTIPLE_OPEN_ALERTS');
+  } else if (openAlerts >= 1) {
+    score += 12;
+    reasons.push('OPEN_ALERT');
+  }
+
+  const km = distanceKm(merchant);
+  if (km === null) {
+    reasons.push('MISSING_DISTANCE');
+  } else if (km >= FAR_FROM_STATION_KM) {
+    score += 10;
+    reasons.push('FAR_FROM_STATION');
+  }
+
+  const bounded = Math.round(Math.min(Math.max(score, 0), 100));
+  const level: MerchantEfficiencyLevel = bounded >= 60 ? 'AT_RISK' : bounded >= 30 ? 'WATCH' : 'HEALTHY';
+  return { score: bounded, level, reasons };
+}
+
+function toMapMerchant(merchant: DemoMerchant): AdminOperationsMapMerchant {
+  const ward = demoCurrentWards().find((item) => item.id === merchant.ward_id);
+  const openAlerts = demoOpenAlertCountByMerchant(merchant.id);
+  const risk = scoreMerchant(merchant, openAlerts);
+  const history = historyFor(merchant.id);
+
+  // Quán đang giữ can coi như đã báo sẵn sàng; còn lại là số AI dự báo.
+  const hasReadyOrder = merchant.container_code !== null;
+  const averagePerPickup =
+    history.pickupCount === 0 ? null : history.totalLiters / history.pickupCount;
+  const expected = hasReadyOrder
+    ? Number((averagePerPickup ?? merchant.avg_daily_liters ?? 0).toFixed(1))
+    : averagePerPickup === null
+      ? null
+      : Number((averagePerPickup * 0.9).toFixed(1));
+
+  return {
+    id: merchant.id,
+    name: merchant.name,
+    address: merchant.address,
+    ward_id: merchant.ward_id,
+    ward_code: ward?.code ?? null,
+    ward_name: ward?.name ?? null,
+    lat: merchant.lat,
+    lng: merchant.lng,
+    efficiency_level: risk.level,
+    efficiency_score: risk.score,
+    efficiency_reasons: risk.reasons,
+    expected_liters: expected,
+    expected_liters_source: expected === null ? 'NONE' : hasReadyOrder ? 'READY_ORDER' : 'FORECAST',
+    forecast_confidence: expected === null || hasReadyOrder ? null : history.pickupCount >= 3 ? 'MEDIUM' : 'LOW',
+    avg_daily_liters: merchant.avg_daily_liters,
+    last_collected_at:
+      merchant.last_collected_days_ago === null ? null : isoHoursAgo(merchant.last_collected_days_ago * 24),
+    open_alert_count: openAlerts,
+    distance_m: (() => {
+      const km = distanceKm(merchant);
+      return km === null ? null : Math.round(km * 1000);
+    })(),
+  };
 }
 
 function buildWards(merchants: AdminOperationsMapMerchant[]): AdminOperationsMapWard[] {
-  return WARDS.map((ward) => {
+  return demoCurrentWards().map((ward) => {
     const inWard = merchants.filter((merchant) => merchant.ward_id === ward.id);
-    const sum = (source: 'READY_ORDER' | 'FORECAST') =>
-      round(inWard.reduce((total, item) => total + (item.expected_liters_source === source ? item.expected_liters ?? 0 : 0), 0));
+    const sumBySource = (source: 'READY_ORDER' | 'FORECAST') =>
+      round(
+        inWard.reduce(
+          (total, item) => total + (item.expected_liters_source === source ? item.expected_liters ?? 0 : 0),
+          0,
+        ),
+      );
     const count = (level: MerchantEfficiencyLevel) =>
       inWard.filter((item) => item.efficiency_level === level).length;
 
@@ -115,9 +208,12 @@ function buildWards(merchants: AdminOperationsMapMerchant[]): AdminOperationsMap
     const healthy = count('HEALTHY');
     const scored = atRisk + watch + healthy;
     const level: MerchantEfficiencyLevel =
-      scored === 0 ? 'INSUFFICIENT_DATA'
-        : atRisk / scored >= 1 / 3 ? 'AT_RISK'
-          : (atRisk + watch) / scored >= 0.2 ? 'WATCH'
+      scored === 0
+        ? 'INSUFFICIENT_DATA'
+        : atRisk / scored >= WARD_AT_RISK_SHARE
+          ? 'AT_RISK'
+          : (atRisk + watch) / scored >= WARD_WATCH_SHARE
+            ? 'WATCH'
             : 'HEALTHY';
 
     return {
@@ -125,12 +221,12 @@ function buildWards(merchants: AdminOperationsMapMerchant[]): AdminOperationsMap
       code: ward.code,
       name: ward.name,
       district: ward.district,
-      center_lat: ward.lat,
-      center_lng: ward.lng,
+      center_lat: ward.center_lat,
+      center_lng: ward.center_lng,
       merchant_count: inWard.length,
-      expected_liters: round(sum('READY_ORDER') + sum('FORECAST')),
-      ready_order_liters: sum('READY_ORDER'),
-      forecast_liters: sum('FORECAST'),
+      expected_liters: round(sumBySource('READY_ORDER') + sumBySource('FORECAST')),
+      ready_order_liters: sumBySource('READY_ORDER'),
+      forecast_liters: sumBySource('FORECAST'),
       efficiency_level: level,
       at_risk_count: atRisk,
       watch_count: watch,
@@ -140,50 +236,76 @@ function buildWards(merchants: AdminOperationsMapMerchant[]): AdminOperationsMap
   });
 }
 
+function buildStations(wardId?: string): AdminOperationsMapStation[] {
+  return demoCurrentStations()
+    .filter((station) => !wardId || station.ward_id === wardId)
+    .map((station) => ({
+      id: station.id,
+      name: station.name,
+      address: station.address,
+      ward_id: station.ward_id,
+      lat: station.lat,
+      lng: station.lng,
+      current_volume_l: station.current_volume_l,
+      capacity_l: station.capacity_l,
+      fill_pct: round((station.current_volume_l / station.capacity_l) * 100),
+    }));
+}
+
+/**
+ * Hai tuyến đang chạy của đúng hai người thu gom trong dữ liệu demo:
+ * Nguyễn Văn Thu đi bốn điểm trong tuyến, Trần Thị Hằng đi ba điểm ngoài tuyến.
+ */
 function buildRoutes(merchants: AdminOperationsMapMerchant[]): AdminActiveRoute[] {
-  const stopFrom = (merchant: AdminOperationsMapMerchant, sequence: number, status: 'PENDING' | 'COLLECTED') => ({
-    order_id: `demo-order-${merchant.id}`,
-    sequence,
-    status,
-    merchant_name: merchant.name,
-    lat: merchant.lat,
-    lng: merchant.lng,
-    expected_liters: merchant.expected_liters,
-  });
-
-  const hoanKiem = merchants.filter((item) => item.ward_id === 'w-hang-bac').slice(0, 4);
-  const dongDa = merchants.filter((item) => item.ward_id === 'w-trung-tu').slice(0, 3);
-
-  return [
+  const plans: Array<{ collectorId: string; merchantIds: string[]; startedHoursAgo: number; done: number }> = [
     {
-      id: 'demo-route-01',
-      collector_id: 'demo-collector-01',
-      collector_name: 'Nguyễn Văn Thu (ca sáng)',
-      started_at: new Date(Date.now() - 2.5 * 60 * 60 * 1000).toISOString(),
-      origin_lat: 21.0361,
-      origin_lng: 105.8572,
-      vehicle_capacity_l: 150,
-      total_expected_liters: 86.5,
-      remaining_capacity_l: 63.5,
-      stop_count: hoanKiem.length,
-      completed_stop_count: 2,
-      stops: hoanKiem.map((merchant, index) => stopFrom(merchant, index + 1, index < 2 ? 'COLLECTED' : 'PENDING')),
+      collectorId: 'demo-collector-001',
+      merchantIds: ['demo-merchant-001', 'demo-merchant-003', 'demo-merchant-004', 'demo-merchant-005'],
+      startedHoursAgo: 2.5,
+      done: 2,
     },
     {
-      id: 'demo-route-02',
-      collector_id: 'demo-collector-02',
-      collector_name: 'Trần Thị Bình (ca chiều)',
-      started_at: new Date(Date.now() - 55 * 60 * 1000).toISOString(),
-      origin_lat: 21.0067,
-      origin_lng: 105.8236,
-      vehicle_capacity_l: 200,
-      total_expected_liters: 113.2,
-      remaining_capacity_l: 158.4,
-      stop_count: dongDa.length,
-      completed_stop_count: 1,
-      stops: dongDa.map((merchant, index) => stopFrom(merchant, index + 1, index < 1 ? 'COLLECTED' : 'PENDING')),
+      collectorId: 'demo-collector-002',
+      merchantIds: ['demo-merchant-006', 'demo-merchant-007', 'demo-merchant-008'],
+      startedHoursAgo: 0.9,
+      done: 1,
     },
   ];
+
+  return plans.map((plan, index) => {
+    const collector = collectorById(plan.collectorId);
+    const stops = plan.merchantIds
+      .map((merchantId) => merchants.find((item) => item.id === merchantId))
+      .filter((item): item is AdminOperationsMapMerchant => item !== undefined)
+      .map((merchant, stopIndex) => ({
+        order_id: `demo-order-${merchant.id}`,
+        sequence: stopIndex + 1,
+        status: (stopIndex < plan.done ? 'COLLECTED' : 'PENDING') as 'COLLECTED' | 'PENDING',
+        merchant_name: merchant.name,
+        lat: merchant.lat,
+        lng: merchant.lng,
+        expected_liters: merchant.expected_liters,
+      }));
+
+    const expected = round(stops.reduce((sum, stop) => sum + (stop.expected_liters ?? 0), 0));
+    const capacity = collector?.max_capacity_l ?? 100;
+    const origin = demoCurrentStations()[index % Math.max(demoCurrentStations().length, 1)];
+
+    return {
+      id: `demo-route-0${index + 1}`,
+      collector_id: plan.collectorId,
+      collector_name: collector?.display_name ?? 'Người thu gom',
+      started_at: isoHoursAgo(plan.startedHoursAgo),
+      origin_lat: origin?.lat ?? null,
+      origin_lng: origin?.lng ?? null,
+      vehicle_capacity_l: capacity,
+      total_expected_liters: expected,
+      remaining_capacity_l: round(Math.max(capacity - expected, 0)),
+      stop_count: stops.length,
+      completed_stop_count: stops.filter((stop) => stop.status === 'COLLECTED').length,
+      stops,
+    };
+  });
 }
 
 function round(value: number): number {
@@ -191,11 +313,15 @@ function round(value: number): number {
 }
 
 export function demoOperationsMap(wardId?: string, onlyAtRisk = false): AdminOperationsMapResponse {
-  const allMerchants = buildMerchants();
-  const scoped = wardId ? allMerchants.filter((merchant) => merchant.ward_id === wardId) : allMerchants;
+  // Chỉ vẽ quán đã duyệt — quán chờ duyệt chưa có địa bàn chính thức.
+  const approved = demoCurrentMerchants().filter(
+    (merchant) => merchant.approval_status === MerchantApprovalStatus.APPROVED,
+  );
+  const mapped = approved.map(toMapMerchant);
+  const scoped = wardId ? mapped.filter((merchant) => merchant.ward_id === wardId) : mapped;
   const visible = onlyAtRisk ? scoped.filter((merchant) => merchant.efficiency_level === 'AT_RISK') : scoped;
   const wards = buildWards(scoped).filter((ward) => !wardId || ward.id === wardId);
-  const routes = buildRoutes(allMerchants);
+  const routes = buildRoutes(mapped);
 
   return {
     generated_at: new Date().toISOString(),
@@ -209,17 +335,14 @@ export function demoOperationsMap(wardId?: string, onlyAtRisk = false): AdminOpe
     },
     merchants: visible,
     wards,
-    stations: wardId ? STATIONS.filter((station) => station.ward_id === wardId) : STATIONS,
+    stations: buildStations(wardId),
     routes,
   };
 }
 
 export function demoActiveRoutes(): AdminActiveRoute[] {
-  return buildRoutes(buildMerchants());
+  const approved = demoCurrentMerchants().filter(
+    (merchant) => merchant.approval_status === MerchantApprovalStatus.APPROVED,
+  );
+  return buildRoutes(approved.map(toMapMerchant));
 }
-
-export const demoWardOptions = WARDS.map((ward) => ({
-  id: ward.id,
-  name: ward.name,
-  district: ward.district,
-}));
