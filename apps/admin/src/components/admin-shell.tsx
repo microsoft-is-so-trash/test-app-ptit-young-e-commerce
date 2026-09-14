@@ -8,6 +8,7 @@ import { useAuth } from '../lib/auth';
 import { api } from '../lib/api';
 import { isAdminUser } from '../lib/dashboard-utils';
 import { DEMO_OFFLINE } from '../lib/demo-mode';
+import { configuredLoginGateUrl } from '../lib/login-gate';
 import { Skeleton } from './ui';
 
 const links = [
@@ -119,7 +120,13 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <button
               className="flex min-h-10 items-center gap-2 rounded-xl border border-outline-variant px-4 text-sm font-semibold text-on-surface-variant transition hover:bg-surface-container-high"
               onClick={() => {
-                void signOut().then(() => router.replace('/login'));
+                void signOut().then(() => {
+                  // Quay lại đúng cổng đã chọn vai trò, để đổi sang quán hoặc
+                  // người thu gom mà không phải tự gõ địa chỉ.
+                  const gate = configuredLoginGateUrl();
+                  if (gate) window.location.assign(gate);
+                  else router.replace('/login');
+                });
               }}
             >
               <span className="material-symbols-outlined text-[18px]" aria-hidden="true">logout</span>

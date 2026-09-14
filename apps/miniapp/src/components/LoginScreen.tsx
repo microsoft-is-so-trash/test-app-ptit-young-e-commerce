@@ -4,7 +4,7 @@ import type { AdminWardSummary, DevAccount } from '@eco-oil/shared-types';
 import { ApiError, API_BASE_URL, api } from '../lib/api';
 import { isZaloEnvironment, zaloClient } from '../lib/zalo-client';
 import { useAuthStore } from '../stores/auth-store';
-import { getSeedLoginCredentials, shouldShowDevelopmentLogin } from './login-screen-logic';
+import { adminConsoleRedirect, getSeedLoginCredentials, shouldShowDevelopmentLogin } from './login-screen-logic';
 import { WebZaloLoginLink } from './WebZaloLoginLink';
 import { COLLECTOR_INVITE_PARAM, getStoredCollectorInvite } from '../lib/collector-invite';
 import { isDemoOfflineMode } from '../lib/demo-accounts';
@@ -119,6 +119,12 @@ export function LoginScreen() {
   }
 
   async function handleSeedLogin() {
+    // Quản trị viên dùng chung cổng này nhưng làm việc ở web quản trị riêng.
+    const adminUrl = adminConsoleRedirect(devAccounts, selectedId, import.meta.env.VITE_ADMIN_URL);
+    if (adminUrl) {
+      window.location.assign(adminUrl);
+      return;
+    }
     if (isDemoOfflineMode()) {
       loginDemoAccount(selectedId);
       return;

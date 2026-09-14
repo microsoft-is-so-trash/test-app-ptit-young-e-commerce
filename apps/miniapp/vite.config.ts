@@ -21,6 +21,8 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_DEMO_OFFLINE': JSON.stringify(
         env.VITE_DEMO_OFFLINE || 'false',
       ),
+      // Web quản trị là ứng dụng riêng; cổng đăng nhập chung cần biết đường tới nó.
+      'import.meta.env.VITE_ADMIN_URL': JSON.stringify(env.VITE_ADMIN_URL || ''),
     },
     resolve: {
       alias: {

@@ -32,3 +32,35 @@ export function isValidAuthSession(session: unknown): session is AuthSession {
   const candidate = session as Partial<AuthSession>;
   return hasText(candidate.access_token) && hasText(candidate.refresh_token) && isValidAuthUser(candidate.user);
 }
+
+/**
+ * Web quản trị là một ứng dụng riêng, chạy ở địa chỉ khác miniapp. Khi người
+ * dùng chọn tài khoản quản trị ở cổng đăng nhập chung, trả về địa chỉ cần
+ * chuyển tới; các vai trò khác trả null để đăng nhập ngay tại miniapp.
+ *
+ * Không kèm số điện thoại hay mã tài khoản vào địa chỉ: đó là dữ liệu cá nhân,
+ * và địa chỉ trang có thể bị lưu lại trong lịch sử trình duyệt hoặc log máy chủ.
+ */
+export function adminConsoleRedirect(
+  accounts: DevAccount[],
+  selectedId: string,
+  adminConsoleUrl: string | undefined,
+): string | null {
+  if (!hasText(selectedId)) return null;
+  const account = accounts.find((item) => item.zalo_id === selectedId);
+  if (account?.role !== Role.ADMIN) return null;
+
+  const trimmed = (adminConsoleUrl ?? '').trim();
+  if (!hasText(trimmed)) return null;
+
+  let parsed: URL;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return null;
+  }
+  // Chỉ nhận http/https để không mở được javascript: hay data:
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+
+  return trimmed.replace(/\/+$/, '');
+}

@@ -84,6 +84,22 @@ export const DEMO_ACCOUNTS: DemoAccount[] = [
       merchantRejectionReason: null,
     },
   },
+  {
+    id: 'zalo_admin_01',
+    label: 'ECollect Admin',
+    scenario: 'Quản trị viên — mở bảng vận hành ở web quản trị',
+    user: {
+      id: 'demo-admin-01',
+      zalo_id: 'zalo_admin_01',
+      phone: '0900000000',
+      name: 'ECollect Admin',
+      role: Role.ADMIN,
+      merchantId: null,
+      collectorId: null,
+      merchantApprovalStatus: null,
+      merchantRejectionReason: null,
+    },
+  },
 ];
 
 export function findDemoAccount(accountId: string | null): DemoAccount | null {
@@ -99,7 +115,7 @@ export function resolveActiveDemoAccount(): DemoAccount | null {
   const stored = demoAccountStorage.load();
   if (stored === LOGGED_OUT_MARKER) return null;
   const account = findDemoAccount(stored);
-  if (account) return account;
+  if (account && account.user.role !== Role.ADMIN) return account;
   return DEMO_ACCOUNTS[0] ?? null;
 }
 

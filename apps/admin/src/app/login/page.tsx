@@ -3,10 +3,12 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '../../lib/auth';
+import { configuredLoginGateUrl } from '../../lib/login-gate';
 
 export default function LoginPage() {
   const { user, loading, error, loginAdmin } = useAuth();
   const router = useRouter();
+  const loginGate = configuredLoginGateUrl();
 
   useEffect(() => {
     if (!loading && user) router.replace('/');
@@ -34,6 +36,15 @@ export default function LoginPage() {
           {loading ? 'Đang đăng nhập…' : 'Đăng nhập quản trị'}
         </button>
         {error && <p className="mt-4 rounded-xl bg-error-container p-3 text-sm text-on-error-container" role="alert">{error}</p>}
+        {loginGate ? (
+          <a
+            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-outline-variant px-4 text-sm font-semibold text-on-surface-variant transition hover:bg-surface-container-high"
+            href={loginGate}
+          >
+            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">swap_horiz</span>
+            Đăng nhập bằng vai trò khác
+          </a>
+        ) : null}
         <p className="mt-6 text-xs text-on-surface-variant/60">
           Tài khoản: {process.env.NEXT_PUBLIC_ADMIN_ZALO_ID || 'zalo_admin_01'}
         </p>

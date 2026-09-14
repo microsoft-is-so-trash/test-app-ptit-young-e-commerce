@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { Role } from '@eco-oil/shared-types';
 import type { DevAccount } from '@eco-oil/shared-types';
-import { getSeedLoginCredentials, isValidAuthSession, isValidAuthUser, shouldShowDevelopmentLogin } from '../src/components/login-screen-logic';
+import { adminConsoleRedirect, getSeedLoginCredentials, isValidAuthSession, isValidAuthUser, shouldShowDevelopmentLogin } from '../src/components/login-screen-logic';
 
 test('backend mock accounts are usable even when the Zalo SDK client is real', () => {
   const account: DevAccount = {
@@ -70,4 +70,51 @@ test('normalized auth session accepts a new authenticated user without a merchan
     refresh_token: 'refresh-token-fixture',
     user: { zalo_id: 'zalo-new', role: Role.MERCHANT, merchantId: null },
   }), false);
+});
+
+test('tài khoản quản trị được chuyển sang web admin thay vì đăng nhập tại miniapp', () => {
+  const admin: DevAccount = {
+    zalo_id: 'zalo_admin_01',
+    name: 'ECollect Admin',
+    role: Role.ADMIN,
+    phone: '0900000000',
+    wards: [],
+  };
+  const merchant: DevAccount = {
+    zalo_id: 'zalo_merchant_01',
+    name: 'Quán Cô Ba',
+    role: Role.MERCHANT,
+    phone: '0908123456',
+    wards: [],
+  };
+
+  assert.equal(adminConsoleRedirect([admin], 'zalo_admin_01', 'http://localhost:3001'), 'http://localhost:3001');
+  assert.equal(adminConsoleRedirect([merchant], 'zalo_merchant_01', 'http://localhost:3001'), null);
+});
+
+test('bỏ dấu gạch chéo thừa ở cuối địa chỉ web admin', () => {
+  const admin: DevAccount = { zalo_id: 'a', name: null, role: Role.ADMIN, phone: null, wards: [] };
+
+  assert.equal(adminConsoleRedirect([admin], 'a', 'https://admin.ecollect.vn/'), 'https://admin.ecollect.vn');
+});
+
+test('không chuyển hướng khi chưa cấu hình địa chỉ web admin', () => {
+  const admin: DevAccount = { zalo_id: 'a', name: null, role: Role.ADMIN, phone: null, wards: [] };
+
+  assert.equal(adminConsoleRedirect([admin], 'a', ''), null);
+  assert.equal(adminConsoleRedirect([admin], 'a', '   '), null);
+});
+
+test('chỉ chấp nhận địa chỉ http/https, chặn javascript: và dữ liệu lạ', () => {
+  const admin: DevAccount = { zalo_id: 'a', name: null, role: Role.ADMIN, phone: null, wards: [] };
+
+  assert.equal(adminConsoleRedirect([admin], 'a', 'javascript:alert(1)'), null);
+  assert.equal(adminConsoleRedirect([admin], 'a', 'data:text/html,x'), null);
+  assert.equal(adminConsoleRedirect([admin], 'a', 'ftp://example.com'), null);
+});
+
+test('không chuyển hướng khi chưa chọn tài khoản nào', () => {
+  const admin: DevAccount = { zalo_id: 'a', name: null, role: Role.ADMIN, phone: null, wards: [] };
+
+  assert.equal(adminConsoleRedirect([admin], '', 'http://localhost:3001'), null);
 });
