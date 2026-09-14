@@ -12,6 +12,27 @@ import {
   Quality,
 } from '@eco-oil/shared-types';
 
+/**
+ * Cờ boolean đi qua URL luôn là chuỗi. Không dùng z.coerce.boolean() được vì
+ * nó gọi Boolean(), mà Boolean("false") ra true — tham số ?x=false sẽ bị hiểu
+ * ngược. Giá trị lạ thì báo lỗi chứ không âm thầm coi là false, để gõ sai tên
+ * tham số là biết ngay thay vì bộ lọc chạy sai trong im lặng.
+ */
+const TRUE_TOKENS = new Set(['true', '1']);
+const FALSE_TOKENS = new Set(['false', '0']);
+
+const queryBoolean = z.union([z.boolean(), z.string()]).transform((value, ctx) => {
+  if (typeof value === 'boolean') return value;
+  const token = value.trim().toLowerCase();
+  if (TRUE_TOKENS.has(token)) return true;
+  if (FALSE_TOKENS.has(token)) return false;
+  ctx.addIssue({
+    code: z.ZodIssueCode.custom,
+    message: 'Giá trị phải là true/false hoặc 1/0',
+  });
+  return z.NEVER;
+});
+
 export const uuidSchema = z.string().uuid();
 export const phoneSchema = z.string().min(8).max(20);
 
@@ -140,7 +161,7 @@ export type EntityStatusInput = z.infer<typeof entityStatusSchema>;
 export const paginationSchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(20),
-  include_inactive: z.coerce.boolean().default(false),
+  include_inactive: queryBoolean.default(false),
 });
 
 export const paymentPeriodSchema = z
@@ -282,7 +303,7 @@ export type AdminContainerCreateInput = z.infer<typeof adminContainerCreateSchem
 export const adminContainerListQuerySchema = paginationSchema.extend({
   state: z.nativeEnum(ContainerState).optional(),
   merchant_id: uuidSchema.optional(),
-  unassigned: z.coerce.boolean().optional(),
+  unassigned: queryBoolean.optional(),
 });
 export type AdminContainerListQueryInput = z.infer<typeof adminContainerListQuerySchema>;
 
@@ -334,14 +355,14 @@ export const adminWardPatchSchema = adminWardBaseSchema.partial().extend({
 export type AdminWardPatchInput = z.infer<typeof adminWardPatchSchema>;
 
 export const adminWardListQuerySchema = z.object({
-  include_inactive: z.coerce.boolean().default(true),
+  include_inactive: queryBoolean.default(true),
 });
 export type AdminWardListQueryInput = z.infer<typeof adminWardListQuerySchema>;
 
 export const adminOperationsMapQuerySchema = z.object({
   ward_id: uuidSchema.optional(),
   /** Bỏ qua quán chưa đủ dữ liệu để chấm điểm, dùng khi chỉ muốn soi điểm nóng. */
-  only_at_risk: z.coerce.boolean().default(false),
+  only_at_risk: queryBoolean.default(false),
 });
 export type AdminOperationsMapQueryInput = z.infer<typeof adminOperationsMapQuerySchema>;
 
@@ -617,22 +638,16 @@ export const adminAiAnomalyFeedbackSchema = z
   .strict();
 export type AdminAiAnomalyFeedbackInput = z.infer<typeof adminAiAnomalyFeedbackSchema>;
 
-const queryBooleanSchema = z.preprocess((value) => {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  return value;
-}, z.boolean());
-
 export const adminAlertListQuerySchema = paginationSchema.extend({
   type: z.nativeEnum(AlertType).optional(),
-  resolved: queryBooleanSchema.optional(),
+  resolved: queryBoolean.optional(),
 });
 export type AdminAlertListQueryInput = z.infer<typeof adminAlertListQuerySchema>;
 
 export const adminMerchantListQuerySchema = merchantListQuerySchema.extend({
   status: z.nativeEnum(MerchantApprovalStatus).optional(),
   search: z.string().trim().max(120).optional(),
-  anomaly: z.coerce.boolean().optional(),
+  anomaly: queryBoolean.optional(),
 });
 export type AdminMerchantListQueryInput = z.infer<typeof adminMerchantListQuerySchema>;
 
