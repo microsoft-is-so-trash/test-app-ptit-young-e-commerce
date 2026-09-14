@@ -7,6 +7,7 @@ import { api, ApiError } from '../lib/api';
 import { formatDate, formatLiters } from '../lib/dashboard-utils';
 import { validateMerchantEdit, type MerchantEditFormValues } from '../lib/merchant-edit';
 import { AdminShell } from './admin-shell';
+import { containerStateLabel } from '../lib/labels';
 import { Badge, EmptyState, ErrorState, Skeleton } from './ui';
 
 function valuesForMerchant(merchant: AdminMerchantSummary): MerchantEditFormValues {
@@ -205,7 +206,7 @@ export function MerchantsView() {
                 <div key={container.id} className="rounded-xl bg-surface-container-lowest p-4 shadow-m3-1">
                   <div className="flex items-center justify-between gap-2">
                     <strong className="font-mono text-sm">{container.qr_code}</strong>
-                    <Badge tone={container.state === 'AT_MERCHANT' ? 'green' : 'orange'}>{container.state}</Badge>
+                    <Badge tone={container.state === 'AT_MERCHANT' ? 'green' : 'orange'}>{containerStateLabel(container.state)}</Badge>
                   </div>
                   <p className="mt-2 text-sm text-on-surface-variant">Dung tích: {container.capacity_liters ?? '—'} lít</p>
                 </div>

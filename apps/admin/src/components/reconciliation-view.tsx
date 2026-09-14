@@ -6,6 +6,7 @@ import type { AdminTransactionAnomaly } from '@eco-oil/shared-types';
 import { api, ApiError } from '../lib/api';
 import { formatDate, formatLiters, todayIso } from '../lib/dashboard-utils';
 import { AdminShell } from './admin-shell';
+import { varianceStatusLabel } from '../lib/labels';
 import { Badge, EmptyState, ErrorState, Skeleton } from './ui';
 
 const anomalyPresentation = {
@@ -169,7 +170,7 @@ export function ReconciliationView() {
                     <td className="py-3">{formatLiters(collector.delivered_l)} / {collector.delivered_kg.toFixed(2)} kg</td>
                     <td className={`py-3 ${collector.status === 'FLAGGED' ? 'font-bold text-error' : ''}`}>{collector.variance_kg.toFixed(2)} kg</td>
                     <td className="py-3">
-                      <Badge tone={collector.status === 'FLAGGED' ? 'red' : 'green'}>{collector.status}</Badge>
+                      <Badge tone={collector.status === 'FLAGGED' ? 'red' : 'green'}>{varianceStatusLabel(collector.status)}</Badge>
                       {collector.has_estimated_mass ? <p className="mt-1 text-xs text-amber-700">Có số kg ước lượng</p> : null}
                       {collector.transactions.length > 0 && (
                         <details className="mt-2 text-xs font-normal">

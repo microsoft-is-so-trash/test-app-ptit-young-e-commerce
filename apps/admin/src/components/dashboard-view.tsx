@@ -7,6 +7,7 @@ import { formatDate, formatLiters, todayIso } from '../lib/dashboard-utils';
 import { AdminShell } from './admin-shell';
 import { EmptyState, ErrorState, Skeleton, Badge } from './ui';
 import { KpiCards } from './kpi-cards';
+import { qualityLabel } from '../lib/labels';
 
 function dateDaysAgo(days: number) {
   const date = new Date();
@@ -188,7 +189,7 @@ export function DashboardView() {
                       </td>
                       <td className="py-3">
                         <Badge tone={transaction.quality === 'FLAG' ? 'red' : 'green'}>
-                          {transaction.quality}
+                          {qualityLabel(transaction.quality)}
                         </Badge>
                       </td>
                       <td className="py-3 text-on-surface-variant">

@@ -129,17 +129,17 @@ function reasonsFor(txn: DemoTransaction) {
   if (txn.suspected_adulteration) {
     return [
       {
-        code: 'SUSPECTED_ADULTERATION',
-        label: 'Người thu gom đánh dấu nghi pha lẫn',
-        description: 'Người thu gom bật cờ nghi ngờ ngay tại điểm thu.',
+        code: 'DENSITY_OUTLIER',
+        label: 'Tỷ lệ kg/lít bất thường',
+        description: 'Dầu bị pha thì tỷ lệ kg trên lít lệch khỏi khoảng thường thấy.',
         contribution: 55,
         evidence: { flagged_by: collectorName(txn.collector_id) },
         severity: AlertSeverity.HIGH,
       },
       {
-        code: 'GRADE_DOWNGRADE',
-        label: 'Hạng dầu thấp bất thường',
-        description: 'Quán này thường giao hạng A, lần này xuống hạng C.',
+        code: 'MASS_OR_VOLUME_OUTLIER',
+        label: 'Khối lượng hoặc thể tích bất thường',
+        description: 'Số lít lần này lệch xa so với các lần trước của quán.',
         contribution: 33,
         evidence: { usual_grade: OilGrade.A, this_grade: OilGrade.C },
         severity: AlertSeverity.MEDIUM,
@@ -148,8 +148,8 @@ function reasonsFor(txn: DemoTransaction) {
   }
   return [
     {
-      code: 'VOLUME_DEVIATION',
-      label: 'Sản lượng lệch so với thường lệ',
+      code: 'MASS_OR_VOLUME_OUTLIER',
+      label: 'Khối lượng hoặc thể tích bất thường',
       description: 'Số lít chênh so với trung bình các lần trước của quán.',
       contribution: 46,
       evidence: { deviation_pct: 18 },

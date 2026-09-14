@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, ApiError } from '../lib/api';
 import { AdminShell } from './admin-shell';
+import { approvalStatusLabel } from '../lib/labels';
 import { Badge, EmptyState, ErrorState, Skeleton } from './ui';
 
 type Coordinates = { lat: string; lng: string };
@@ -74,7 +75,7 @@ export function ApprovalsView() {
               <p className="mt-2 text-sm text-on-surface-variant">{merchant.business_type ?? 'Chưa chọn loại hình'} · {merchant.phone ?? 'Chưa có số điện thoại'}</p>
               <p className="mt-1 text-xs text-on-surface-variant">Phường: {merchant.ward_name ?? merchant.ward_code ?? '—'}</p>
             </div>
-            <Badge tone="orange">PENDING</Badge>
+            <Badge tone="orange">{approvalStatusLabel('PENDING')}</Badge>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <button className="min-h-11 rounded-xl bg-primary px-4 text-sm font-bold text-white" onClick={() => {

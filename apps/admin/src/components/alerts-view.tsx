@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { api, ApiError } from '../lib/api';
 import { formatDate } from '../lib/dashboard-utils';
 import { AdminShell } from './admin-shell';
+import { alertSeverityLabel, riskLevelLabel } from '../lib/labels';
 import { Badge, EmptyState, ErrorState, Skeleton } from './ui';
 
 const ALERT_LABELS: Record<string, string> = {
@@ -184,7 +185,7 @@ export function AiAnomalyListItem({ item, onSave, saving, saveError, saveSuccess
             <span className="material-symbols-outlined text-[20px] text-violet-600" aria-hidden="true">psychology</span>
             <Badge tone="violet">Bất thường AI</Badge>
             <Badge tone={anomalyTone(item.risk_level)}>
-              {item.risk_level === 'HIGH_RISK' ? 'Rủi ro cao' : 'Cần kiểm tra'}
+              {riskLevelLabel(item.risk_level)}
             </Badge>
             <Badge tone={item.feedback ? 'green' : 'slate'}>{feedbackLabel}</Badge>
           </div>
@@ -212,7 +213,7 @@ export function AiAnomalyListItem({ item, onSave, saving, saveError, saveSuccess
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-semibold">{reason.label}</span>
                   <Badge tone={reason.severity === 'HIGH' ? 'red' : reason.severity === 'MEDIUM' ? 'orange' : 'slate'}>
-                    {reason.severity}
+                    {alertSeverityLabel(reason.severity)}
                   </Badge>
                   <span className="text-on-surface-variant">
                     {reason.contribution === null ? 'Đóng góp: chưa xác định' : `Đóng góp: ${reason.contribution} điểm`}

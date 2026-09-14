@@ -6,6 +6,7 @@ import type { AdminCollectorInviteResponse, AdminCollectorSummary } from '@eco-o
 import { api, ApiError } from '../lib/api';
 import { formatLiters } from '../lib/dashboard-utils';
 import { AdminShell } from './admin-shell';
+import { varianceStatusLabel } from '../lib/labels';
 import { Badge, EmptyState, ErrorState, Skeleton } from './ui';
 
 const empty = { name: '', phone: '', vehicle_type: 'Xe máy có thùng chứa', max_capacity_l: '100' };
@@ -364,7 +365,7 @@ export function CollectorsView() {
                                 {(performance.data.variance_pct * 100).toFixed(2)}%)
                               </span>
                               <Badge tone={performance.data.status === 'FLAGGED' ? 'red' : 'green'}>
-                                {performance.data.status}
+                                {varianceStatusLabel(performance.data.status)}
                               </Badge>
                             </div>
                           ) : null}
