@@ -4,6 +4,7 @@ import { HealthModule } from './health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ContainersModule } from './modules/containers/containers.module';
 import { CollectionsModule } from './modules/collections/collections.module';
+import { CollectorsModule } from './modules/collectors/collectors.module';
 import { MerchantsModule } from './modules/merchants/merchants.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { StationsModule } from './modules/stations/stations.module';
@@ -29,6 +30,7 @@ import { ZaloVerificationModule } from './verification/zalo-verification.module'
     StationsModule,
     ContainersModule,
     CollectionsModule,
+    CollectorsModule,
     StationDeliveriesModule,
     SyncModule,
     AdminModule,
