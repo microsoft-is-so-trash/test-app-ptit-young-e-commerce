@@ -274,19 +274,33 @@ async function main() {
   });
   await prisma.$executeRaw`UPDATE "stations" SET "location" = ST_SetSRID(ST_MakePoint(105.8151, 21.0352), 4326)::geography WHERE "id" = ${secondStationId}::uuid`;
 
-  const demoOrders = merchants.slice(0, 3).map(([merchantId], index) => ({
+  const firstCollectorId = '73000000-0000-4000-8000-000000000001';
+
+  // Bốn quán đầu: hai quán phường Hàng Bạc, một Cống Vị, một Nguyễn Du. Nhờ vậy
+  // cả hai người thu gom đều có điểm phải ghé trong địa bàn mình phụ trách.
+  const demoOrders = merchants.slice(0, 4).map(([merchantId], index) => ({
     id: `76000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
     merchantId,
     containerId: `72000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`,
-    collectorId:
-      index < 2 ? '73000000-0000-4000-8000-000000000001' : '73000000-0000-4000-8000-000000000002',
     expectedLiters: 20 + index * 5,
   }));
-  for (const order of demoOrders) {
+
+  // Đơn đầu tiên có giao dịch kèm theo nên để COLLECTED cho khớp thực tế.
+  // Các đơn còn lại để READY và chưa gán người thu: tuyến thu gom, bản đồ điểm
+  // thu và ô "dầu dự kiến" của trang quản trị đều chỉ đếm đơn READY, nên nếu
+  // seed để ASSIGNED thì mở app lên sẽ không thấy gì để thu.
+  for (const [index, order] of demoOrders.entries()) {
+    const collected = index === 0;
+    const data = {
+      ...order,
+      status: collected ? OrderStatus.COLLECTED : OrderStatus.READY,
+      collectorId: collected ? firstCollectorId : null,
+      completedAt: collected ? new Date() : null,
+    };
     await prisma.collectionOrder.upsert({
       where: { id: order.id },
-      update: { ...order, status: OrderStatus.ASSIGNED, deletedAt: null },
-      create: { ...order, status: OrderStatus.ASSIGNED },
+      update: { ...data, deletedAt: null },
+      create: data,
     });
   }
   await prisma.collectionTransaction.upsert({
@@ -295,7 +309,7 @@ async function main() {
       orderId: demoOrders[0].id,
       containerId: demoOrders[0].containerId,
       merchantId: demoOrders[0].merchantId,
-      collectorId: demoOrders[0].collectorId,
+      collectorId: firstCollectorId,
       actualLiters: 18,
       grade: OilGrade.A,
       quality: Quality.PASS,
@@ -307,7 +321,7 @@ async function main() {
       orderId: demoOrders[0].id,
       containerId: demoOrders[0].containerId,
       merchantId: demoOrders[0].merchantId,
-      collectorId: demoOrders[0].collectorId,
+      collectorId: firstCollectorId,
       actualLiters: 18,
       grade: OilGrade.A,
       quality: Quality.PASS,
@@ -332,7 +346,7 @@ async function main() {
     });
   }
   console.log(
-    'Demo seed complete: 4 Hanoi wards, 5 merchants, 2 collectors, 2 stations, 5 containers, 3 orders, 1 transaction.',
+    'Demo seed complete: 4 Hanoi wards, 5 merchants, 2 collectors, 2 stations, 5 containers, 4 orders (1 COLLECTED + 3 READY), 1 transaction.',
   );
 }
 
