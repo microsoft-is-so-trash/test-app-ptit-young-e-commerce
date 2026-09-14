@@ -84,7 +84,11 @@ export function OperationsMapCanvas({
               .filter((station) => station.lat !== null && station.lng !== null)
               .map((station) => [station.lat as number, station.lng as number]),
           );
-        if (points.length > 0) map.fitBounds(leaflet.latLngBounds(points).pad(0.15));
+        // Không dùng animation: React StrictMode gắn rồi gỡ ngay, animation còn
+        // treo lại sẽ chạy trên bản đồ đã bị huỷ và ném lỗi _leaflet_pos.
+        if (points.length > 0) {
+          map.fitBounds(leaflet.latLngBounds(points).pad(0.15), { animate: false });
+        }
       } catch {
         if (!cancelled) setFailed(true);
       }
