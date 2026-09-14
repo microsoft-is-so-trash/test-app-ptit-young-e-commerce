@@ -16,3 +16,30 @@ test('rejects unsafe production API base URLs', () => {
     assert.throws(() => resolveApiBaseUrl('production', value));
   }
 });
+
+test('nói rõ giá trị nhận được khi cấu hình sai, để đọc log build là biết ngay', () => {
+  // Thiếu https:// là lỗi hay gặp nhất khi dán vào ô Value trên Vercel.
+  assert.throws(
+    () => resolveApiBaseUrl('production', 'eco-oil-api-kgoe.onrender.com/api/v1'),
+    (error: Error) => error.message.includes('eco-oil-api-kgoe.onrender.com/api/v1'),
+    'thông báo lỗi phải chứa giá trị đã nhận',
+  );
+});
+
+test('nêu tên biến lẫn giá trị khi URL đúng dạng nhưng sai đường dẫn', () => {
+  assert.throws(
+    () => resolveApiBaseUrl('production', 'https://eco-oil-api-kgoe.onrender.com'),
+    (error: Error) =>
+      error.message.includes('VITE_API_BASE_URL')
+      && error.message.includes('https://eco-oil-api-kgoe.onrender.com'),
+  );
+});
+
+test('cắt bớt giá trị quá dài để log không bị rác', () => {
+  // Giá trị vừa dài vừa sai: thiếu scheme nên không phân tích được thành URL.
+  const huge = `${'a'.repeat(400)}.com/api/v1`;
+  assert.throws(
+    () => resolveApiBaseUrl('production', huge),
+    (error: Error) => error.message.includes('…') && !error.message.includes('a'.repeat(200)),
+  );
+});
