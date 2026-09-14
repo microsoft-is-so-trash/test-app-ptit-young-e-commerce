@@ -70,3 +70,12 @@ table { border-collapse: collapse; }
   background: #a8f499;
   color: #002204;
 }
+
+/* ── Khoảng cách cột trong bảng ── */
+/* Các bảng của trang quản trị chỉ đặt padding dọc, nên khi bảng bị ép hẹp thì
+   nội dung hai cột cạnh nhau dính liền. Đặt khoảng cách ngang mặc định ở đây
+   để không phải sửa từng ô trong hơn mười bảng. */
+table th:not(:last-child),
+table td:not(:last-child) {
+  padding-right: 1.25rem;
+}

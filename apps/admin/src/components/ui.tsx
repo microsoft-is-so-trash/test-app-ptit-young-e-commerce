@@ -39,7 +39,7 @@ const badgeTones = {
 
 export function Badge({ children, tone = 'slate' }: { children: React.ReactNode; tone?: keyof typeof badgeTones }) {
   return (
-    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${badgeTones[tone]}`}>
+    <span className={`inline-flex items-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold ${badgeTones[tone]}`}>
       {children}
     </span>
   );
