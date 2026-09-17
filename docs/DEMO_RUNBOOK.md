@@ -123,6 +123,41 @@ git push origin main
 
 Render tự deploy từ `main`. Nếu thay đổi có Prisma migration, phải chạy migration Neon trước khi push theo hướng dẫn trong `DEPLOY.md`.
 
+## Đăng nhập Zalo thật cần relay hồ sơ đang chạy sống
+
+Xác nhận 17/09/2026: máy vận hành thật là Linux Fedora tại chỗ (không phải máy
+Windows nhắc ở các mục PowerShell phía trên — mục đó đã lỗi thời). API hồ sơ
+Zalo (`graph.zalo.me/v2.0/me`) áp cùng giới hạn `-501` như API vị trí: chỉ nhận
+request từ IP Việt Nam. Render chạy Singapore nên **mọi đăng nhập Zalo thật đều
+cần relay hồ sơ chạy sống** — không có relay, lỗi ngay `ZALO_PROFILE_API_ERROR`.
+
+```bash
+# Terminal 1 — relay (giữ chạy)
+cd /home/giaphamkhanh/Music/test-app-ptit-young-e-commerce
+export ZALO_PROFILE_RELAY_SECRET=$(openssl rand -hex 24)
+echo "$ZALO_PROFILE_RELAY_SECRET"   # ghi lai, dan vao Render o buoc duoi
+export ZALO_PROFILE_RELAY_PORT=8787
+pnpm --filter @eco-oil/api relay:zalo-profile
+```
+
+```bash
+# Terminal 2 — tunnel (giữ chạy)
+/home/giaphamkhanh/Music/test-app-ptit-young-e-commerce/.tools/cloudflared tunnel --url http://127.0.0.1:8787
+```
+
+Lấy URL `https://<ngẫu-nhiên>.trycloudflare.com` từ output, kiểm tra `/health`
+trả `{"status":"ok"}`, rồi cập nhật Render → `eco-oil-api` → Environment:
+
+```
+ZALO_PROFILE_RELAY_URL=<url tunnel>
+ZALO_PROFILE_RELAY_SECRET=<secret vừa tạo>
+```
+
+Save, rebuild, and deploy. Đúng như relay vị trí: **Quick Tunnel không cam kết
+uptime, URL đổi mỗi lần chạy lại.** Tắt 1 trong 2 terminal là đăng nhập Zalo thật
+gãy ngay — quay lại `ZALO_PROFILE_API_ERROR` — phải lặp lại toàn bộ hai bước trên
+và cập nhật lại URL mới trên Render.
+
 ## Trình tự demo đề xuất
 
 1. Mở collector và lấy GPS thật.
