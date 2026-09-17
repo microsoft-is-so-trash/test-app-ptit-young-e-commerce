@@ -28,7 +28,7 @@ describe('Zalo domain verification (e2e)', () => {
       .expect(200);
 
     expect(response.headers['content-type']).toMatch(/^text\/html;\s*charset=utf-8$/);
-    expect(response.text).toBe('<!DOCTYPE html>\n<html lang="en">\n\n<head>\n    <meta property="zalo-platform-site-verification" content="Ujw03lZo6XOpXymhruLl4nVounNxX3bDE30n" />\n</head>\n\n<body>\nThere Is No Limit To What You Can Accomplish Using Zalo!\n</body>\n\n</html>');
+    expect(response.text).toBe('<!DOCTYPE html>\n<html lang="en">\n\n<head>\n    <meta property="zalo-platform-site-verification" content="N-EW8eJWCXXVp-4_ghjiP4E8r5Yl_WuFE34r" />\n</head>\n\n<body>\nThere Is No Limit To What You Can Accomplish Using Zalo!\n</body>\n\n</html>');
     await request(app.getHttpServer()).get(`/api/v1/${ZALO_VERIFIER_PATH}`).expect(404);
   });
 

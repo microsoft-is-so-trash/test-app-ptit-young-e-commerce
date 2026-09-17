@@ -27,7 +27,7 @@ Quick Tunnel chỉ dành cho demo. URL `trycloudflare.com` thay đổi sau mỗi
 Mở URL health trước buổi demo vài phút:
 
 ```text
-https://eco-oil-api-kgoe.onrender.com/health
+https://eco-oil-api-kgoe.onrender.com/api/v1/health
 ```
 
 Render Free có thể mất khoảng 50 giây để khởi động sau thời gian không hoạt động.
@@ -108,7 +108,7 @@ npx --yes zmp-cli@4.0.3 deploy --existing --outputDir dist
 Khi CLI hỏi, chọn:
 
 - Project: `Eco Oil`
-- Mini App ID: `2013689159096493937`
+- Mini App ID: `676390262547910961`
 - Version status: `Development`
 - Description: mô tả ngắn thay đổi vừa làm
 
