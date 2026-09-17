@@ -1,1 +1,1 @@
-export const ZALO_VERIFIER_PATH = 'zalo_verifierUjw03lZo6XOpXymhruLl4nVounNxX3bDE30n.html';
+export const ZALO_VERIFIER_PATH = 'zalo_verifierN-EW8eJWCXXVp-4_ghjiP4E8r5Yl_WuFE34r.html';

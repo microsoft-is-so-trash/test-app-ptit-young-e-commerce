@@ -1,5 +1,7 @@
 # Lộ trình tích hợp Eco-Oil với Zalo Mini App
 
+> ⚠️ **ĐÃ LỖI THỜI kể từ 17/09/2026.** Khảo sát dưới đây (19/08/2026) mô tả sai hiện trạng ở nhiều điểm — `RealZaloAuthProvider`, `app-config.json`, script ZMP CLI đều đã được triển khai xong từ trước ngày này. Xem `docs/zalo-integration-handoff.md` và `docs/ZALO_DEV_SETUP.md` để biết hiện trạng và kế hoạch thật.
+
 Ngày khảo sát: 19/08/2026
 Phạm vi: đánh giá hiện trạng và lập kế hoạch; chưa triển khai OAuth, chưa đổi API, package, database hay source code.
 
