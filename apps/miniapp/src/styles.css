@@ -1,3 +1,10 @@
+/* zmp-cli sync-config chỉ quét <link rel="stylesheet"> trong index.html và
+   ghi sai URL Google Fonts vào listCSS (làm app-config.json bị Zalo từ chối
+   lúc deploy: "File app-config.json is invalid"). Nạp font qua @import ở đây
+   để sync-config không thấy chúng nữa — @import phải đứng trước mọi rule khác. */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Google+Sans+Text:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Roboto+Flex:opsz,wght@8..144,300..800&family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
 /* ============================================
    ECOllect Mini App — Design System v2
    Google Material You · Modern Eco Green Theme
