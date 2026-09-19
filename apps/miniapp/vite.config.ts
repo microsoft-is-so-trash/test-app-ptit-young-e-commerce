@@ -14,18 +14,13 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     define: {
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiBaseUrl),
-      // Vite nạp .env.local bất kể --mode là gì (trừ mode "test"), nên máy dev
-      // bật demo cục bộ (.env.local) sẽ vô tình lẫn vào MỌI build production —
-      // kể cả build:zmp cho Zalo Mini App. Ép cứng false khi mode production,
-      // bất kể .env.local nói gì, để bản production không bao giờ dính demo mode.
-      'import.meta.env.VITE_DEMO_MODE': JSON.stringify(
-        mode === 'production' ? 'false' : (env.VITE_DEMO_MODE || 'false'),
-      ),
+      // Cho phép bật Demo Mode trên Web Demo (Vercel), ưu tiên biến môi trường VITE_DEMO_MODE (mặc định 'true' nếu không khai báo khác)
+      'import.meta.env.VITE_DEMO_MODE': JSON.stringify(env.VITE_DEMO_MODE || 'true'),
       'import.meta.env.VITE_DEVICE_CLIENT_MODE': JSON.stringify(
         env.VITE_DEVICE_CLIENT_MODE || '',
       ),
       'import.meta.env.VITE_DEMO_OFFLINE': JSON.stringify(
-        mode === 'production' ? 'false' : (env.VITE_DEMO_OFFLINE || 'false'),
+        env.VITE_DEMO_OFFLINE || 'false',
       ),
       // Web quản trị là ứng dụng riêng; cổng đăng nhập chung cần biết đường tới nó.
       'import.meta.env.VITE_ADMIN_URL': JSON.stringify(env.VITE_ADMIN_URL || ''),

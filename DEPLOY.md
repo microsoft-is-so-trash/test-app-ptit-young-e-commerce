@@ -196,53 +196,16 @@ nhất là bảng `oil_prices` — thiếu giá thì chốt kỳ ném `NO_PRICE_
 Render gói Free ngủ khi không có request; lần gọi đầu mất khoảng 50 giây.
 Gọi trước `GET /api/v1/health` vài phút trước khi trình diễn.
 
-## Đóng gói Zalo Mini App
+## Đóng gói Zalo Mini App [ĐÃ HỦY / LƯU TRỮ]
 
-Mục này khác hẳn phần "Mini App trình duyệt" ở trên: đây là đóng gói bản chạy
-trong app Zalo (webview `h5.zdn.vn`), không phải build Vite thường cho trình
-duyệt.
+> ⚠️ **LƯU Ý:** Toàn bộ luồng deploy lên Zalo Mini App đã được hủy bỏ để tập trung
+> 100% vào bản Web Demo chạy trực tiếp trên Vercel. Không còn sử dụng `zmp-cli` hay
+> `build:zmp` trong mã nguồn. Các tài liệu hướng dẫn Zalo trước đây đã được chuyển
+> vào `docs/archive/` để tham khảo khi cần.
+>
+> **Trạng thái hiện tại:**
+> - Mini App chạy trên Vercel dưới dạng Web SPA (`apps/miniapp`).
+> - Màn hình đăng nhập sử dụng Demo Account Picker (`VITE_DEMO_MODE=true`), kết nối
+>   tới Backend API Render chạy chế độ `ZALO_AUTH_MODE=mock`.
+> - Dữ liệu được quản lý và nạp mẫu qua `pnpm seed:demo`.
 
-### Hai ID khác nhau — đừng nhầm
-
-| | Zalo App | Zalo Mini App |
-|---|---|---|
-| Trang cấp | developers.zalo.me | mini.zalo.me |
-| Dùng để | Đăng nhập OAuth (`ZALO_APP_ID`, biến trên Render) | Tham số `--miniAppId` khi `zmp deploy` |
-
-Dán nhầm Mini App ID vào biến `ZALO_APP_ID` (hoặc ngược lại) là nguyên nhân phổ
-biến nhất của lỗi `-5000 App id is invalid`.
-
-### Thứ tự deploy
-
-```bash
-cd apps/miniapp
-pnpm exec zmp-cli login          # token CLI hết hạn định kỳ, phải đăng nhập lại
-pnpm build:zmp
-pnpm deploy:zmp
-```
-
-CLI sẽ hỏi: Project → Mini App ID → Version status → Description. Chọn
-**Development** cho tới khi qua bước Xác thực + kiểm duyệt.
-
-`zmp start` không dùng được cho repo này — CLI không nhận đây là project ZMP
-chuẩn. Luôn dùng `build:zmp` + `deploy:zmp`.
-
-### Trước khi test trên thiết bị thật
-
-- Thêm số điện thoại Zalo của người test vào **whitelist tester** trên Mini
-  App Center. Thiếu bước này → `-6001 Invalid Permission (not in white list)`,
-  rất dễ tưởng nhầm là lỗi code.
-- Xác nhận `ZALO_AUTH_MODE=real` đã bật trên service API mà Mini App trỏ tới —
-  ở mock mode, mỗi lần đăng nhập tạo một user rác vì access token thật bị dùng
-  thẳng làm `zalo_id`.
-- API Domain khai báo trong Mini App Center phải là origin API (không kèm
-  `/api/v1`), và `CORS_ORIGINS` trên service đó phải có `https://h5.zdn.vn`.
-
-### Phát hành
-
-Chỉ làm sau khi đã test xong bản Development: hoàn tất bước **Xác thực**
-(bắt buộc trước khi phát hành) → nộp duyệt theo chính sách kiểm duyệt của
-Zalo → mới có link `zalo.me/s/...` công khai. Trước khi duyệt, link đó báo
-"ứng dụng đang phát triển" — dùng QR Development thay thế.
-
-Chi tiết đầy đủ từng bước tạo App/Mini App: xem `docs/ZALO_DEV_SETUP.md`.

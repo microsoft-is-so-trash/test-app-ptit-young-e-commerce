@@ -95,24 +95,14 @@ Kết quả GPS đúng:
 - Hiện `Đã cập nhật GPS và tuyến lúc HH:mm`.
 - Khoảng cách và thứ tự điểm được tính lại từ vị trí thật.
 
-## Deploy Mini App khi có code mới
+## Deploy Mini App lên Vercel khi có code mới
 
-Không chạy bước này chỉ vì URL Quick Tunnel thay đổi; URL relay nằm ở Render, không nằm trong bundle Mini App.
+Mini App được deploy tự động trên Vercel dưới dạng Web SPA. Khi push code lên nhánh chính kết nối Vercel:
 
-```powershell
-cd "C:\Users\admin\OneDrive\Documents\ChatGPT\Y.E.S 2\apps\miniapp"
-pnpm build:zmp
-npx --yes zmp-cli@4.0.3 deploy --existing --outputDir dist
-```
+- Vercel tự động nhận diện root directory `apps/miniapp`.
+- Lệnh build: `cd ../.. && npx turbo run build --filter=@eco-oil/miniapp`.
+- Đảm bảo biến môi trường `VITE_DEMO_MODE=true` đã được cấu hình trên Vercel Project Settings để bật bộ chọn tài khoản demo.
 
-Khi CLI hỏi, chọn:
-
-- Project: `Eco Oil`
-- Mini App ID: `676390262547910961`
-- Version status: `Development`
-- Description: mô tả ngắn thay đổi vừa làm
-
-Quét QR mới bằng Zalo. `zmp start` không dùng được cho repo static hiện tại vì CLI không nhận đây là project ZMP chuẩn.
 
 ## Khi backend có code mới
 
