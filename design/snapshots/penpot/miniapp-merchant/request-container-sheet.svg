@@ -1,0 +1,541 @@
+<svg width="380" xmlns="http://www.w3.org/2000/svg" height="812" viewBox="1800 7360 380 812" style="-webkit-print-color-adjust::exact" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" version="1.1">
+  <style>
+  </style>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb7acf11e">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb7acf11e-render-13627" class="frame-clip frame-clip-def">
+        <rect rx="0" ry="0" x="1800" y="7360" width="375" height="812" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb7acf11e-render-13627)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb7acf11e">
+              <rect rx="0" ry="0" x="1800" y="7360" width="375" height="812" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#000000;fill-opacity:0.55">
+              </rect>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb7d95d81">
+                <defs>
+                  <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb7d95d81-render-13628" class="frame-clip frame-clip-def">
+                    <path d="M1824,7842 h327 a24,24 0 0 1 24,24 v306 a0,0 0 0 1 0,0 h-375 a0,0 0 0 1 0,0 v-306 a24,24 0 0 1 24,-24 z" x="1800" y="7842" width="375" height="330" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                    </path>
+                  </clipPath>
+                </defs>
+                <g class="frame-container-wrapper">
+                  <g class="frame-container-blur">
+                    <g class="frame-container-shadows">
+                      <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb7d95d81-render-13628)" fill="none">
+                        <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb7d95d81">
+                          <path d="M1824,7842 h327 a24,24 0 0 1 24,24 v306 a0,0 0 0 1 0,0 h-375 a0,0 0 0 1 0,0 v-306 a24,24 0 0 1 24,-24 z" x="1800" y="7842" width="375" height="330" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#ffffff;fill-opacity:1">
+                          </path>
+                        </g>
+                        <g class="frame-children">
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81fb807e945">
+                            <defs>
+                              <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb807e945-render-13629" class="frame-clip frame-clip-def">
+                                <rect rx="2" ry="2" x="1968" y="7854" width="40" height="4" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                                </rect>
+                              </clipPath>
+                            </defs>
+                            <g class="frame-container-wrapper">
+                              <g class="frame-container-blur">
+                                <g class="frame-container-shadows">
+                                  <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb807e945-render-13629)" fill="none">
+                                    <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb807e945">
+                                      <rect rx="2" ry="2" x="1968" y="7854" width="40" height="4" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#e2e8e0;fill-opacity:1">
+                                      </rect>
+                                    </g>
+                                    <g class="frame-children">
+                                    </g>
+                                  </g>
+                                </g>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81fb8513e4c">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7874" width="207" height="20" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="206.22500610351562" height="19.200000762939453" id="fill-0-render-13630-0">
+                                  <g>
+                                    <rect width="206.22500610351562" height="19.200000762939453" style="fill:#0f1712;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb8513e4c">
+                                <text x="1820" y="7893.200000762939" dominant-baseline="ideographic" textLength="206.22500610351562" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:16px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">Đăng ký cấp thêm can chuẩn</text>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81fb89780cb">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7900" width="360" height="15" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="359.5625" height="14.40000057220459" id="fill-0-render-13631-0">
+                                  <g>
+                                    <rect width="359.5625" height="14.40000057220459" style="fill:#37413a;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb89780cb">
+                                <text x="1820" y="7914.400000572205" dominant-baseline="ideographic" textLength="359.5625" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#37413a;fill-opacity:1">ECOllect sẽ liên hệ và giao can HDPE ISCC đến quán trong 1-2 ngày.</text>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81fb8e46e74">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7938" width="124" height="15" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="123.375" height="14.40000057220459" id="fill-0-render-13632-0">
+                                  <g>
+                                    <rect width="123.375" height="14.40000057220459" style="fill:#0f1712;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb8e46e74">
+                                <text x="1820" y="7952.400000572205" dominant-baseline="ideographic" textLength="123.375" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">Số lượng can cần thêm</text>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81fb91fe178">
+                            <defs>
+                              <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb91fe178-render-13633" class="frame-clip frame-clip-def">
+                                <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                                </rect>
+                              </clipPath>
+                            </defs>
+                            <g class="frame-container-wrapper">
+                              <g class="frame-container-blur">
+                                <g class="frame-container-shadows">
+                                  <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb91fe178-render-13633)" fill="none">
+                                    <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb91fe178">
+                                      <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#ffffff;fill-opacity:1">
+                                      </rect>
+                                    </g>
+                                    <g class="frame-children">
+                                      <g id="shape-6fc5473d-77bf-807e-8008-a81fb95fef4a">
+                                        <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1834" y="7973" width="113" height="18" rx="0" ry="0">
+                                          <defs>
+                                            <pattern patternUnits="objectBoundingBox" width="112.63750457763672" height="17.600000381469727" id="fill-0-render-13634-0">
+                                              <g>
+                                                <rect width="112.63750457763672" height="17.600000381469727" style="fill:#0f1712;fill-opacity:1">
+                                                </rect>
+                                              </g>
+                                            </pattern>
+                                          </defs>
+                                          <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb95fef4a">
+                                            <text x="1834" y="7990.60000038147" dominant-baseline="ideographic" textLength="112.63750457763672" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:15px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">2 can (loại 30 lít)</text>
+                                          </g>
+                                        </g>
+                                      </g>
+                                    </g>
+                                  </g>
+                                </g>
+                                <g id="strokes-6fc5473d-77bf-807e-8008-a8214a692f13-6fc5473d-77bf-807e-8008-a81fb91fe178" class="strokes">
+                                  <g class="stroke-shape">
+                                    <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:none;fill-opacity:none;stroke-width:1.5;stroke:#1b6d24;stroke-opacity:1">
+                                    </rect>
+                                  </g>
+                                </g>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81fb9a27997">
+                            <defs>
+                              <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb9a27997-render-13635" class="frame-clip frame-clip-def">
+                                <rect rx="24" ry="24" x="1820" y="8032" width="335" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                                </rect>
+                              </clipPath>
+                            </defs>
+                            <g class="frame-container-wrapper">
+                              <g class="frame-container-blur">
+                                <g class="frame-container-shadows">
+                                  <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb9a27997-render-13635)" fill="none">
+                                    <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb9a27997">
+                                      <rect rx="24" ry="24" x="1820" y="8032" width="335" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+                                      </rect>
+                                    </g>
+                                    <g class="frame-children">
+                                      <g id="shape-6fc5473d-77bf-807e-8008-a81fb9cb9b05">
+                                        <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1946" y="8047" width="74" height="17" rx="0" ry="0">
+                                          <defs>
+                                            <pattern patternUnits="objectBoundingBox" width="73.70000457763672" height="16" id="fill-0-render-13636-0">
+                                              <g>
+                                                <rect width="73.70000457763672" height="16" style="fill:#ffffff;fill-opacity:1">
+                                                </rect>
+                                              </g>
+                                            </pattern>
+                                          </defs>
+                                          <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb9cb9b05">
+                                            <text x="1946" y="8063" dominant-baseline="ideographic" textLength="73.70000457763672" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">Gửi yêu cầu</text>
+                                          </g>
+                                        </g>
+                                      </g>
+                                    </g>
+                                  </g>
+                                </g>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb7d95d81">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb7d95d81-render-13637" class="frame-clip frame-clip-def">
+        <path d="M1824,7842 h327 a24,24 0 0 1 24,24 v306 a0,0 0 0 1 0,0 h-375 a0,0 0 0 1 0,0 v-306 a24,24 0 0 1 24,-24 z" x="1800" y="7842" width="375" height="330" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </path>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb7d95d81-render-13637)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb7d95d81">
+              <path d="M1824,7842 h327 a24,24 0 0 1 24,24 v306 a0,0 0 0 1 0,0 h-375 a0,0 0 0 1 0,0 v-306 a24,24 0 0 1 24,-24 z" x="1800" y="7842" width="375" height="330" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#ffffff;fill-opacity:1">
+              </path>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb807e945">
+                <defs>
+                  <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb807e945-render-13638" class="frame-clip frame-clip-def">
+                    <rect rx="2" ry="2" x="1968" y="7854" width="40" height="4" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                    </rect>
+                  </clipPath>
+                </defs>
+                <g class="frame-container-wrapper">
+                  <g class="frame-container-blur">
+                    <g class="frame-container-shadows">
+                      <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb807e945-render-13638)" fill="none">
+                        <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb807e945">
+                          <rect rx="2" ry="2" x="1968" y="7854" width="40" height="4" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#e2e8e0;fill-opacity:1">
+                          </rect>
+                        </g>
+                        <g class="frame-children">
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb8513e4c">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7874" width="207" height="20" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="206.22500610351562" height="19.200000762939453" id="fill-0-render-13639-0">
+                      <g>
+                        <rect width="206.22500610351562" height="19.200000762939453" style="fill:#0f1712;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb8513e4c">
+                    <text x="1820" y="7893.200000762939" dominant-baseline="ideographic" textLength="206.22500610351562" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:16px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">Đăng ký cấp thêm can chuẩn</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb89780cb">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7900" width="360" height="15" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="359.5625" height="14.40000057220459" id="fill-0-render-13640-0">
+                      <g>
+                        <rect width="359.5625" height="14.40000057220459" style="fill:#37413a;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb89780cb">
+                    <text x="1820" y="7914.400000572205" dominant-baseline="ideographic" textLength="359.5625" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#37413a;fill-opacity:1">ECOllect sẽ liên hệ và giao can HDPE ISCC đến quán trong 1-2 ngày.</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb8e46e74">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7938" width="124" height="15" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="123.375" height="14.40000057220459" id="fill-0-render-13641-0">
+                      <g>
+                        <rect width="123.375" height="14.40000057220459" style="fill:#0f1712;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb8e46e74">
+                    <text x="1820" y="7952.400000572205" dominant-baseline="ideographic" textLength="123.375" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">Số lượng can cần thêm</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb91fe178">
+                <defs>
+                  <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb91fe178-render-13642" class="frame-clip frame-clip-def">
+                    <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                    </rect>
+                  </clipPath>
+                </defs>
+                <g class="frame-container-wrapper">
+                  <g class="frame-container-blur">
+                    <g class="frame-container-shadows">
+                      <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb91fe178-render-13642)" fill="none">
+                        <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb91fe178">
+                          <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#ffffff;fill-opacity:1">
+                          </rect>
+                        </g>
+                        <g class="frame-children">
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81fb95fef4a">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1834" y="7973" width="113" height="18" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="112.63750457763672" height="17.600000381469727" id="fill-0-render-13643-0">
+                                  <g>
+                                    <rect width="112.63750457763672" height="17.600000381469727" style="fill:#0f1712;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb95fef4a">
+                                <text x="1834" y="7990.60000038147" dominant-baseline="ideographic" textLength="112.63750457763672" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:15px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">2 can (loại 30 lít)</text>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                    <g id="strokes-6fc5473d-77bf-807e-8008-a8214a69b9a9-6fc5473d-77bf-807e-8008-a81fb91fe178" class="strokes">
+                      <g class="stroke-shape">
+                        <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:none;fill-opacity:none;stroke-width:1.5;stroke:#1b6d24;stroke-opacity:1">
+                        </rect>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb9a27997">
+                <defs>
+                  <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb9a27997-render-13644" class="frame-clip frame-clip-def">
+                    <rect rx="24" ry="24" x="1820" y="8032" width="335" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                    </rect>
+                  </clipPath>
+                </defs>
+                <g class="frame-container-wrapper">
+                  <g class="frame-container-blur">
+                    <g class="frame-container-shadows">
+                      <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb9a27997-render-13644)" fill="none">
+                        <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb9a27997">
+                          <rect rx="24" ry="24" x="1820" y="8032" width="335" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+                          </rect>
+                        </g>
+                        <g class="frame-children">
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81fb9cb9b05">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1946" y="8047" width="74" height="17" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="73.70000457763672" height="16" id="fill-0-render-13645-0">
+                                  <g>
+                                    <rect width="73.70000457763672" height="16" style="fill:#ffffff;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb9cb9b05">
+                                <text x="1946" y="8063" dominant-baseline="ideographic" textLength="73.70000457763672" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">Gửi yêu cầu</text>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb807e945">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb807e945-render-13646" class="frame-clip frame-clip-def">
+        <rect rx="2" ry="2" x="1968" y="7854" width="40" height="4" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb807e945-render-13646)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb807e945">
+              <rect rx="2" ry="2" x="1968" y="7854" width="40" height="4" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#e2e8e0;fill-opacity:1">
+              </rect>
+            </g>
+            <g class="frame-children">
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb8513e4c">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7874" width="207" height="20" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="206.22500610351562" height="19.200000762939453" id="fill-0-render-13647-0">
+          <g>
+            <rect width="206.22500610351562" height="19.200000762939453" style="fill:#0f1712;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb8513e4c">
+        <text x="1820" y="7893.200000762939" dominant-baseline="ideographic" textLength="206.22500610351562" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:16px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">Đăng ký cấp thêm can chuẩn</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb89780cb">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7900" width="360" height="15" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="359.5625" height="14.40000057220459" id="fill-0-render-13648-0">
+          <g>
+            <rect width="359.5625" height="14.40000057220459" style="fill:#37413a;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb89780cb">
+        <text x="1820" y="7914.400000572205" dominant-baseline="ideographic" textLength="359.5625" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#37413a;fill-opacity:1">ECOllect sẽ liên hệ và giao can HDPE ISCC đến quán trong 1-2 ngày.</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb8e46e74">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1820" y="7938" width="124" height="15" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="123.375" height="14.40000057220459" id="fill-0-render-13649-0">
+          <g>
+            <rect width="123.375" height="14.40000057220459" style="fill:#0f1712;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb8e46e74">
+        <text x="1820" y="7952.400000572205" dominant-baseline="ideographic" textLength="123.375" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">Số lượng can cần thêm</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb91fe178">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb91fe178-render-13650" class="frame-clip frame-clip-def">
+        <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb91fe178-render-13650)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb91fe178">
+              <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#ffffff;fill-opacity:1">
+              </rect>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb95fef4a">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1834" y="7973" width="113" height="18" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="112.63750457763672" height="17.600000381469727" id="fill-0-render-13651-0">
+                      <g>
+                        <rect width="112.63750457763672" height="17.600000381469727" style="fill:#0f1712;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb95fef4a">
+                    <text x="1834" y="7990.60000038147" dominant-baseline="ideographic" textLength="112.63750457763672" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:15px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">2 can (loại 30 lít)</text>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+        <g id="strokes-6fc5473d-77bf-807e-8008-a8214a6a0b31-6fc5473d-77bf-807e-8008-a81fb91fe178" class="strokes">
+          <g class="stroke-shape">
+            <rect rx="12" ry="12" x="1820" y="7960" width="335" height="46" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:none;fill-opacity:none;stroke-width:1.5;stroke:#1b6d24;stroke-opacity:1">
+            </rect>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb9a27997">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81fb9a27997-render-13652" class="frame-clip frame-clip-def">
+        <rect rx="24" ry="24" x="1820" y="8032" width="335" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81fb9a27997-render-13652)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb9a27997">
+              <rect rx="24" ry="24" x="1820" y="8032" width="335" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+              </rect>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a81fb9cb9b05">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1946" y="8047" width="74" height="17" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="73.70000457763672" height="16" id="fill-0-render-13653-0">
+                      <g>
+                        <rect width="73.70000457763672" height="16" style="fill:#ffffff;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb9cb9b05">
+                    <text x="1946" y="8063" dominant-baseline="ideographic" textLength="73.70000457763672" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">Gửi yêu cầu</text>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb95fef4a">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1834" y="7973" width="113" height="18" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="112.63750457763672" height="17.600000381469727" id="fill-0-render-13654-0">
+          <g>
+            <rect width="112.63750457763672" height="17.600000381469727" style="fill:#0f1712;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb95fef4a">
+        <text x="1834" y="7990.60000038147" dominant-baseline="ideographic" textLength="112.63750457763672" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:15px;text-decoration:none;direction:ltr;fill:#0f1712;fill-opacity:1">2 can (loại 30 lít)</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81fb9cb9b05">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="1946" y="8047" width="74" height="17" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="73.70000457763672" height="16" id="fill-0-render-13655-0">
+          <g>
+            <rect width="73.70000457763672" height="16" style="fill:#ffffff;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81fb9cb9b05">
+        <text x="1946" y="8063" dominant-baseline="ideographic" textLength="73.70000457763672" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">Gửi yêu cầu</text>
+      </g>
+    </g>
+  </g>
+</svg>

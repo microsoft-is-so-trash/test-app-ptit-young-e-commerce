@@ -13,10 +13,8 @@ Vietnam. It is not a general HTTP proxy.
 - Render authenticates with `x-zalo-profile-relay-secret`.
 - The relay secret, access token, authorization code, refresh token, app secret,
   cookie and request body are never logged.
-- Quick Tunnel URLs are temporary. Do not put the current `trycloudflare.com`
-  URL in Git; set it only in the Render Environment settings.
 
-## Run locally
+## Run locally (Development / Fallback)
 
 PowerShell example; replace the placeholder in memory and do not echo the
 secret:

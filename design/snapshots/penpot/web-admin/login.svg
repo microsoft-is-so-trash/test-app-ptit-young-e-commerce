@@ -1,0 +1,587 @@
+<svg width="1440" xmlns="http://www.w3.org/2000/svg" height="900" viewBox="0 1100 1440 900" style="-webkit-print-color-adjust::exact" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" version="1.1">
+  <style>
+  </style>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8152faedfd3">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8152faedfd3-render-5327" class="frame-clip frame-clip-def">
+        <rect rx="0" ry="0" x="0" y="1100" width="1440" height="900" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8152faedfd3-render-5327)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152faedfd3">
+              <rect rx="0" ry="0" x="0" y="1100" width="1440" height="900" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#f8faf6;fill-opacity:1">
+              </rect>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a8152fb495ca">
+                <defs>
+                  <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8152fb495ca-render-5328" class="frame-clip frame-clip-def">
+                    <rect rx="28" ry="28" x="510" y="1350" width="420" height="404" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                    </rect>
+                  </clipPath>
+                </defs>
+                <g class="frame-container-wrapper">
+                  <g class="frame-container-blur">
+                    <defs>
+                      <filter id="filter-shadow-render-5328" x="-0.09285714285714286" y="-0.09653465346534654" width="1.1857142857142857" height="1.2079207920792079" filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+                        <feFlood flood-opacity="0">
+                        </feFlood>
+                        <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0">
+                        </feColorMatrix>
+                        <feMorphology radius="2" operator="dilate" in="SourceAlpha">
+                        </feMorphology>
+                        <feOffset dx="0" dy="2">
+                        </feOffset>
+                        <feGaussianBlur stdDeviation="3">
+                        </feGaussianBlur>
+                        <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0">
+                        </feColorMatrix>
+                        <feBlend mode="normal">
+                        </feBlend>
+                        <feBlend mode="normal" in="SourceGraphic">
+                        </feBlend>
+                      </filter>
+                    </defs>
+                    <g class="frame-container-shadows" filter="url(#filter-shadow-render-5328)">
+                      <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8152fb495ca-render-5328)" fill="none">
+                        <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fb495ca">
+                          <rect rx="28" ry="28" x="510" y="1350" width="420" height="404" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#ffffff;fill-opacity:1">
+                          </rect>
+                        </g>
+                        <g class="frame-children">
+                          <g id="shape-6fc5473d-77bf-807e-8008-a8152fe30975">
+                            <defs>
+                              <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8152fe30975-render-5329" class="frame-clip frame-clip-def">
+                                <rect rx="32" ry="32" x="688" y="1398" width="64" height="64" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                                </rect>
+                              </clipPath>
+                            </defs>
+                            <g class="frame-container-wrapper">
+                              <g class="frame-container-blur">
+                                <g class="frame-container-shadows">
+                                  <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8152fe30975-render-5329)" fill="none">
+                                    <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fe30975">
+                                      <rect rx="32" ry="32" x="688" y="1398" width="64" height="64" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+                                      </rect>
+                                    </g>
+                                    <g class="frame-children">
+                                      <g id="shape-6fc5473d-77bf-807e-8008-a8152fea80b0">
+                                        <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="704" y="1406" width="18" height="39" rx="0" ry="0">
+                                          <defs>
+                                            <pattern patternUnits="objectBoundingBox" width="18" height="37.60000228881836" id="fill-0-render-5330-0">
+                                              <g>
+                                                <rect width="18" height="37.60000228881836" style="fill:#ffffff;fill-opacity:1">
+                                                </rect>
+                                              </g>
+                                            </pattern>
+                                          </defs>
+                                          <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fea80b0">
+                                            <text x="704" y="1443.6000022888184" dominant-baseline="ideographic" textLength="18" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:32px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">E</text>
+                                          </g>
+                                        </g>
+                                      </g>
+                                    </g>
+                                  </g>
+                                </g>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a8153c41c5b0">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="627.5" y="1478" width="185" height="34" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="184.9499969482422" height="32.79999923706055" id="fill-0-render-5331-0">
+                                  <g>
+                                    <rect width="184.9499969482422" height="32.79999923706055" style="fill:#191c19;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c41c5b0">
+                                <text x="627.5" y="1510.7999992370605" dominant-baseline="ideographic" textLength="184.9499969482422" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:28px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">Bảng vận hành</text>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a8153c561c2c">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="693.5" y="1528" width="53" height="17" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="52.85000228881836" height="16" id="fill-0-render-5332-0">
+                                  <g>
+                                    <rect width="52.85000228881836" height="16" style="fill:#414941;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c561c2c">
+                                <text x="693.5" y="1544" dominant-baseline="ideographic" textLength="52.85000228881836" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">ECOllect</text>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a8153c6c8eca">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="616" y="1561" width="208" height="17" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="207.8125" height="16" id="fill-0-render-5333-0">
+                                  <g>
+                                    <rect width="207.8125" height="16" style="fill:#414941;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c6c8eca">
+                                <text x="616" y="1577" dominant-baseline="ideographic" textLength="207.8125" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Đăng nhập vào tài khoản quản trị.</text>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a8153c7431aa">
+                            <defs>
+                              <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8153c7431aa-render-5334" class="frame-clip frame-clip-def">
+                                <rect rx="24" ry="24" x="558" y="1594" width="324" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                                </rect>
+                              </clipPath>
+                            </defs>
+                            <g class="frame-container-wrapper">
+                              <g class="frame-container-blur">
+                                <g class="frame-container-shadows">
+                                  <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8153c7431aa-render-5334)" fill="none">
+                                    <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c7431aa">
+                                      <rect rx="24" ry="24" x="558" y="1594" width="324" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+                                      </rect>
+                                    </g>
+                                    <g class="frame-children">
+                                      <g id="shape-6fc5473d-77bf-807e-8008-a8153c890bc5">
+                                        <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="638" y="1606" width="136" height="20" rx="0" ry="0">
+                                          <defs>
+                                            <pattern patternUnits="objectBoundingBox" width="135.1750030517578" height="19.200000762939453" id="fill-0-render-5335-0">
+                                              <g>
+                                                <rect width="135.1750030517578" height="19.200000762939453" style="fill:#ffffff;fill-opacity:1">
+                                                </rect>
+                                              </g>
+                                            </pattern>
+                                          </defs>
+                                          <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c890bc5">
+                                            <text x="638" y="1625.2000007629395" dominant-baseline="ideographic" textLength="135.1750030517578" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:500;white-space:pre;font-size:16px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">Đăng nhập quản trị</text>
+                                          </g>
+                                        </g>
+                                      </g>
+                                    </g>
+                                  </g>
+                                </g>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a81545374cf0">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="631" y="1658" width="178" height="17" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="177.4250030517578" height="16" id="fill-0-render-5336-0">
+                                  <g>
+                                    <rect width="177.4250030517578" height="16" style="fill:#1b6d24;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81545374cf0">
+                                <text x="631" y="1674" dominant-baseline="ideographic" textLength="177.4250030517578" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:500;white-space:pre;font-size:14px;text-decoration:underline;direction:ltr;fill:#1b6d24;fill-opacity:1">Đăng nhập bằng vai trò khác</text>
+                              </g>
+                            </g>
+                          </g>
+                          <g id="shape-6fc5473d-77bf-807e-8008-a815454a870e">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="633.5" y="1691" width="173" height="15" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="172.83750915527344" height="16" id="fill-0-render-5337-0">
+                                  <g>
+                                    <rect width="172.83750915527344" height="16" style="fill:#717971;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815454a870e">
+                                <text x="633.5" y="1706.199999988079" dominant-baseline="ideographic" textLength="172.83750915527344" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:&quot;Roboto Mono&quot;;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#717971;fill-opacity:1">Tài khoản: zalo_admin_01</text>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8152fb495ca">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8152fb495ca-render-5338" class="frame-clip frame-clip-def">
+        <rect rx="28" ry="28" x="510" y="1350" width="420" height="404" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <defs>
+          <filter id="filter-shadow-render-5338" x="-0.09285714285714286" y="-0.09653465346534654" width="1.1857142857142857" height="1.2079207920792079" filterUnits="objectBoundingBox" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0">
+            </feFlood>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0">
+            </feColorMatrix>
+            <feMorphology radius="2" operator="dilate" in="SourceAlpha">
+            </feMorphology>
+            <feOffset dx="0" dy="2">
+            </feOffset>
+            <feGaussianBlur stdDeviation="3">
+            </feGaussianBlur>
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.2 0">
+            </feColorMatrix>
+            <feBlend mode="normal">
+            </feBlend>
+            <feBlend mode="normal" in="SourceGraphic">
+            </feBlend>
+          </filter>
+        </defs>
+        <g class="frame-container-shadows" filter="url(#filter-shadow-render-5338)">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8152fb495ca-render-5338)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fb495ca">
+              <rect rx="28" ry="28" x="510" y="1350" width="420" height="404" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#ffffff;fill-opacity:1">
+              </rect>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a8152fe30975">
+                <defs>
+                  <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8152fe30975-render-5339" class="frame-clip frame-clip-def">
+                    <rect rx="32" ry="32" x="688" y="1398" width="64" height="64" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                    </rect>
+                  </clipPath>
+                </defs>
+                <g class="frame-container-wrapper">
+                  <g class="frame-container-blur">
+                    <g class="frame-container-shadows">
+                      <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8152fe30975-render-5339)" fill="none">
+                        <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fe30975">
+                          <rect rx="32" ry="32" x="688" y="1398" width="64" height="64" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+                          </rect>
+                        </g>
+                        <g class="frame-children">
+                          <g id="shape-6fc5473d-77bf-807e-8008-a8152fea80b0">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="704" y="1406" width="18" height="39" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="18" height="37.60000228881836" id="fill-0-render-5340-0">
+                                  <g>
+                                    <rect width="18" height="37.60000228881836" style="fill:#ffffff;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fea80b0">
+                                <text x="704" y="1443.6000022888184" dominant-baseline="ideographic" textLength="18" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:32px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">E</text>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a8153c41c5b0">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="627.5" y="1478" width="185" height="34" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="184.9499969482422" height="32.79999923706055" id="fill-0-render-5341-0">
+                      <g>
+                        <rect width="184.9499969482422" height="32.79999923706055" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c41c5b0">
+                    <text x="627.5" y="1510.7999992370605" dominant-baseline="ideographic" textLength="184.9499969482422" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:28px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">Bảng vận hành</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a8153c561c2c">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="693.5" y="1528" width="53" height="17" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="52.85000228881836" height="16" id="fill-0-render-5342-0">
+                      <g>
+                        <rect width="52.85000228881836" height="16" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c561c2c">
+                    <text x="693.5" y="1544" dominant-baseline="ideographic" textLength="52.85000228881836" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">ECOllect</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a8153c6c8eca">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="616" y="1561" width="208" height="17" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="207.8125" height="16" id="fill-0-render-5343-0">
+                      <g>
+                        <rect width="207.8125" height="16" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c6c8eca">
+                    <text x="616" y="1577" dominant-baseline="ideographic" textLength="207.8125" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Đăng nhập vào tài khoản quản trị.</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a8153c7431aa">
+                <defs>
+                  <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8153c7431aa-render-5344" class="frame-clip frame-clip-def">
+                    <rect rx="24" ry="24" x="558" y="1594" width="324" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+                    </rect>
+                  </clipPath>
+                </defs>
+                <g class="frame-container-wrapper">
+                  <g class="frame-container-blur">
+                    <g class="frame-container-shadows">
+                      <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8153c7431aa-render-5344)" fill="none">
+                        <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c7431aa">
+                          <rect rx="24" ry="24" x="558" y="1594" width="324" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+                          </rect>
+                        </g>
+                        <g class="frame-children">
+                          <g id="shape-6fc5473d-77bf-807e-8008-a8153c890bc5">
+                            <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="638" y="1606" width="136" height="20" rx="0" ry="0">
+                              <defs>
+                                <pattern patternUnits="objectBoundingBox" width="135.1750030517578" height="19.200000762939453" id="fill-0-render-5345-0">
+                                  <g>
+                                    <rect width="135.1750030517578" height="19.200000762939453" style="fill:#ffffff;fill-opacity:1">
+                                    </rect>
+                                  </g>
+                                </pattern>
+                              </defs>
+                              <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c890bc5">
+                                <text x="638" y="1625.2000007629395" dominant-baseline="ideographic" textLength="135.1750030517578" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:500;white-space:pre;font-size:16px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">Đăng nhập quản trị</text>
+                              </g>
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a81545374cf0">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="631" y="1658" width="178" height="17" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="177.4250030517578" height="16" id="fill-0-render-5346-0">
+                      <g>
+                        <rect width="177.4250030517578" height="16" style="fill:#1b6d24;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81545374cf0">
+                    <text x="631" y="1674" dominant-baseline="ideographic" textLength="177.4250030517578" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:500;white-space:pre;font-size:14px;text-decoration:underline;direction:ltr;fill:#1b6d24;fill-opacity:1">Đăng nhập bằng vai trò khác</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a815454a870e">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="633.5" y="1691" width="173" height="15" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="172.83750915527344" height="16" id="fill-0-render-5347-0">
+                      <g>
+                        <rect width="172.83750915527344" height="16" style="fill:#717971;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815454a870e">
+                    <text x="633.5" y="1706.199999988079" dominant-baseline="ideographic" textLength="172.83750915527344" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:&quot;Roboto Mono&quot;;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#717971;fill-opacity:1">Tài khoản: zalo_admin_01</text>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a815454a870e">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="633.5" y="1691" width="173" height="15" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="172.83750915527344" height="16" id="fill-0-render-5348-0">
+          <g>
+            <rect width="172.83750915527344" height="16" style="fill:#717971;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815454a870e">
+        <text x="633.5" y="1706.199999988079" dominant-baseline="ideographic" textLength="172.83750915527344" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:&quot;Roboto Mono&quot;;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:12px;text-decoration:none;direction:ltr;fill:#717971;fill-opacity:1">Tài khoản: zalo_admin_01</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81545374cf0">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="631" y="1658" width="178" height="17" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="177.4250030517578" height="16" id="fill-0-render-5349-0">
+          <g>
+            <rect width="177.4250030517578" height="16" style="fill:#1b6d24;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81545374cf0">
+        <text x="631" y="1674" dominant-baseline="ideographic" textLength="177.4250030517578" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:500;white-space:pre;font-size:14px;text-decoration:underline;direction:ltr;fill:#1b6d24;fill-opacity:1">Đăng nhập bằng vai trò khác</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8153c7431aa">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8153c7431aa-render-5350" class="frame-clip frame-clip-def">
+        <rect rx="24" ry="24" x="558" y="1594" width="324" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8153c7431aa-render-5350)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c7431aa">
+              <rect rx="24" ry="24" x="558" y="1594" width="324" height="48" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+              </rect>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a8153c890bc5">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="638" y="1606" width="136" height="20" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="135.1750030517578" height="19.200000762939453" id="fill-0-render-5351-0">
+                      <g>
+                        <rect width="135.1750030517578" height="19.200000762939453" style="fill:#ffffff;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c890bc5">
+                    <text x="638" y="1625.2000007629395" dominant-baseline="ideographic" textLength="135.1750030517578" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:500;white-space:pre;font-size:16px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">Đăng nhập quản trị</text>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8153c6c8eca">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="616" y="1561" width="208" height="17" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="207.8125" height="16" id="fill-0-render-5352-0">
+          <g>
+            <rect width="207.8125" height="16" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c6c8eca">
+        <text x="616" y="1577" dominant-baseline="ideographic" textLength="207.8125" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Đăng nhập vào tài khoản quản trị.</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8153c561c2c">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="693.5" y="1528" width="53" height="17" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="52.85000228881836" height="16" id="fill-0-render-5353-0">
+          <g>
+            <rect width="52.85000228881836" height="16" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c561c2c">
+        <text x="693.5" y="1544" dominant-baseline="ideographic" textLength="52.85000228881836" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">ECOllect</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8153c41c5b0">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="627.5" y="1478" width="185" height="34" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="184.9499969482422" height="32.79999923706055" id="fill-0-render-5354-0">
+          <g>
+            <rect width="184.9499969482422" height="32.79999923706055" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c41c5b0">
+        <text x="627.5" y="1510.7999992370605" dominant-baseline="ideographic" textLength="184.9499969482422" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:600;white-space:pre;font-size:28px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">Bảng vận hành</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8152fe30975">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a8152fe30975-render-5355" class="frame-clip frame-clip-def">
+        <rect rx="32" ry="32" x="688" y="1398" width="64" height="64" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a8152fe30975-render-5355)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fe30975">
+              <rect rx="32" ry="32" x="688" y="1398" width="64" height="64" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#1b6d24;fill-opacity:1">
+              </rect>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a8152fea80b0">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="704" y="1406" width="18" height="39" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="18" height="37.60000228881836" id="fill-0-render-5356-0">
+                      <g>
+                        <rect width="18" height="37.60000228881836" style="fill:#ffffff;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fea80b0">
+                    <text x="704" y="1443.6000022888184" dominant-baseline="ideographic" textLength="18" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:32px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">E</text>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8153c890bc5">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="638" y="1606" width="136" height="20" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="135.1750030517578" height="19.200000762939453" id="fill-0-render-5357-0">
+          <g>
+            <rect width="135.1750030517578" height="19.200000762939453" style="fill:#ffffff;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8153c890bc5">
+        <text x="638" y="1625.2000007629395" dominant-baseline="ideographic" textLength="135.1750030517578" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:500;white-space:pre;font-size:16px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">Đăng nhập quản trị</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8152fea80b0">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="704" y="1406" width="18" height="39" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="18" height="37.60000228881836" id="fill-0-render-5358-0">
+          <g>
+            <rect width="18" height="37.60000228881836" style="fill:#ffffff;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8152fea80b0">
+        <text x="704" y="1443.6000022888184" dominant-baseline="ideographic" textLength="18" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:32px;text-decoration:none;direction:ltr;fill:#ffffff;fill-opacity:1">E</text>
+      </g>
+    </g>
+  </g>
+</svg>

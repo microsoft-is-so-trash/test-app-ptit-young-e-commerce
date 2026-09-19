@@ -130,3 +130,26 @@ test('logout clears authentication but preserves the active route stored by coll
     globalThis.fetch = originalFetch;
   }
 });
+
+test('hydrate without stored tokens finishes with user=null, error=null without making unnecessary /auth/me network calls', async () => {
+  let fetchCalled = false;
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => {
+    fetchCalled = true;
+    return new Response(JSON.stringify({ code: 'UNAUTHORIZED' }), { status: 401 });
+  };
+  tokenStorage.clear();
+  useAuthStore.setState({ user: null, hydrated: false, busy: false, error: null });
+
+  try {
+    await useAuthStore.getState().hydrate();
+    assert.equal(useAuthStore.getState().user, null);
+    assert.equal(useAuthStore.getState().error, null);
+    assert.equal(useAuthStore.getState().hydrated, true);
+    assert.equal(fetchCalled, false, 'fetch should not be called when no tokens are stored');
+  } finally {
+    globalThis.fetch = originalFetch;
+    useAuthStore.setState({ user: null, hydrated: false, busy: false, error: null });
+  }
+});
+

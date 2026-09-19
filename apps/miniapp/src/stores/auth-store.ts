@@ -19,6 +19,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   patchUser: (patch: Partial<AuthUser>) => void;
   loginDemoAccount: (accountId: string) => void;
+  clearError: () => void;
 }
 
 function applyUserScope(user: AuthUser | null): void {
@@ -135,6 +136,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
+      const accessToken = tokenStorage.getAccessToken();
+      const refreshToken = tokenStorage.getRefreshToken();
+      if (!accessToken && !refreshToken) {
+        clearSession();
+        set({ user: null, error: null });
+        return;
+      }
+
       try {
         const user = await api.me();
         if (!isValidAuthUser(user)) {
@@ -240,6 +249,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       return { user: updated };
     });
   },
+  clearError: () => set({ error: null }),
 }));
 
 setUnauthorizedHandler(() => useAuthStore.getState().signOut());
