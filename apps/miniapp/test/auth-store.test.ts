@@ -5,6 +5,25 @@ import { tokenStorage } from '../src/lib/storage';
 import { fetchWithTimeout } from '../src/lib/api';
 import { pendingStationDeliveryStorage } from '../src/lib/storage';
 
+test('hydrate skips /auth/me when there is no cached session, so a cold server cannot block first-time login', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (input) => {
+    throw new Error(`Unexpected fetch during hydrate with no session: ${String(input)}`);
+  };
+  tokenStorage.clear();
+
+  try {
+    await useAuthStore.getState().hydrate();
+    assert.equal(useAuthStore.getState().user, null);
+    assert.equal(useAuthStore.getState().hydrated, true);
+    assert.equal(useAuthStore.getState().busy, false);
+    assert.equal(useAuthStore.getState().error, null);
+  } finally {
+    useAuthStore.setState({ user: null, hydrated: false, busy: false, error: null });
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test('API requests time out instead of leaving authentication hydration pending forever', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Promise<Response>(() => undefined);

@@ -135,6 +135,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
+      if (!tokenStorage.getAccessToken()) {
+        // Không có token thì không có phiên nào để khôi phục — gọi /auth/me lúc này
+        // chỉ tổ chờ Render free tier thức dậy (có thể hơn 50s) trong khi nút đăng
+        // nhập Zalo bị khoá bởi `busy`, dù việc đăng nhập không cần phiên cũ.
+        set({ user: null, error: null });
+        return;
+      }
+
       try {
         const user = await api.me();
         if (!isValidAuthUser(user)) {
