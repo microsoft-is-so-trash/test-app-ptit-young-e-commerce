@@ -14,8 +14,12 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     define: {
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiBaseUrl),
-      // Cho phép bật Demo Mode trên Web Demo (Vercel), ưu tiên biến môi trường VITE_DEMO_MODE (mặc định 'true' nếu không khai báo khác)
-      'import.meta.env.VITE_DEMO_MODE': JSON.stringify(env.VITE_DEMO_MODE || 'true'),
+      // Cho phép bật Demo Mode trên Web Demo (Vercel), ưu tiên biến môi trường VITE_DEMO_MODE (mặc định 'true' nếu không khai báo khác).
+      // Bản đóng gói Zalo Mini App dùng mode riêng "zmp": luôn tắt demo mode để bundle gửi lên Zalo
+      // không bao giờ chứa bộ chọn tài khoản thử nghiệm, bất kể .env.local trên máy dev nói gì.
+      'import.meta.env.VITE_DEMO_MODE': JSON.stringify(
+        mode === 'zmp' ? 'false' : env.VITE_DEMO_MODE || 'true',
+      ),
       'import.meta.env.VITE_DEVICE_CLIENT_MODE': JSON.stringify(
         env.VITE_DEVICE_CLIENT_MODE || '',
       ),
@@ -37,6 +41,12 @@ export default defineConfig(({ mode }) => {
           entryFileNames: 'assets/[name].module.js',
           chunkFileNames: 'assets/[name].[hash].module.js',
           assetFileNames: 'assets/[name][extname]',
+          // Zalo Mini App (mode "zmp"): gộp toàn bộ dynamic import vào 1 bundle
+          // duy nhất. Runtime Zalo không đảm bảo resolve được dynamic import
+          // tương đối, và tên chunk có hash (đổi mỗi lần build) không thể khai
+          // báo tĩnh trong app-config.json. Chỉ áp dụng cho ZMP, không ảnh
+          // hưởng bản Web Vercel (mode "production"/"development").
+          ...(mode === 'zmp' ? { inlineDynamicImports: true } : {}),
         },
       },
     },

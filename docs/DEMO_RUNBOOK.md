@@ -148,6 +148,76 @@ uptime, URL đổi mỗi lần chạy lại.** Tắt 1 trong 2 terminal là đă
 gãy ngay — quay lại `ZALO_PROFILE_API_ERROR` — phải lặp lại toàn bộ hai bước trên
 và cập nhật lại URL mới trên Render.
 
+## Checklist vận hành relay (chạy trước mỗi buổi demo)
+
+Relay là **điều kiện sống còn** cho đăng nhập Zalo thật và GPS thật: API hồ sơ
+(`graph.zalo.me/v2.0/me`) và API vị trí đều từ chối request từ IP ngoài Việt Nam
+(`error: -501`), trong khi Render chạy Singapore. Không có relay ⇒ đăng nhập thật lỗi ngay
+`ZALO_PROFILE_API_ERROR`, còn GPS rơi về vị trí trung tâm phường.
+
+### Chuẩn bị (một lần)
+
+- [ ] Máy chạy relay đặt tại Việt Nam, **không bật VPN/WARP** (bật là mất egress IP Việt Nam,
+      `-501` quay lại dù relay vẫn chạy).
+- [ ] `.tools/cloudflared` đã có trong repo (thư mục `.tools` bị gitignore).
+- [ ] `ZALO_APP_SECRET` lấy từ `developers.zalo.me` — **không** ghi vào source, chat hay ảnh chụp.
+- [ ] Biết hai biến cần cập nhật trên Render: `ZALO_PROFILE_RELAY_*` và `ZALO_LOCATION_RELAY_*`.
+
+### Trình tự mỗi buổi demo
+
+1. **Đánh thức API** trước vài phút: `GET /api/v1/health` (Render Free ngủ, lần đầu mất ~50 giây).
+2. **Terminal 1 — relay hồ sơ** (giữ chạy suốt buổi):
+   ```bash
+   cd /home/giaphamkhanh/Music/test-app-ptit-young-e-commerce
+   export ZALO_PROFILE_RELAY_SECRET=$(openssl rand -hex 24)   # ghi lại để dán vào Render
+   export ZALO_PROFILE_RELAY_PORT=8787
+   pnpm --filter @eco-oil/api relay:zalo-profile
+   ```
+3. **Terminal 2 — relay vị trí** (chỉ khi demo GPS thật):
+   ```bash
+   export ZALO_LOCATION_RELAY_TOKEN=$(openssl rand -hex 24)   # ghi lại để dán vào Render
+   export ZALO_APP_SECRET=<nhập trực tiếp, không ghi ra file>
+   pnpm demo:zalo-location-relay
+   ```
+   > ⚠️ Cả hai relay mặc định **dùng chung cổng 8787** nên không chạy song song trên cùng một
+   > máy. Chạy lần lượt theo kịch bản, hoặc đổi `ZALO_LOCATION_RELAY_PORT` (ví dụ `8788`) để
+   > chạy đồng thời.
+4. **Terminal 3 — Cloudflare Quick Tunnel** trỏ vào relay đang chạy:
+   ```bash
+   .tools/cloudflared tunnel --url http://127.0.0.1:8787
+   ```
+5. **Kiểm tunnel**: mở `https://<tên-ngẫu-nhiên>.trycloudflare.com/health` — phải trả
+   `{"status":"ok"}`. Đường dẫn gốc `/` trả `NOT_FOUND` là bình thường.
+6. **Cập nhật Render** (`eco-oil-api-staging`) → Environment → **Save Changes** → chờ **Live**:
+   ```text
+   ZALO_PROFILE_RELAY_URL=<url tunnel>
+   ZALO_PROFILE_RELAY_SECRET=<secret ở bước 2>
+   ZALO_LOCATION_RELAY_URL=<url tunnel>/zalo/location
+   ZALO_LOCATION_RELAY_TOKEN=<token ở bước 3>
+   ```
+   Không đặt App Secret vào các biến trên.
+7. **Kiểm chứng trên điện thoại**: tắt hẳn Zalo → mở lại Mini App → đăng nhập Zalo (không còn
+   `ZALO_PROFILE_API_ERROR`) → vào **Tuyến hôm nay** → nhấn làm mới → banner fallback GPS biến mất
+   và hiện `Đã cập nhật GPS và tuyến lúc HH:mm`.
+
+### Kết thúc buổi demo
+
+- [ ] Ctrl+C cả 3 terminal.
+- [ ] Lần chạy sau phải **sinh secret/token mới** và lấy **URL tunnel mới**, rồi cập nhật lại Render.
+- [ ] Không xoá App Secret, database hay bản Development trên Zalo.
+
+### Sự cố nhanh
+
+| Hiện tượng                            | Nguyên nhân thường gặp                                                               |
+| ------------------------------------- | ------------------------------------------------------------------------------------ |
+| `ZALO_PROFILE_API_ERROR`              | Relay/tunnel không chạy, hoặc URL/secret trên Render sai, lệch nhau                  |
+| Zalo trả `error: -501`                | Request đi từ IP ngoài Việt Nam: VPN/WARP đang bật, hoặc relay chạy ở máy nước ngoài |
+| Mở `127.0.0.1:8787/` thấy `NOT_FOUND` | Bình thường — kiểm tra bằng `/health`                                                |
+| GPS vẫn là vị trí trung tâm phường    | Thiếu hậu tố `/zalo/location` trong `ZALO_LOCATION_RELAY_URL`, hoặc tunnel đã chết   |
+| `ZALO_APP_SECRET is required`         | Chưa export App Secret cho tiến trình relay vị trí                                   |
+| Render đã Live nhưng vẫn lỗi          | URL Quick Tunnel **đổi mỗi lần chạy lại** — phải cập nhật lại Render                 |
+| Relay chạy nhưng cổng bận             | Hai relay cùng dùng 8787 — chạy lần lượt hoặc đổi cổng                               |
+
 ## Trình tự demo đề xuất
 
 1. Mở collector và lấy GPS thật.
