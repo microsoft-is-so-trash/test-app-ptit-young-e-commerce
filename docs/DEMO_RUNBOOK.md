@@ -126,6 +126,7 @@ cần relay hồ sơ chạy sống** — không có relay, lỗi ngay `ZALO_PROF
 cd /home/giaphamkhanh/Music/test-app-ptit-young-e-commerce
 export ZALO_PROFILE_RELAY_SECRET=$(openssl rand -hex 24)
 echo "$ZALO_PROFILE_RELAY_SECRET"   # ghi lai, dan vao Render o buoc duoi
+export ZALO_APP_SECRET=<nhập trực tiếp từ Zalo for Developers, không ghi ra file/chat>
 export ZALO_PROFILE_RELAY_PORT=8787
 pnpm --filter @eco-oil/api relay:zalo-profile
 ```
@@ -170,6 +171,7 @@ Relay là **điều kiện sống còn** cho đăng nhập Zalo thật và GPS t
    ```bash
    cd /home/giaphamkhanh/Music/test-app-ptit-young-e-commerce
    export ZALO_PROFILE_RELAY_SECRET=$(openssl rand -hex 24)   # ghi lại để dán vào Render
+   export ZALO_APP_SECRET=<nhập trực tiếp, không ghi ra file>
    export ZALO_PROFILE_RELAY_PORT=8787
    pnpm --filter @eco-oil/api relay:zalo-profile
    ```
@@ -214,7 +216,7 @@ Relay là **điều kiện sống còn** cho đăng nhập Zalo thật và GPS t
 | Zalo trả `error: -501`                | Request đi từ IP ngoài Việt Nam: VPN/WARP đang bật, hoặc relay chạy ở máy nước ngoài |
 | Mở `127.0.0.1:8787/` thấy `NOT_FOUND` | Bình thường — kiểm tra bằng `/health`                                                |
 | GPS vẫn là vị trí trung tâm phường    | Thiếu hậu tố `/zalo/location` trong `ZALO_LOCATION_RELAY_URL`, hoặc tunnel đã chết   |
-| `ZALO_APP_SECRET is required`         | Chưa export App Secret cho tiến trình relay vị trí                                   |
+| `ZALO_APP_SECRET is required`         | Chưa export App Secret cho tiến trình relay (cả hồ sơ lẫn vị trí)                    |
 | Render đã Live nhưng vẫn lỗi          | URL Quick Tunnel **đổi mỗi lần chạy lại** — phải cập nhật lại Render                 |
 | Relay chạy nhưng cổng bận             | Hai relay cùng dùng 8787 — chạy lần lượt hoặc đổi cổng                               |
 
