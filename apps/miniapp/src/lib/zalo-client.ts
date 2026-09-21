@@ -442,7 +442,9 @@ export class RealZaloClient implements IZaloClient {
   }
 
   getAccessToken(): Promise<string> {
-    return import('zmp-sdk').then(({ getAccessToken }) => getAccessToken());
+    return import('zmp-sdk').then(({ getAccessToken }) =>
+      withDeviceTimeout(getAccessToken(), 15_000, 'Zalo không trả access token.'),
+    );
   }
 
   async getLocation(): Promise<GeoPoint | null> {
