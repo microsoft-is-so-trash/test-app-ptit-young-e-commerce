@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import { Inject, Injectable, Logger, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { IZaloAuthProvider, ZaloProfile } from './zalo-auth.provider';
@@ -72,6 +73,13 @@ export class RealZaloAuthProvider implements IZaloAuthProvider {
     }
 
     const relay = this.profileRelayConfig();
+    // Zalo requires appsecret_proof on /me since 2024-01-01. It is computed from the
+    // access token + app secret, so it is only derived here for the direct (non-relay)
+    // path; the relay computes it itself on the Vietnam-side machine that holds the secret.
+    let appSecretProof = '';
+    if (!relay) {
+      appSecretProof = this.appSecretProof(accessToken, this.required('ZALO_APP_SECRET'));
+    }
     let response: Response;
     try {
       response = relay
@@ -85,7 +93,7 @@ export class RealZaloAuthProvider implements IZaloAuthProvider {
           signal: AbortSignal.timeout(ZALO_REQUEST_TIMEOUT_MS),
         })
         : await fetch(ZALO_PROFILE_URL, {
-          headers: { access_token: accessToken },
+          headers: { access_token: accessToken, appsecret_proof: appSecretProof },
           signal: AbortSignal.timeout(ZALO_REQUEST_TIMEOUT_MS),
         });
     } catch {
@@ -256,5 +264,9 @@ export class RealZaloAuthProvider implements IZaloAuthProvider {
     const value = this.config.get<string>(name)?.trim();
     if (!value) throw new ServiceUnavailableException({ code: 'ZALO_CONFIG_MISSING', message: `${name} chưa được cấu hình`, details: { variable: name } });
     return value;
+  }
+
+  private appSecretProof(accessToken: string, secretKey: string): string {
+    return createHmac('sha256', secretKey).update(accessToken).digest('hex');
   }
 }

@@ -1,4 +1,4 @@
-import { timingSafeEqual } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 
 export const ZALO_PROFILE_URL = 'https://graph.zalo.me/v2.0/me?fields=id,name,picture';
@@ -16,6 +16,7 @@ type SafeDiagnostic = string | number | boolean | null;
 
 export type ZaloProfileRelayConfig = {
   relaySecret: string;
+  appSecret: string;
 };
 
 export type ZaloProfileRelayLog = {
@@ -183,7 +184,10 @@ export function createZaloProfileRelayServer(
     try {
       const upstream = await fetcher(ZALO_PROFILE_URL, {
         method: 'GET',
-        headers: { access_token: accessToken },
+        headers: {
+          access_token: accessToken,
+          appsecret_proof: createHmac('sha256', config.appSecret).update(accessToken).digest('hex'),
+        },
         signal: controller.signal,
       });
       const contentType = upstream.headers.get('content-type');
@@ -226,6 +230,12 @@ function requiredSecret(): string {
   return value;
 }
 
+function requiredAppSecret(): string {
+  const value = process.env.ZALO_APP_SECRET?.trim();
+  if (!value) throw new Error('ZALO_APP_SECRET is required');
+  return value;
+}
+
 function relayPort(): number {
   const value = Number(process.env.ZALO_PROFILE_RELAY_PORT ?? 8787);
   if (!Number.isInteger(value) || value < 1 || value > 65_535) throw new Error('ZALO_PROFILE_RELAY_PORT is invalid');
@@ -233,7 +243,7 @@ function relayPort(): number {
 }
 
 if (require.main === module) {
-  const server = createZaloProfileRelayServer({ relaySecret: requiredSecret() });
+  const server = createZaloProfileRelayServer({ relaySecret: requiredSecret(), appSecret: requiredAppSecret() });
   server.listen(relayPort(), '127.0.0.1', () => {
     console.log(`[zalo-profile-relay] listening on http://127.0.0.1:${relayPort()}`);
   });
