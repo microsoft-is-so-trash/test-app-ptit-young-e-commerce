@@ -33,6 +33,19 @@ const ROUTE_COLORS = ['#1d4ed8', '#7c3aed', '#0891b2', '#c2410c', '#4d7c0f'];
 
 const HANOI_CENTER: [number, number] = [21.0278, 105.8342];
 
+// tile.openstreetmap.org bị một số ISP Việt Nam (Viettel/VNPT/FPT) chặn hoặc giới hạn
+// tốc độ, khiến nền bản đồ trắng xoá dù marker vẫn hiện (marker là DOM, không phải tile
+// ảnh). CARTO và Esri (thử trước) đều đã chuyển sang bắt buộc API key nên bỏ. Dùng
+// OpenStreetMap France — mirror cộng đồng khác hạ tầng gốc, không cần key, kiểu bản đồ
+// đường phố giống bản gốc — làm nguồn chính; nếu vẫn lỗi (nguồn chính cũng bị chặn/sập)
+// tự chuyển sang OpenTopoMap (hạ tầng khác nữa) sau vài tile lỗi liên tiếp, tránh
+// chuyển nhầm vì một tile lẻ tẻ mất mạng tạm thời.
+const PRIMARY_TILE_URL = 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png';
+const PRIMARY_TILE_ATTRIBUTION = '© OpenStreetMap France | © OpenStreetMap contributors';
+const FALLBACK_TILE_URL = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
+const FALLBACK_TILE_ATTRIBUTION = '© OpenTopoMap contributors';
+const TILE_ERROR_FALLBACK_THRESHOLD = 3;
+
 interface OperationsMapCanvasProps {
   merchants: AdminOperationsMapMerchant[];
   wards: AdminOperationsMapWard[];
@@ -65,12 +78,7 @@ export function OperationsMapCanvas({
         if (cancelled || !containerRef.current) return;
 
         map = leaflet.map(element, { attributionControl: true }).setView(HANOI_CENTER, 13);
-        leaflet
-          .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap',
-          })
-          .addTo(map);
+        addResilientTileLayer(leaflet, map);
 
         if (showWardZones) drawWardZones(leaflet, map, wards);
         if (showRoutes) drawRoutes(leaflet, map, routes);
@@ -125,6 +133,34 @@ export function OperationsMapCanvas({
 }
 
 type Leaflet = typeof LeafletNamespace;
+
+/** Nạp tile nguồn chính, tự chuyển sang nguồn dự phòng nếu nguồn chính lỗi liên tiếp. */
+function addResilientTileLayer(leaflet: Leaflet, map: LeafletMap): void {
+  let errorCount = 0;
+  let fellBack = false;
+
+  const primary = leaflet.tileLayer(PRIMARY_TILE_URL, {
+    maxZoom: 19,
+    subdomains: 'abc',
+    attribution: PRIMARY_TILE_ATTRIBUTION,
+  });
+
+  primary.on('tileerror', () => {
+    errorCount += 1;
+    if (fellBack || errorCount < TILE_ERROR_FALLBACK_THRESHOLD) return;
+    fellBack = true;
+    map.removeLayer(primary);
+    leaflet
+      .tileLayer(FALLBACK_TILE_URL, {
+        maxZoom: 17,
+        subdomains: 'abc',
+        attribution: FALLBACK_TILE_ATTRIBUTION,
+      })
+      .addTo(map);
+  });
+
+  primary.addTo(map);
+}
 
 /**
  * Vùng khu vực vẽ bằng hình tròn quanh tâm phường: bảng wards có cột boundary

@@ -28,6 +28,20 @@ const ONBOARDING_STEPS = [
   },
 ];
 
+/** Trích mã lỗi + thông điệp từ lỗi do Zalo SDK (AppError có `code`/`message`) ném ra. */
+function describeZaloAuthError(error: unknown): string {
+  if (error && typeof error === 'object') {
+    const code = (error as { code?: unknown }).code;
+    const message = (error as { message?: unknown }).message;
+    const parts: string[] = [];
+    if (code !== undefined && code !== null) parts.push(`mã ${String(code)}`);
+    if (typeof message === 'string' && message.trim()) parts.push(message.trim());
+    if (parts.length > 0) return parts.join(': ');
+  }
+  if (typeof error === 'string' && error.trim()) return error.trim();
+  return 'không rõ nguyên nhân';
+}
+
 export function LoginScreen() {
   const demoModeEnabled = import.meta.env.VITE_DEMO_MODE === 'true';
   const demoOffline = isDemoOfflineMode();
@@ -112,9 +126,10 @@ export function LoginScreen() {
     try {
       const accessToken = await zaloClient.getAccessToken();
       await loginWithZalo(accessToken);
-    } catch {
+    } catch (error) {
+      console.error('[zalo-login] getAccessToken failed', error);
       setOauthStartError(
-        'Không thể mở đăng nhập Zalo. Vui lòng thử lại hoặc kiểm tra quyền của Mini App.',
+        `Không thể mở đăng nhập Zalo (${describeZaloAuthError(error)}). Vui lòng thử lại hoặc kiểm tra quyền của Mini App.`,
       );
     }
   }

@@ -14,18 +14,17 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     define: {
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(apiBaseUrl),
-      // Vite nạp .env.local bất kể --mode là gì (trừ mode "test"), nên máy dev
-      // bật demo cục bộ (.env.local) sẽ vô tình lẫn vào MỌI build production —
-      // kể cả build:zmp cho Zalo Mini App. Ép cứng false khi mode production,
-      // bất kể .env.local nói gì, để bản production không bao giờ dính demo mode.
+      // Cho phép bật Demo Mode trên Web Demo (Vercel), ưu tiên biến môi trường VITE_DEMO_MODE (mặc định 'true' nếu không khai báo khác).
+      // Bản đóng gói Zalo Mini App dùng mode riêng "zmp": luôn tắt demo mode để bundle gửi lên Zalo
+      // không bao giờ chứa bộ chọn tài khoản thử nghiệm, bất kể .env.local trên máy dev nói gì.
       'import.meta.env.VITE_DEMO_MODE': JSON.stringify(
-        mode === 'production' ? 'false' : (env.VITE_DEMO_MODE || 'false'),
+        mode === 'zmp' ? 'false' : env.VITE_DEMO_MODE || 'true',
       ),
       'import.meta.env.VITE_DEVICE_CLIENT_MODE': JSON.stringify(
         env.VITE_DEVICE_CLIENT_MODE || '',
       ),
       'import.meta.env.VITE_DEMO_OFFLINE': JSON.stringify(
-        mode === 'production' ? 'false' : (env.VITE_DEMO_OFFLINE || 'false'),
+        env.VITE_DEMO_OFFLINE || 'false',
       ),
       // Web quản trị là ứng dụng riêng; cổng đăng nhập chung cần biết đường tới nó.
       'import.meta.env.VITE_ADMIN_URL': JSON.stringify(env.VITE_ADMIN_URL || ''),
@@ -42,6 +41,12 @@ export default defineConfig(({ mode }) => {
           entryFileNames: 'assets/[name].module.js',
           chunkFileNames: 'assets/[name].[hash].module.js',
           assetFileNames: 'assets/[name][extname]',
+          // Zalo Mini App (mode "zmp"): gộp toàn bộ dynamic import vào 1 bundle
+          // duy nhất. Runtime Zalo không đảm bảo resolve được dynamic import
+          // tương đối, và tên chunk có hash (đổi mỗi lần build) không thể khai
+          // báo tĩnh trong app-config.json. Chỉ áp dụng cho ZMP, không ảnh
+          // hưởng bản Web Vercel (mode "production"/"development").
+          ...(mode === 'zmp' ? { inlineDynamicImports: true } : {}),
         },
       },
     },

@@ -196,53 +196,129 @@ nhất là bảng `oil_prices` — thiếu giá thì chốt kỳ ném `NO_PRICE_
 Render gói Free ngủ khi không có request; lần gọi đầu mất khoảng 50 giây.
 Gọi trước `GET /api/v1/health` vài phút trước khi trình diễn.
 
-## Đóng gói Zalo Mini App
+## Đóng gói Zalo Mini App (Development)
 
-Mục này khác hẳn phần "Mini App trình duyệt" ở trên: đây là đóng gói bản chạy
-trong app Zalo (webview `h5.zdn.vn`), không phải build Vite thường cho trình
-duyệt.
+Luồng đóng gói Zalo Mini App đã được **khôi phục** (trước đó tạm huỷ để tập trung Web Demo).
+Bản Web trên Vercel vẫn là kênh demo chính; gói ZMP là **đầu ra thứ hai, độc lập**:
 
-### Hai ID khác nhau — đừng nhầm
+| Đầu ra              | Lệnh                                       | Mode build    | Demo Account Picker             |
+| ------------------- | ------------------------------------------ | ------------- | ------------------------------- |
+| Web SPA trên Vercel | `pnpm --filter @eco-oil/miniapp build`     | `production`  | **BẬT** (`VITE_DEMO_MODE=true`) |
+| Gói Zalo Mini App   | `pnpm --filter @eco-oil/miniapp build:zmp` | `zmp` (riêng) | **TẮT luôn**                    |
 
-| | Zalo App | Zalo Mini App |
-|---|---|---|
-| Trang cấp | developers.zalo.me | mini.zalo.me |
-| Dùng để | Đăng nhập OAuth (`ZALO_APP_ID`, biến trên Render) | Tham số `--miniAppId` khi `zmp deploy` |
+`build:zmp` dùng mode riêng `zmp` nên **không thể lẫn demo mode** từ `.env.local` hay biến
+môi trường Vercel, và bật `inlineDynamicImports` để gộp mọi dynamic import vào một bundle
+duy nhất (`assets/index.module.js`) — nhờ đó `app-config.json` chỉ cần khai báo đúng một
+file. Lệnh `build` của Vercel (mode `production`) không bị thay đổi.
 
-Dán nhầm Mini App ID vào biến `ZALO_APP_ID` (hoặc ngược lại) là nguyên nhân phổ
-biến nhất của lỗi `-5000 App id is invalid`.
-
-### Thứ tự deploy
+### Các bước deploy bản Development
 
 ```bash
-cd apps/miniapp
-pnpm exec zmp-cli login          # token CLI hết hạn định kỳ, phải đăng nhập lại
-pnpm build:zmp
-pnpm deploy:zmp
+pnpm --filter @eco-oil/miniapp exec zmp-cli login   # quét QR bằng tài khoản Admin/Developer của Mini App
+pnpm --filter @eco-oil/miniapp build:zmp
+pnpm --filter @eco-oil/miniapp deploy:zmp           # = npx zmp-cli@4.0.3 deploy --passive --existing --outputDir dist
 ```
 
-CLI sẽ hỏi: Project → Mini App ID → Version status → Description. Chọn
-**Development** cho tới khi qua bước Xác thực + kiểm duyệt.
+- Chọn đúng **Mini App ID** (19 chữ số, lấy ở `mini.zalo.me`) — **không** phải App ID.
+- Chọn loại phiên bản **Development**: bản này bị ghi đè mỗi lần deploy và không hiện trong
+  "Quản lý phiên bản", đúng nhu cầu chỉ cho tester nội bộ.
+- **Luôn nhập Description.** Quên Description hoặc `zmp-cli login` đã hết hạn thì deploy
+  "im lặng": không báo lỗi rõ mà bản cũ vẫn nguyên.
+- `zmp start` **không dùng được** cho repo này — CLI không nhận đây là project ZMP chuẩn vì
+  nằm trong monorepo. Luôn dùng `build:zmp` + `deploy:zmp`.
+- `zmp-cli` cố ý chạy qua `npx` (không thêm vào `devDependencies`) để không phải nạp lại
+  hàng nghìn dòng vào `pnpm-lock.yaml`.
 
-`zmp start` không dùng được cho repo này — CLI không nhận đây là project ZMP
-chuẩn. Luôn dùng `build:zmp` + `deploy:zmp`.
+### Bẫy đã gặp — ghi lại để không lặp lại
 
-### Trước khi test trên thiết bị thật
+- **Không thêm `<link rel="stylesheet">` vào `apps/miniapp/index.html`.** `zmp-cli sync-config`
+  quét thẻ này và ghi URL (ví dụ Google Fonts) vào `listCSS`, khiến Zalo từ chối với
+  _"File app-config.json is invalid"_. Font đang nạp qua `@import` ở đầu `src/styles.css`.
+- `"inline.js"` trước đây nằm trong `listSyncJS` nhưng **không tồn tại** trong `dist/` — file
+  này chỉ do `zmp-cli sync-config` sinh khi `index.html` có inline `<style>`/`<script>`, còn
+  repo này không có inline content (mọi style đều nằm trong `index.css`). Đã **bỏ** `"inline.js"`
+  khỏi `listSyncJS`, chỉ giữ `"./assets/index.module.js"`.
+- `index.html` phải giữ `<div id="app">`; `vite.config.ts` phải giữ `base: './'` và tên
+  chunk `*.module.js` — cả hai đang đúng, **không sửa**. Riêng mode `zmp` có thêm
+  `inlineDynamicImports: true` (gộp chunk) để tránh phải khai báo tên chunk có hash vào
+  `app-config.json`; mode `production` (Vercel) vẫn code-split bình thường.
 
-- Thêm số điện thoại Zalo của người test vào **whitelist tester** trên Mini
-  App Center. Thiếu bước này → `-6001 Invalid Permission (not in white list)`,
-  rất dễ tưởng nhầm là lỗi code.
-- Xác nhận `ZALO_AUTH_MODE=real` đã bật trên service API mà Mini App trỏ tới —
-  ở mock mode, mỗi lần đăng nhập tạo một user rác vì access token thật bị dùng
-  thẳng làm `zalo_id`.
-- API Domain khai báo trong Mini App Center phải là origin API (không kèm
-  `/api/v1`), và `CORS_ORIGINS` trên service đó phải có `https://h5.zdn.vn`.
+### Danh sách tester (whitelist số điện thoại)
 
-### Phát hành
+1. Vào `mini.zalo.me` → chọn Mini App → mục thành viên/tester.
+2. Thêm số điện thoại Zalo của từng tester nội bộ.
+3. Thiếu bước này, tester mở app sẽ nhận lỗi `-6001 Invalid Permission (not in white list)`.
 
-Chỉ làm sau khi đã test xong bản Development: hoàn tất bước **Xác thực**
-(bắt buộc trước khi phát hành) → nộp duyệt theo chính sách kiểm duyệt của
-Zalo → mới có link `zalo.me/s/...` công khai. Trước khi duyệt, link đó báo
-"ứng dụng đang phát triển" — dùng QR Development thay thế.
+### Tên miền API phải khai báo (Domain Whitelist)
 
-Chi tiết đầy đủ từng bước tạo App/Mini App: xem `docs/ZALO_DEV_SETUP.md`.
+Khai báo origin API mà Mini App gọi, ví dụ `https://<staging-api>.onrender.com`.
+Mini App chạy trên host `h5.zdn.vn`, nên phía API phải có `https://h5.zdn.vn` trong
+`CORS_ORIGINS`, và middleware phải trả **đúng một** origin khớp request (kể cả preflight).
+
+### File xác thực domain (verifier) — cách lấy tên file mới
+
+Zalo bắt buộc chứng minh quyền sở hữu domain API trước khi cho dùng OAuth. File verifier
+hiện có trong repo (`zalo_verifierN-EW8eJWCXXVp-4_ghjiP4E8r5Yl_WuFE34r.html`) thuộc **Zalo App
+của tài khoản cũ** — hạ tầng dự án không còn kiểm soát — nên **không dùng lại được**. Zalo App
+mới sẽ được cấp **một file mới**.
+
+**Cách lấy tên file (làm trên web, cần tài khoản chủ dự án):**
+
+1. Đăng nhập `https://developers.zalo.me` bằng tài khoản chủ dự án.
+2. Vào **Ứng dụng** → chọn Zalo App mới → mục **Cài đặt** → **Xác thực domain**.
+3. Nhập domain API staging — **chỉ origin, KHÔNG kèm `/api/v1`**:
+   `https://<staging-api>.onrender.com`
+4. Zalo hiển thị một file cho tải về, tên dạng **`zalo_verifierXXXXXXXX.html`**.
+5. Sao chép **đúng tên file đó** (giữ nguyên cả `zalo_verifier`, phần `XXXXXXXX` và đuôi
+   `.html`) rồi gửi lại cho đội kỹ thuật kèm `ZALO_APP_ID` và origin staging.
+
+> Tên file verifier **không phải secret** — gửi qua chat được.
+> ⛔ **Không** gửi `ZALO_APP_SECRET`; secret chỉ dán trực tiếp vào Render staging.
+
+**Khi đã có tên file, đội kỹ thuật cập nhật đúng 3 chỗ:**
+
+| #   | Vị trí                                                     | Việc cần làm                                                    |
+| --- | ---------------------------------------------------------- | --------------------------------------------------------------- |
+| 1   | `apps/api/public/<tên-file-mới>.html`                      | Đặt nội dung file Zalo cấp vào đây (API phục vụ qua controller) |
+| 2   | `apps/api/src/verification/zalo-verification.constants.ts` | Đổi `ZALO_VERIFIER_PATH` sang tên file mới                      |
+| 3   | `apps/miniapp/public/<tên-file-mới>.html`                  | Đặt bản sao (để gói ZMP cũng phục vụ được file), xoá file cũ    |
+
+Kiểm chứng trước khi bấm "Xác thực" trên trang Zalo:
+
+```bash
+pnpm --filter @eco-oil/api test          # có e2e zalo-verification.e2e-spec.ts
+curl -s https://<staging-api>.onrender.com/<tên-file-mới>.html
+```
+
+URL trên phải trả về **đúng nội dung** file Zalo cấp.
+
+### Biến môi trường bắt buộc trên staging (khác service demo)
+
+```text
+NODE_ENV=production
+ZALO_AUTH_MODE=real
+DEMO_MODE=false
+ZALO_APP_ID=<App ID>
+ZALO_APP_SECRET=<Secret Key — dán trực tiếp, không qua chat>
+ZALO_OAUTH_CALLBACK_URL=https://<staging-api>.onrender.com/api/v1/auth/zalo/callback
+ZALO_OAUTH_SUCCESS_REDIRECT_URL=<Mini App staging origin>
+REDIS_URL=<Upstash — thiếu thì OAuth kẹt ở ZALO_OAUTH_HANDOFF_UNAVAILABLE>
+CORS_ORIGINS=https://h5.zdn.vn,<Mini App staging origin>
+DATABASE_URL=<Neon — nên dùng branch riêng>
+JWT_SECRET=<sinh mới, KHÁC secret của demo>
+```
+
+> ⚠️ **Không bật `ZALO_AUTH_MODE=real` trên `eco-oil-api` (service demo).** Khi đó
+> `GET /auth/dev-accounts` trả 404 và **bản Web Vercel mất khả năng đăng nhập**. Mini App và
+> OAuth thật chỉ được trỏ vào staging. Quy trình dựng staging chi tiết:
+> `docs/archive/ZALO_DEV_SETUP.md`.
+
+### Checklist trước khi phát QR cho tester
+
+- [ ] `build:zmp` chạy thành công, `dist/app-config.json` và `dist/assets/index.module.js` tồn tại.
+- [ ] Bundle ZMP **không** chứa UI demo (kiểm nhanh: `grep -l dev-login-block dist/assets/*.js` phải rỗng).
+- [ ] `zmp-cli login` còn hạn, đã chọn đúng Mini App ID và loại **Development**, đã nhập Description.
+- [ ] Tester đã có trong whitelist số điện thoại; domain API đã khai báo.
+- [ ] API staging đã bật `ZALO_AUTH_MODE=real` + Redis; `/auth/zalo/start` chuyển hướng sang Zalo (không trả 503).
+- [ ] Relay profile/location đang chạy sống (xem `docs/DEMO_RUNBOOK.md`), nếu không đăng nhập thật sẽ lỗi `ZALO_PROFILE_API_ERROR`.
+- [ ] Không có App Secret, access token hay tài khoản seed nào trong bundle/log.

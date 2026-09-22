@@ -62,7 +62,7 @@ export const DEMO_GREEN_JOURNEY: MerchantGreenJourneyResponse = {
 
 export const DEMO_OIL_PRICE: OilPriceRecord = {
   id: 'demo-price-001',
-  unit_price: 6000,
+  unit_price: 20000,
   unit: PriceUnit.PER_LITER,
   effective_from: isoDaysAgo(2),
   effective_to: null,

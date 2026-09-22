@@ -21,6 +21,7 @@ secret:
 
 ```powershell
 $env:ZALO_PROFILE_RELAY_SECRET = '<RELAY_SECRET_PLACEHOLDER_32_CHARS_MINIMUM>'
+$env:ZALO_APP_SECRET = '<ZALO_APP_SECRET>'
 $env:ZALO_PROFILE_RELAY_PORT = '8787'
 pnpm --filter @eco-oil/api relay:zalo-profile
 ```
@@ -31,6 +32,10 @@ the tunnel is active:
 ```powershell
 .\.tools\cloudflared.exe tunnel --url http://127.0.0.1:8787
 ```
+
+The relay computes the `appsecret_proof` header (required by Zalo since
+01/01/2024) from the access token and `ZALO_APP_SECRET`, so the app secret
+stays on the relay machine and is never sent to Render.
 
 Check the public tunnel with `GET /health`; it returns `{"status":"ok"}`.
 

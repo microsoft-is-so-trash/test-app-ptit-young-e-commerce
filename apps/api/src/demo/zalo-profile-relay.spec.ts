@@ -1,4 +1,5 @@
 import request from 'supertest';
+import { createHmac } from 'node:crypto';
 import {
   createZaloProfileRelayServer,
   ZALO_PROFILE_RELAY_PATH,
@@ -8,17 +9,18 @@ import {
 
 describe('Zalo profile relay', () => {
   const relaySecret = 'relay-secret-that-is-at-least-32-characters-long';
+  const appSecret = 'zalo-app-secret-that-is-at-least-32-characters-long';
   const accessToken = 'zalo-access-token-that-must-never-be-logged';
 
   it('keeps the health check public', async () => {
-    const server = createZaloProfileRelayServer({ relaySecret }, jest.fn() as typeof fetch);
+    const server = createZaloProfileRelayServer({ relaySecret, appSecret }, jest.fn() as typeof fetch);
 
     await request(server).get('/health').expect(200, { status: 'ok' });
   });
 
   it('rejects missing and invalid relay secrets without forwarding the access token', async () => {
     const fetchMock = jest.fn();
-    const server = createZaloProfileRelayServer({ relaySecret }, fetchMock as typeof fetch);
+    const server = createZaloProfileRelayServer({ relaySecret, appSecret }, fetchMock as typeof fetch);
 
     await request(server).post(ZALO_PROFILE_RELAY_PATH).send({ access_token: accessToken }).expect(401, { error: 'UNAUTHORIZED' });
     await request(server).post(ZALO_PROFILE_RELAY_PATH).set(ZALO_PROFILE_RELAY_SECRET_HEADER, 'wrong-secret').send({ access_token: accessToken }).expect(403, { error: 'FORBIDDEN' });
@@ -32,7 +34,7 @@ describe('Zalo profile relay', () => {
       message: `IP restriction ${accessToken} ${relaySecret}`,
       secret_value: relaySecret,
     }), { status: 200, headers: { 'content-type': 'application/json' } }));
-    const server = createZaloProfileRelayServer({ relaySecret }, fetchMock as typeof fetch, (entry) => logs.push(entry));
+    const server = createZaloProfileRelayServer({ relaySecret, appSecret }, fetchMock as typeof fetch, (entry) => logs.push(entry));
 
     const response = await request(server)
       .post(ZALO_PROFILE_RELAY_PATH)
@@ -43,7 +45,10 @@ describe('Zalo profile relay', () => {
     expect(response.body).toEqual({ error: -501, message: expect.stringContaining('IP restriction') });
     expect(fetchMock).toHaveBeenCalledWith(ZALO_PROFILE_URL, expect.objectContaining({
       method: 'GET',
-      headers: { access_token: accessToken },
+      headers: {
+        access_token: accessToken,
+        appsecret_proof: createHmac('sha256', appSecret).update(accessToken).digest('hex'),
+      },
     }));
     expect(JSON.stringify(response.body)).not.toContain(relaySecret);
     expect(JSON.stringify(logs)).not.toContain(accessToken);
@@ -59,7 +64,7 @@ describe('Zalo profile relay', () => {
 
   it('rejects non-JSON and oversized request bodies before calling Zalo', async () => {
     const fetchMock = jest.fn();
-    const server = createZaloProfileRelayServer({ relaySecret }, fetchMock as typeof fetch);
+    const server = createZaloProfileRelayServer({ relaySecret, appSecret }, fetchMock as typeof fetch);
 
     await request(server)
       .post(ZALO_PROFILE_RELAY_PATH)

@@ -13,7 +13,7 @@ const TREND_MONTHS_BACK = 6;
 
 export function CollectorStatsPage() {
   const collectorId = useAuthStore((state) => state.user?.collectorId ?? state.user?.id ?? 'unknown');
-  const history = useQuery({ queryKey: ['collector-history', collectorId], queryFn: () => api.myCollections(1, 200) });
+  const history = useQuery({ queryKey: ['collector-history', collectorId], queryFn: () => api.myCollections(1, 100) });
 
   if (history.isPending) return <StatusView title="Đang tải thống kê…" />;
   if (history.isError) {

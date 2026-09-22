@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { PRODUCTION_API_BASE_URL, resolveApiBaseUrl } from '../src/lib/api-base-url';
+import { PRODUCTION_API_BASE_URL, ZMP_API_BASE_URL, resolveApiBaseUrl } from '../src/lib/api-base-url';
 
 test('uses the local API proxy during development', () => {
   assert.equal(resolveApiBaseUrl('development'), '/api/v1');
@@ -9,6 +9,12 @@ test('uses the local API proxy during development', () => {
 test('uses Render API by default for production', () => {
   assert.equal(resolveApiBaseUrl('production'), PRODUCTION_API_BASE_URL);
   assert.equal(resolveApiBaseUrl('production', PRODUCTION_API_BASE_URL), PRODUCTION_API_BASE_URL);
+});
+
+test('zmp build always uses the dedicated staging API (ignores env)', () => {
+  assert.equal(resolveApiBaseUrl('zmp'), ZMP_API_BASE_URL);
+  // Kể cả khi có biến môi trường trỏ demo, bản ZMP vẫn phải dùng staging.
+  assert.equal(resolveApiBaseUrl('zmp', 'https://eco-oil-api-kgoe.onrender.com/api/v1'), ZMP_API_BASE_URL);
 });
 
 test('rejects unsafe production API base URLs', () => {

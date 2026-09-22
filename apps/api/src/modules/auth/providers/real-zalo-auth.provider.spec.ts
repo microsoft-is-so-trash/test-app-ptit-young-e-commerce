@@ -1,5 +1,6 @@
 import type { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
+import { createHmac } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { RealZaloAuthProvider } from './real-zalo-auth.provider';
@@ -37,7 +38,12 @@ describe('RealZaloAuthProvider', () => {
     const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(fixture('zalo-profile-with-avatar.json')), { status: 200, headers: { 'content-type': 'application/json' } }));
 
     await expect(provider().verify('zalo-access')).resolves.toEqual({ zaloId: '1234567890', phone: null, name: 'Nguyen Van A', avatarUrl: 'https://example.test/zalo-avatar.jpg' });
-    expect(fetchMock).toHaveBeenCalledWith('https://graph.zalo.me/v2.0/me?fields=id,name,picture', expect.objectContaining({ headers: { access_token: 'zalo-access' } }));
+    expect(fetchMock).toHaveBeenCalledWith('https://graph.zalo.me/v2.0/me?fields=id,name,picture', expect.objectContaining({
+      headers: {
+        access_token: 'zalo-access',
+        appsecret_proof: createHmac('sha256', 'server-only-secret').update('zalo-access').digest('hex'),
+      },
+    }));
   });
 
   it('accepts the documented profile when avatar is not returned', async () => {

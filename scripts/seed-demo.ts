@@ -4,11 +4,13 @@ import {
   MerchantApprovalStatus,
   OilGrade,
   OrderStatus,
+  PaymentStatus,
   PrismaClient,
   Quality,
   Role,
 } from '@prisma/client';
 import { getDemoWardId, upsertDemoWards } from '../apps/api/src/demo/seed-demo-wards';
+import { paymentPeriodFor } from '../apps/api/src/modules/payments/payment-period';
 
 const prisma = new PrismaClient();
 
@@ -328,6 +330,141 @@ async function main() {
     },
   });
 
+  // Tài khoản demo-picker (khác dữ liệu tổ chức thật đã tích luỹ qua test) chỉ có
+  // đúng 1 giao dịch ở trên — vào Thống kê/Lịch sử/Hành trình xanh/Thanh toán của
+  // người thu gom lẫn quán đều thấy trống trơn. Rải thêm lịch sử nhiều tháng cho cả
+  // 5 quán và 2 người thu gom mẫu để demo bằng tài khoản picker cũng đầy đủ như
+  // dữ liệu thật. Giao dịch quá PAID_CUTOFF_DAYS thì chốt thanh toán (PAID) luôn —
+  // chỉ vài giao dịch gần nhất để nguyên PENDING cho khớp luồng "chờ thanh toán".
+  const secondCollectorId = '73000000-0000-4000-8000-000000000002';
+  const PAID_CUTOFF_DAYS = 5;
+  const PRICE_CHANGE_AT = new Date('2026-09-20T09:29:00.000Z');
+
+  function unitPriceAt(date: Date): number {
+    return date >= PRICE_CHANGE_AT ? 20000 : 5500;
+  }
+
+  function daysAgo(days: number): Date {
+    const date = new Date();
+    date.setUTCDate(date.getUTCDate() - days);
+    return date;
+  }
+
+  const collectionHistory = [
+    { seq: 10, merchantIndex: 0, collectorId: firstCollectorId, daysAgo: 85, liters: 20, grade: OilGrade.A },
+    { seq: 11, merchantIndex: 0, collectorId: firstCollectorId, daysAgo: 55, liters: 24, grade: OilGrade.A },
+    { seq: 12, merchantIndex: 0, collectorId: firstCollectorId, daysAgo: 25, liters: 19, grade: OilGrade.A },
+    { seq: 13, merchantIndex: 0, collectorId: firstCollectorId, daysAgo: 7, liters: 25, grade: OilGrade.A },
+    { seq: 14, merchantIndex: 3, collectorId: firstCollectorId, daysAgo: 80, liters: 28, grade: OilGrade.A },
+    { seq: 15, merchantIndex: 3, collectorId: firstCollectorId, daysAgo: 50, liters: 22, grade: OilGrade.B },
+    { seq: 16, merchantIndex: 3, collectorId: firstCollectorId, daysAgo: 20, liters: 30, grade: OilGrade.A },
+    { seq: 17, merchantIndex: 3, collectorId: firstCollectorId, daysAgo: 4, liters: 26, grade: OilGrade.A },
+    { seq: 18, merchantIndex: 1, collectorId: secondCollectorId, daysAgo: 60, liters: 26, grade: OilGrade.A },
+    { seq: 19, merchantIndex: 1, collectorId: firstCollectorId, daysAgo: 30, liters: 20, grade: OilGrade.B },
+    { seq: 20, merchantIndex: 1, collectorId: firstCollectorId, daysAgo: 8, liters: 24, grade: OilGrade.A },
+    { seq: 21, merchantIndex: 2, collectorId: secondCollectorId, daysAgo: 75, liters: 18, grade: OilGrade.A },
+    { seq: 22, merchantIndex: 2, collectorId: secondCollectorId, daysAgo: 45, liters: 21, grade: OilGrade.A },
+    { seq: 23, merchantIndex: 2, collectorId: secondCollectorId, daysAgo: 15, liters: 17, grade: OilGrade.A },
+    { seq: 24, merchantIndex: 2, collectorId: secondCollectorId, daysAgo: 5, liters: 23, grade: OilGrade.A },
+    { seq: 25, merchantIndex: 4, collectorId: firstCollectorId, daysAgo: 65, liters: 23, grade: OilGrade.A },
+    { seq: 26, merchantIndex: 4, collectorId: secondCollectorId, daysAgo: 35, liters: 19, grade: OilGrade.A },
+    { seq: 27, merchantIndex: 4, collectorId: secondCollectorId, daysAgo: 9, liters: 27, grade: OilGrade.A },
+  ] as const;
+
+  for (const entry of collectionHistory) {
+    const merchantId = merchants[entry.merchantIndex][0];
+    const containerId = `72000000-0000-4000-8000-${String(entry.merchantIndex + 1).padStart(12, '0')}`;
+    const orderId = `76000000-0000-4000-8000-${String(entry.seq).padStart(12, '0')}`;
+    const transactionId = `77000000-0000-4000-8000-${String(entry.seq).padStart(12, '0')}`;
+    const clientUuid = `77100000-0000-4000-8000-${String(entry.seq).padStart(12, '0')}`;
+    const collectedAt = daysAgo(entry.daysAgo);
+
+    await prisma.collectionOrder.upsert({
+      where: { id: orderId },
+      update: {
+        merchantId,
+        containerId,
+        collectorId: entry.collectorId,
+        status: OrderStatus.COLLECTED,
+        expectedLiters: entry.liters,
+        requestedAt: collectedAt,
+        assignedAt: collectedAt,
+        completedAt: collectedAt,
+        deletedAt: null,
+      },
+      create: {
+        id: orderId,
+        merchantId,
+        containerId,
+        collectorId: entry.collectorId,
+        status: OrderStatus.COLLECTED,
+        expectedLiters: entry.liters,
+        requestedAt: collectedAt,
+        assignedAt: collectedAt,
+        completedAt: collectedAt,
+      },
+    });
+
+    await prisma.collectionTransaction.upsert({
+      where: { id: transactionId },
+      update: {
+        orderId,
+        containerId,
+        merchantId,
+        collectorId: entry.collectorId,
+        actualLiters: entry.liters,
+        grade: entry.grade,
+        quality: Quality.PASS,
+        collectedAt,
+        createdAt: collectedAt,
+        deletedAt: null,
+      },
+      create: {
+        id: transactionId,
+        clientUuid,
+        orderId,
+        containerId,
+        merchantId,
+        collectorId: entry.collectorId,
+        actualLiters: entry.liters,
+        grade: entry.grade,
+        quality: Quality.PASS,
+        collectedAt,
+        createdAt: collectedAt,
+      },
+    });
+
+    if (entry.daysAgo > PAID_CUTOFF_DAYS) {
+      const unitPrice = unitPriceAt(collectedAt);
+      const amount = Math.round(entry.liters * unitPrice);
+      const paymentId = `78000000-0000-4000-8000-${String(entry.seq).padStart(12, '0')}`;
+      const paidAt = new Date(collectedAt.getTime() + 2 * 60 * 60 * 1000);
+      await prisma.payment.upsert({
+        where: { transactionId },
+        update: {
+          merchantId,
+          liters: entry.liters,
+          unitPrice,
+          amount,
+          period: paymentPeriodFor(collectedAt),
+          status: PaymentStatus.PAID,
+          paidAt,
+        },
+        create: {
+          id: paymentId,
+          merchantId,
+          transactionId,
+          liters: entry.liters,
+          unitPrice,
+          amount,
+          period: paymentPeriodFor(collectedAt),
+          status: PaymentStatus.PAID,
+          paidAt,
+        },
+      });
+    }
+  }
+
   const admin = await prisma.user.findUnique({ where: { zaloId: 'zalo_admin_01' } });
   if (admin) {
     await prisma.user.update({
@@ -346,7 +483,8 @@ async function main() {
     });
   }
   console.log(
-    'Demo seed complete: 4 Hanoi wards, 5 merchants, 2 collectors, 2 stations, 5 containers, 4 orders (1 COLLECTED + 3 READY), 1 transaction.',
+    'Demo seed complete: 4 Hanoi wards, 5 merchants, 2 collectors, 2 stations, 5 containers, ' +
+      '22 orders (19 COLLECTED across ~3 months + 3 READY), 19 transactions, 16 payments (PAID).',
   );
 }
 

@@ -26,7 +26,7 @@ export const DEMO_ADMIN_USER_ID = 'demo-admin-01';
 /** Tâm phường Hàng Bài, trùng với WARD_CENTER của demo-collector-fixtures. */
 export const WARD_CENTER = { lat: 21.0221, lng: 105.8524 };
 
-export const DEMO_OIL_UNIT_PRICE = 6000;
+export const DEMO_OIL_UNIT_PRICE = 20000;
 
 export interface DemoWard {
   id: string;

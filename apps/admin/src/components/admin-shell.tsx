@@ -126,7 +126,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
                   const gate = configuredLoginGateUrl();
                   if (gate) window.location.assign(gate);
                   else router.replace('/login');
-                  router.replace('/login');
                 });
               }}
             >

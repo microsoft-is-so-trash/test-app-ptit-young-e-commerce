@@ -12,7 +12,7 @@
     "db:migrate": "prisma migrate dev",
     "db:reset": "prisma migrate reset --force",
     "db:seed": "prisma db seed",
-    "seed:demo": "tsx scripts/seed-demo.ts",
+    "seed:demo": "tsx --env-file-if-exists=.env scripts/seed-demo.ts",
     "demo:zalo-location-relay": "pnpm --filter @eco-oil/api demo:zalo-location-relay",
     "db:cleanup-invalid-orders": "tsx scripts/cleanup-invalid-orders.ts",
     "db:cleanup-legacy-hcm-demo": "tsx scripts/cleanup-legacy-hcm-demo.ts",
@@ -34,7 +34,7 @@
     "tsx": "^4.19.3"
   },
   "prisma": {
-    "seed": "tsx scripts/seed-demo.ts"
+    "seed": "tsx --env-file-if-exists=.env scripts/seed-demo.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0"

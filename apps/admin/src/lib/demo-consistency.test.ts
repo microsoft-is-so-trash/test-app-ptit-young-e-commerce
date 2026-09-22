@@ -107,7 +107,7 @@ describe('dữ liệu demo của admin khớp với miniapp', () => {
     expect(huongLien?.approval_status).toBe('PENDING');
   });
 
-  it('dùng chung đơn giá dầu 6.000 đ/lít', () => {
-    expect(DEMO_OIL_UNIT_PRICE).toBe(6000);
+  it('dùng chung đơn giá dầu 20.000 đ/lít', () => {
+    expect(DEMO_OIL_UNIT_PRICE).toBe(20000);
   });
 });

@@ -1,5 +1,10 @@
 export const PRODUCTION_API_BASE_URL = 'https://eco-oil-api-kgoe.onrender.com/api/v1';
 
+// Zalo Mini App (mode "zmp") trỏ về API staging riêng (ZALO_AUTH_MODE=real).
+// Không dùng PRODUCTION_API_BASE_URL (service demo eco-oil-api-kgoe) vì demo phải giữ
+// mock cho Web Vercel; bật real trên demo sẽ làm /auth/dev-accounts trả 404.
+export const ZMP_API_BASE_URL = 'https://test-app-ptit-young-e-commerce.onrender.com/api/v1';
+
 const INVALID_PRODUCTION_HOSTS = new Set(['localhost', '127.0.0.1', '::1', 'example.com']);
 
 /**
@@ -13,6 +18,10 @@ function describeReceived(value: string): string {
 }
 
 export function resolveApiBaseUrl(mode: string, configured?: string): string {
+  // ZMP luôn dùng API staging, bỏ qua mọi biến môi trường (kể cả .env.local).
+  if (mode === 'zmp') {
+    return ZMP_API_BASE_URL;
+  }
   const candidate = configured?.trim() || (mode === 'development' ? '/api/v1' : PRODUCTION_API_BASE_URL);
   if (mode !== 'development') {
     let parsed: URL;

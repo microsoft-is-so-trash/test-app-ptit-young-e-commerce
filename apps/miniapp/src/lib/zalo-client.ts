@@ -37,6 +37,30 @@ interface NativeStorage {
   removeItem(key: string): void;
 }
 
+/**
+ * Native Storage chính thức của zmp-sdk (`nativeStorage.getItem/setItem/removeItem`).
+ *
+ * Chỉ nạp khi thật sự chạy trong runtime Zalo (`isZaloEnvironment`) và có `navigator`:
+ * `zmp-sdk` đọc `navigator.userAgent` ngay tại thời điểm import, nên ở Node/test hoặc
+ * trên trình duyệt web (Vercel) việc nạp sẽ ném lỗi và để lại handle treo event loop.
+ * Khi không nạp được, adapter dùng global `ZaloMiniAppSDK` làm đường lui.
+ */
+async function loadZmpNativeStorage(): Promise<NativeStorage | null> {
+  if (typeof window === 'undefined' || !window.navigator?.userAgent) {
+    return null;
+  }
+  try {
+    const { nativeStorage } = await import('zmp-sdk');
+    return nativeStorage;
+  } catch {
+    return null;
+  }
+}
+
+const zmpNativeStorage: NativeStorage | null = isZaloEnvironment()
+  ? await loadZmpNativeStorage()
+  : null;
+
 type WindowWithZaloRuntime = Window & {
   APP_ID?: string;
   zAppID?: string;
@@ -418,7 +442,9 @@ export class RealZaloClient implements IZaloClient {
   }
 
   getAccessToken(): Promise<string> {
-    return import('zmp-sdk').then(({ getAccessToken }) => getAccessToken());
+    return import('zmp-sdk').then(({ getAccessToken }) =>
+      withDeviceTimeout(getAccessToken(), 15_000, 'Zalo không trả access token.'),
+    );
   }
 
   async getLocation(): Promise<GeoPoint | null> {
@@ -511,7 +537,10 @@ export class RealZaloClient implements IZaloClient {
   }
 
   private nativeStorage(): NativeStorage {
-    const storage = (window as WindowWithZaloRuntime).ZaloMiniAppSDK?.nativeStorage;
+    // API chính thức của zmp-sdk (`nativeStorage`); giữ global ZaloMiniAppSDK làm
+    // đường lui cho client Zalo cũ không nạp module SDK.
+    const storage: NativeStorage | undefined =
+      zmpNativeStorage ?? (window as WindowWithZaloRuntime).ZaloMiniAppSDK?.nativeStorage;
     if (!storage) {
       throw new Error('Zalo native storage is unavailable');
     }
