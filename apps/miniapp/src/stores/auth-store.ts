@@ -254,10 +254,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       return { user: updated };
     });
   },
-<<<<<<< HEAD
-=======
   clearError: () => set({ error: null }),
->>>>>>> origin/main
 }));
 
 setUnauthorizedHandler(() => useAuthStore.getState().signOut());
