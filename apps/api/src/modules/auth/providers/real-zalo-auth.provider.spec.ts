@@ -110,4 +110,30 @@ describe('RealZaloAuthProvider', () => {
     await expect(provider().verify('zalo-access')).rejects.toMatchObject({ response: expect.objectContaining({ code: 'ZALO_PROFILE_INVALID' }) });
     expect(warnSpy).toHaveBeenCalledWith(expect.objectContaining({ event: 'zalo_profile_response_invalid', status: 200, top_level_keys: ['error', 'message', 'name'] }));
   });
+
+  it('falls back to direct Zalo Graph API when configured relay is unreachable', async () => {
+    const relaySecret = 'secret-must-be-at-least-32-chars-long';
+    const directFetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes('relay.example')) {
+        throw new Error('Connection refused');
+      }
+      return new Response(JSON.stringify({ id: 'fallback-user', name: 'Direct User' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+
+    const activeProvider = provider({
+      ZALO_PROFILE_RELAY_URL: 'https://relay.example.com',
+      ZALO_PROFILE_RELAY_SECRET: relaySecret,
+    });
+
+    await expect(activeProvider.verify('valid-token')).resolves.toEqual({
+      zaloId: 'fallback-user',
+      phone: null,
+      name: 'Direct User',
+    });
+    expect(directFetchSpy).toHaveBeenCalledTimes(2);
+  });
 });

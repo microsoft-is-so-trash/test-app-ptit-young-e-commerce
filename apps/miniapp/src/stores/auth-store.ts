@@ -19,6 +19,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   patchUser: (patch: Partial<AuthUser>) => void;
   loginDemoAccount: (accountId: string) => void;
+  clearError: () => void;
 }
 
 function applyUserScope(user: AuthUser | null): void {
@@ -135,10 +136,15 @@ export const useAuthStore = create<AuthState>((set) => ({
         return;
       }
 
-      if (!tokenStorage.getAccessToken()) {
-        // Không có token thì không có phiên nào để khôi phục — gọi /auth/me lúc này
-        // chỉ tổ chờ Render free tier thức dậy (có thể hơn 50s) trong khi nút đăng
-        // nhập Zalo bị khoá bởi `busy`, dù việc đăng nhập không cần phiên cũ.
+      // Không còn accessToken lẫn refreshToken thì không có phiên nào để khôi phục —
+      // gọi /auth/me lúc này chỉ tổ chờ Render free tier thức dậy (có thể hơn 50s)
+      // trong khi nút đăng nhập Zalo bị khoá bởi `busy`, dù việc đăng nhập không cần
+      // phiên cũ. Vẫn phải kiểm tra refreshToken riêng: accessToken hết hạn nhưng còn
+      // refreshToken hợp lệ thì để api.me() chạy tiếp, nó tự làm mới phiên qua 401.
+      const accessToken = tokenStorage.getAccessToken();
+      const refreshToken = tokenStorage.getRefreshToken();
+      if (!accessToken && !refreshToken) {
+        clearSession();
         set({ user: null, error: null });
         return;
       }
@@ -248,6 +254,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       return { user: updated };
     });
   },
+<<<<<<< HEAD
+=======
+  clearError: () => set({ error: null }),
+>>>>>>> origin/main
 }));
 
 setUnauthorizedHandler(() => useAuthStore.getState().signOut());

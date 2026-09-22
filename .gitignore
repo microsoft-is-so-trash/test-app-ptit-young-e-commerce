@@ -13,3 +13,6 @@ pnpm-debug.log*
 *.log
 *.tsbuildinfo
 .tools/
+.wrangler/
+.agents/
+

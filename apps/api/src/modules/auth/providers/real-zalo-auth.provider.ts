@@ -73,17 +73,10 @@ export class RealZaloAuthProvider implements IZaloAuthProvider {
     }
 
     const relay = this.profileRelayConfig();
-    // Zalo requires appsecret_proof on /me since 2024-01-01. It is computed from the
-    // access token + app secret, so it is only derived here for the direct (non-relay)
-    // path; the relay computes it itself on the Vietnam-side machine that holds the secret.
-    let appSecretProof = '';
-    if (!relay) {
-      appSecretProof = this.appSecretProof(accessToken, this.required('ZALO_APP_SECRET'));
-    }
-    let response: Response;
-    try {
-      response = relay
-        ? await fetch(relay.url, {
+    let response: Response | null = null;
+    if (relay) {
+      try {
+        const relayResponse = await fetch(relay.url, {
           method: 'POST',
           headers: {
             'content-type': 'application/json',
@@ -91,13 +84,44 @@ export class RealZaloAuthProvider implements IZaloAuthProvider {
           },
           body: JSON.stringify({ access_token: accessToken }),
           signal: AbortSignal.timeout(ZALO_REQUEST_TIMEOUT_MS),
-        })
-        : await fetch(ZALO_PROFILE_URL, {
+        });
+        if (relayResponse.ok) {
+          response = relayResponse;
+        } else {
+          this.logger.warn({
+            event: 'zalo_profile_relay_non_ok',
+            status: relayResponse.status,
+            message: 'Relay trả về mã lỗi, chuyển sang gọi trực tiếp Zalo Graph API',
+          });
+        }
+      } catch (relayError) {
+        this.logger.warn({
+          event: 'zalo_profile_relay_unreachable',
+          error: relayError instanceof Error ? relayError.message : String(relayError),
+          message: 'Không kết nối được Relay, tự động chuyển sang gọi trực tiếp Zalo Graph API',
+        });
+      }
+    }
+
+    if (!response) {
+      // Zalo requires appsecret_proof on /me since 2024-01-01, tính từ access
+      // token + app secret. Relay tự tính lại giá trị này ở phía nó
+      // (máy Việt Nam giữ secret), nên ở đây chỉ cần tính cho đường gọi
+      // trực tiếp: không cấu hình relay, hoặc relay vừa lỗi ở trên và đang rơi
+      // xuống tự gọi thẳng Zalo.
+      const appSecretProof = this.appSecretProof(accessToken, this.required('ZALO_APP_SECRET'));
+      try {
+        response = await fetch(ZALO_PROFILE_URL, {
           headers: { access_token: accessToken, appsecret_proof: appSecretProof },
           signal: AbortSignal.timeout(ZALO_REQUEST_TIMEOUT_MS),
         });
-    } catch {
-      throw new ServiceUnavailableException({ code: 'ZALO_PROFILE_UNAVAILABLE', message: 'Không kết nối được Zalo', details: null });
+      } catch (directError) {
+        this.logger.error({
+          event: 'zalo_profile_direct_failed',
+          error: directError instanceof Error ? directError.message : String(directError),
+        });
+        throw new ServiceUnavailableException({ code: 'ZALO_PROFILE_UNAVAILABLE', message: 'Không kết nối được Zalo', details: null });
+      }
     }
 
     const body = await this.jsonObject(response);
@@ -203,8 +227,9 @@ export class RealZaloAuthProvider implements IZaloAuthProvider {
   }
 
   private isZaloTokenError(error: unknown): boolean {
-    const normalized = typeof error === 'number' ? error : typeof error === 'string' && /^\d+$/.test(error) ? Number(error) : null;
-    return normalized === 452;
+    const str = typeof error === 'number' ? String(error) : typeof error === 'string' ? error.trim() : '';
+    const normalized = /^-?\d+$/.test(str) ? Number(str) : null;
+    return normalized !== null && (normalized === 452 || normalized === -216 || normalized === -204 || normalized === -211 || normalized === 1001);
   }
 
   private isSuccessfulProviderError(error: unknown): boolean {

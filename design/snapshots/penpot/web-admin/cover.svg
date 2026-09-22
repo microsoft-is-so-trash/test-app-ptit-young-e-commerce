@@ -1,0 +1,1058 @@
+<svg width="1440" xmlns="http://www.w3.org/2000/svg" height="900" viewBox="0 0 1440 900" style="-webkit-print-color-adjust::exact" xmlns:xlink="http://www.w3.org/1999/xlink" fill="none" version="1.1">
+  <style>
+  </style>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81511bfa07c">
+    <defs>
+      <clipPath id="frame-clip-6fc5473d-77bf-807e-8008-a81511bfa07c-render-5443" class="frame-clip frame-clip-def">
+        <rect rx="0" ry="0" x="0" y="0" width="1440" height="900" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)">
+        </rect>
+      </clipPath>
+    </defs>
+    <g class="frame-container-wrapper">
+      <g class="frame-container-blur">
+        <g class="frame-container-shadows">
+          <g clip-path="url(#frame-clip-6fc5473d-77bf-807e-8008-a81511bfa07c-render-5443)" fill="none">
+            <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81511bfa07c">
+              <rect rx="0" ry="0" x="0" y="0" width="1440" height="900" transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="frame-background" style="fill:#f8faf6;fill-opacity:1">
+              </rect>
+            </g>
+            <g class="frame-children">
+              <g id="shape-6fc5473d-77bf-807e-8008-a81512226140">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="80" y="80" width="774" height="44" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="773.0750122070312" height="42.400001525878906" id="fill-0-render-5444-0">
+                      <g>
+                        <rect width="773.0750122070312" height="42.400001525878906" style="fill:#1b6d24;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81512226140">
+                    <text x="80" y="122.4000015258789" dominant-baseline="ideographic" textLength="773.0750122070312" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:36px;text-decoration:none;direction:ltr;fill:#1b6d24;fill-opacity:1">Eco-Oil UCO Platform — UI Snapshot (localhost)</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a8151241b485">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="80" y="150" width="445" height="87" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-0-render-5445-0">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-1-render-5445-0">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-2-render-5445-0">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8151241b485">
+                    <text x="80" y="174.80000114440918" dominant-baseline="ideographic" textLength="444.6875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:18px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Thiết kế tái hiện từ source code &amp; localhost demo mode</text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-0-render-5445-1">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-1-render-5445-1">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-2-render-5445-1">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8151241b485">
+                    <text x="80" y="203.60000228881836" dominant-baseline="ideographic" textLength="361.57501220703125" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:18px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Backend: Penpot | Scope hiện tại: Web Admin</text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-0-render-5445-2">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-1-render-5445-2">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-2-render-5445-2">
+                      <g>
+                        <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8151241b485">
+                    <text x="80" y="232.4000015258789" dominant-baseline="ideographic" textLength="206.02500915527344" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:18px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Ngày bắt đầu: 2026-09-18</text>
+                  </g>
+                </g>
+              </g>
+              <g id="shape-6fc5473d-77bf-807e-8008-a815126668e4">
+                <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="80" y="280" width="1048" height="180" rx="0" ry="0">
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5446-0">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5446-0">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5446-0">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5446-0">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5446-0">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5446-0">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5446-0">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5446-0">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+                    <text x="80" y="299.2000000476837" dominant-baseline="ideographic" textLength="102.875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">Ghi chú phạm vi:</text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5446-1">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5446-1">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5446-1">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5446-1">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5446-1">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5446-1">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5446-1">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5446-1">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+                    <text x="80" y="321.60000228881836" dominant-baseline="ideographic" textLength="1047.2625732421875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Web Admin: 13 route (/, /login, /merchants, /collectors, /stations, /containers, /approvals, /payments, /reconciliation, /operations-map, /alerts, /ai-performance, /wards)</text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5446-2">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5446-2">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5446-2">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5446-2">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5446-2">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5446-2">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5446-2">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5446-2">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+                    <text x="80" y="344" dominant-baseline="ideographic" textLength="198.91250610351562" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Miniapp — Merchant: (đợt sau)</text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5446-3">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5446-3">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5446-3">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5446-3">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5446-3">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5446-3">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5446-3">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5446-3">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+                    <text x="80" y="366.4000015258789" dominant-baseline="ideographic" textLength="195.52500915527344" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Miniapp — Collector: (đợt sau)</text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5446-4">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5446-4">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5446-4">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5446-4">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5446-4">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5446-4">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5446-4">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5446-4">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+                    <text x="80" y="388.8000030517578" dominant-baseline="ideographic" textLength="3.4750001430511475" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1"> </text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5446-5">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5446-5">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5446-5">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5446-5">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5446-5">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5446-5">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5446-5">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5446-5">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+                    <text x="80" y="411.1999969482422" dominant-baseline="ideographic" textLength="53.775001525878906" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">Rào cản:</text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5446-6">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5446-6">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5446-6">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5446-6">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5446-6">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5446-6">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5446-6">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5446-6">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+                    <text x="80" y="433.6000061035156" dominant-baseline="ideographic" textLength="275.875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Bản đồ Leaflet: static snapshot (cần mạng)</text>
+                  </g>
+                  <defs>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5446-7">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5446-7">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5446-7">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5446-7">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5446-7">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5446-7">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5446-7">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                    <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5446-7">
+                      <g>
+                        <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+                        </rect>
+                      </g>
+                    </pattern>
+                  </defs>
+                  <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+                    <text x="80" y="456" dominant-baseline="ideographic" textLength="326.7375183105469" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Màn không truy cập được: liệt ở đây, không vẽ đoán</text>
+                  </g>
+                </g>
+              </g>
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a81512226140">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="80" y="80" width="774" height="44" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="773.0750122070312" height="42.400001525878906" id="fill-0-render-5447-0">
+          <g>
+            <rect width="773.0750122070312" height="42.400001525878906" style="fill:#1b6d24;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a81512226140">
+        <text x="80" y="122.4000015258789" dominant-baseline="ideographic" textLength="773.0750122070312" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:700;white-space:pre;font-size:36px;text-decoration:none;direction:ltr;fill:#1b6d24;fill-opacity:1">Eco-Oil UCO Platform — UI Snapshot (localhost)</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a8151241b485">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="80" y="150" width="445" height="87" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-0-render-5448-0">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-1-render-5448-0">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-2-render-5448-0">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8151241b485">
+        <text x="80" y="174.80000114440918" dominant-baseline="ideographic" textLength="444.6875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:18px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Thiết kế tái hiện từ source code &amp; localhost demo mode</text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-0-render-5448-1">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-1-render-5448-1">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-2-render-5448-1">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8151241b485">
+        <text x="80" y="203.60000228881836" dominant-baseline="ideographic" textLength="361.57501220703125" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:18px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Backend: Penpot | Scope hiện tại: Web Admin</text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-0-render-5448-2">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-1-render-5448-2">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="444.6875" height="78.4000015258789" id="fill-2-render-5448-2">
+          <g>
+            <rect width="444.6875" height="78.4000015258789" style="fill:#414941;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a8151241b485">
+        <text x="80" y="232.4000015258789" dominant-baseline="ideographic" textLength="206.02500915527344" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:18px;text-decoration:none;direction:ltr;fill:#414941;fill-opacity:1">Ngày bắt đầu: 2026-09-18</text>
+      </g>
+    </g>
+  </g>
+  <g id="shape-6fc5473d-77bf-807e-8008-a815126668e4">
+    <g transform="matrix(1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000)" class="text-container" x="80" y="280" width="1048" height="180" rx="0" ry="0">
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5449-0">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5449-0">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5449-0">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5449-0">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5449-0">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5449-0">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5449-0">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5449-0">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+        <text x="80" y="299.2000000476837" dominant-baseline="ideographic" textLength="102.875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">Ghi chú phạm vi:</text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5449-1">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5449-1">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5449-1">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5449-1">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5449-1">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5449-1">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5449-1">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5449-1">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+        <text x="80" y="321.60000228881836" dominant-baseline="ideographic" textLength="1047.2625732421875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Web Admin: 13 route (/, /login, /merchants, /collectors, /stations, /containers, /approvals, /payments, /reconciliation, /operations-map, /alerts, /ai-performance, /wards)</text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5449-2">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5449-2">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5449-2">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5449-2">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5449-2">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5449-2">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5449-2">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5449-2">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+        <text x="80" y="344" dominant-baseline="ideographic" textLength="198.91250610351562" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Miniapp — Merchant: (đợt sau)</text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5449-3">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5449-3">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5449-3">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5449-3">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5449-3">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5449-3">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5449-3">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5449-3">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+        <text x="80" y="366.4000015258789" dominant-baseline="ideographic" textLength="195.52500915527344" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Miniapp — Collector: (đợt sau)</text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5449-4">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5449-4">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5449-4">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5449-4">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5449-4">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5449-4">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5449-4">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5449-4">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+        <text x="80" y="388.8000030517578" dominant-baseline="ideographic" textLength="3.4750001430511475" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1"> </text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5449-5">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5449-5">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5449-5">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5449-5">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5449-5">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5449-5">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5449-5">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5449-5">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+        <text x="80" y="411.1999969482422" dominant-baseline="ideographic" textLength="53.775001525878906" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">Rào cản:</text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5449-6">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5449-6">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5449-6">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5449-6">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5449-6">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5449-6">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5449-6">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5449-6">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+        <text x="80" y="433.6000061035156" dominant-baseline="ideographic" textLength="275.875" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Bản đồ Leaflet: static snapshot (cần mạng)</text>
+      </g>
+      <defs>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-0-render-5449-7">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-1-render-5449-7">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-2-render-5449-7">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-3-render-5449-7">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-4-render-5449-7">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-5-render-5449-7">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-6-render-5449-7">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+        <pattern patternUnits="objectBoundingBox" width="1047.2625732421875" height="172.79999995231628" id="fill-7-render-5449-7">
+          <g>
+            <rect width="1047.2625732421875" height="172.79999995231628" style="fill:#191c19;fill-opacity:1">
+            </rect>
+          </g>
+        </pattern>
+      </defs>
+      <g class="fills" id="fills-6fc5473d-77bf-807e-8008-a815126668e4">
+        <text x="80" y="456" dominant-baseline="ideographic" textLength="326.7375183105469" lengthAdjust="spacingAndGlyphs" style="text-transform:none;font-family:Roboto;letter-spacing:normal;font-style:normal;font-weight:400;white-space:pre;font-size:14px;text-decoration:none;direction:ltr;fill:#191c19;fill-opacity:1">• Màn không truy cập được: liệt ở đây, không vẽ đoán</text>
+      </g>
+    </g>
+  </g>
+</svg>

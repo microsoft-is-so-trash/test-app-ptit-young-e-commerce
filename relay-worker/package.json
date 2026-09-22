@@ -1,0 +1,17 @@
+{
+  "name": "eco-oil-zalo-profile-relay",
+  "version": "1.0.0",
+  "description": "24/7 Cloudflare Worker Relay for Zalo Profile API",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250224.0",
+    "typescript": "^5.7.3",
+    "wrangler": "^4.135.0"
+  }
+}
+

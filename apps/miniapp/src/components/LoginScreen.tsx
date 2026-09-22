@@ -56,6 +56,7 @@ export function LoginScreen() {
   const loginWithZalo = useAuthStore((state) => state.loginWithZalo);
   const loginDemoAccount = useAuthStore((state) => state.loginDemoAccount);
   const hydrate = useAuthStore((state) => state.hydrate);
+  const clearError = useAuthStore((state) => state.clearError);
   const [registering, setRegistering] = useState(false);
   const [onboardingDone, setOnboardingDone] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(0);
@@ -268,6 +269,14 @@ export function LoginScreen() {
           <button className="btn btn-secondary" onClick={() => { void hydrate(); }} disabled={busy}>
             Thử lại
           </button>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 8 }}>
+            <button className="btn btn-secondary" onClick={() => { clearError(); void hydrate(); }} disabled={busy}>
+              Thử lại
+            </button>
+            <button className="btn btn-ghost" onClick={() => clearError()} disabled={busy}>
+              Đóng
+            </button>
+          </div>
         </div>
       ) : null}
 
@@ -277,6 +286,7 @@ export function LoginScreen() {
           className="btn-ghost"
           style={{ margin: '12px auto 0', display: 'flex' }}
           onClick={() => {
+            clearError();
             const next = !registering;
             setRegistering(next);
             setOnboardingStep(0);

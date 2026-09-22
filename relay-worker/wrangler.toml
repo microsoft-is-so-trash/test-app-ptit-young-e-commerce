@@ -1,0 +1,7 @@
+name = "eco-oil-zalo-profile-relay"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+
+[vars]
+ZALO_PROFILE_RELAY_SECRET = "eco_oil_zalo_profile_relay_secret_2026_vn"
+
