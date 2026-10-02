@@ -4,9 +4,9 @@ Tài liệu tổng hợp toàn bộ nội dung nghiên cứu và trao đổi (ng
 cho `apps/miniapp` (vai trò Merchant và Collector), cùng các nghiên cứu về Zalo AI TTS, Gemini API
 và Google Maps Platform.
 
-**Trạng thái:** tài liệu nghiên cứu, chưa phải kế hoạch triển khai. File kế hoạch markdown để
-thực hiện việc chuẩn hoá chỉ được tạo sau khi chủ dự án duyệt các mục ở phần
-[9. Câu hỏi còn mở](#9-câu-hỏi-còn-mở).
+**Trạng thái:** tài liệu nghiên cứu. Chủ dự án đã duyệt; kế hoạch thực hiện nằm ở
+`docs/KE_HOACH_CHUAN_HOA_UI_V4.md`, bộ quy tắc nằm ở `.claude/rules/ui-non-fiction.md` và
+`.claude/rules/external-apis.md`.
 
 **Phương pháp:** audit bằng cách đọc source code, chưa chạy app để xem trực quan. Vì vậy các vấn
 đề về khoảng cách, màu sắc, thứ bậc thị giác chưa được phát hiện.
@@ -34,14 +34,13 @@ thực hiện việc chuẩn hoá chỉ được tạo sau khi chủ dự án du
 
 | Chủ đề | Quyết định |
 |---|---|
-| Branch làm việc | `ui_version_4`. Không làm trên `ui_version_3` |
+| Branch làm việc | `ui_version_4`, tạo từ `ui_version_3`. Không làm trên `ui_version_3` |
 | Định hướng UI | **Non-fiction UI**: mọi thứ hiện trên màn hình phải là thật |
-| Các phần giả hiện có | Cố ý **giữ lại để demo** |
-| Thanh điều hướng | Tối giản về **2 nhóm** |
+| Các phần giả hiện có và dataset demo | **Giữ nguyên**: không xoá, không đổi, không ẩn sau cờ |
+| Thanh điều hướng | **2 nhóm**, kiểu A (thanh dưới đáy, 2 nút có chữ) |
 | Nơi lưu bộ quy tắc | Trong `.claude/rules/` để agent tự tuân theo |
-| Thứ tự làm | Merchant trước, rồi đến Collector |
-| File kế hoạch | Chỉ tạo sau khi chủ dự án đọc và duyệt nội dung nghiên cứu |
-| Thứ tự các giai đoạn (tự động hoá, TTS, Google API) | Chưa chốt, chờ trả lời sau nghiên cứu Gemini |
+| Thứ tự làm | Merchant trước, rồi đến Collector; tích hợp (Google Maps, TTS, Gemini) sau cùng |
+| Tài khoản | Đã có Google Cloud (có thanh toán) và Zalo AI |
 
 ---
 
@@ -58,11 +57,13 @@ trả lời được thì phần tử đó là "giả".
 - Không dùng nhãn "Sắp có", vì nhãn này vẫn là hứa hẹn một thứ chưa tồn tại.
 - Thông tin viết cứng (chứng nhận, ngân hàng, trạng thái kết nối, phiên bản build) cũng là giả.
 - Công tắc chỉ lưu trong bộ nhớ tạm, tải lại trang là mất, cũng là giả.
-- Danh sách phần giả bị gỡ khỏi bản thật được ghi vào backlog để sau này làm thật thì thêm lại.
+- Các phần giả hiện có (mục 3.1) được giữ nguyên theo quyết định của chủ dự án; danh sách ở mục
+  3.1 là backlog để sau này làm thật.
 
-**Dung hoà với quyết định giữ phần giả cho demo** (đề xuất, chờ duyệt): quy tắc non-fiction áp
-dụng cho bản thật. Các phần giả chỉ hiện khi bật chế độ demo (`VITE_DEMO_MODE`), nhờ vậy bản
-thật vẫn sạch mà bản demo vẫn đủ nội dung trình diễn.
+**Dung hoà với quyết định giữ phần giả cho demo** (đã chốt): các phần giả hiện có và dataset
+demo được giữ nguyên, không xoá, không ẩn sau cờ. Quy tắc non-fiction áp dụng cho mọi phần tử
+mới hoặc phần tử thật đang được sửa: không tạo thêm phần giả. Khi tái cấu trúc, phần giả hiện có
+được đặt lại vào vị trí mới, giữ nguyên chữ.
 
 ### Phân loại phần tử UI
 
@@ -71,7 +72,7 @@ thật vẫn sạch mà bản demo vẫn đủ nội dung trình diễn.
 | Hành động | Bấm vào thì dữ liệu thật thay đổi | Giữ, mỗi màn tối đa 1 nút chính |
 | Mở rộng | Bấm vào thì hiện thêm thông tin | Đưa vào menu thả xuống ngay trong thẻ |
 | Thiết lập | Bấm vào không thấy gì ngay, chỉ đổi hành vi về sau | Gom vào một mục "Cài đặt chung" |
-| Giả | Không làm gì, hoặc dữ liệu viết cứng | Gỡ khỏi bản thật (giữ trong chế độ demo) |
+| Giả | Không làm gì, hoặc dữ liệu viết cứng | Phần hiện có: giữ nguyên. Không tạo thêm phần mới |
 | Trùng | Cùng một thứ xuất hiện ở 2 nơi trở lên | Chỉ giữ 1 nơi |
 
 ---
@@ -408,17 +409,12 @@ buộc, nhưng lý do là Collector hay mất sóng chứ không phải vì Goog
 
 ## 9. Câu hỏi còn mở
 
-1. **Thứ tự các giai đoạn.** Đề xuất:
-   1. Dọn UI (Merchant rồi Collector).
-   2. Tự động hoá.
-   3. Google Maps: admin nhập vị trí trạm và gợi ý trạm theo đường đi thật.
-   4. Đọc giọng nói: thử song song Zalo AI và Gemini rồi chọn.
-   5. Gợi ý hạng dầu bằng Gemini: để cuối cùng, hoặc không làm.
-2. **Phần giả chỉ hiện ở chế độ demo** (`VITE_DEMO_MODE`): đồng ý không?
-3. **Kiểu thanh điều hướng:** A (thanh dưới đáy, 2 nút có chữ, đề xuất) hay B (nút "Của tôi" ở góc
-   trên)?
-4. **Tài khoản:** đã có Google Cloud có gắn thanh toán chưa? Đã có Zalo AI API key chưa? Giọng đọc
-   mặc định số mấy (1–4)?
+Đã được trả lời ngày 02/10/2026:
+
+1. Thứ tự: Merchant trước, Collector sau.
+2. Phần giả và dataset demo: giữ nguyên (không ẩn sau cờ demo).
+3. Thanh điều hướng: kiểu A.
+4. Tài khoản: đã có Google Cloud và Zalo AI.
 
 ---
 
@@ -433,8 +429,8 @@ Sẽ lưu thành 2 file để agent tự tuân theo, sau khi được duyệt:
 
 - **U1.** Mọi chỗ bấm được phải thuộc một trong ba loại Hành động / Mở rộng / Thiết lập. Không
   thuộc loại nào thì xoá.
-- **U2.** Non-fiction: không có thông tin giả, không báo thành công giả. Tính năng chưa có backend
-  không hiện ở bản thật (chỉ được hiện ở chế độ demo, nếu được duyệt).
+- **U2.** Non-fiction: không tạo thêm thông tin giả, không báo thành công giả. Phần giả hiện có
+  và dataset demo giữ nguyên.
 - **U3.** Mỗi màn tối đa 1 nút chính. Hành động phụ nằm trong menu thả xuống của thẻ.
 - **U4.** Mỗi vai trò chỉ có một mục "Cài đặt chung" cho các thiết lập.
 - **U5.** Mỗi thông tin hoặc hành động chỉ có một nơi chính thức.
@@ -465,9 +461,10 @@ Sẽ lưu thành 2 file để agent tự tuân theo, sau khi được duyệt:
 
 ## 11. Lộ trình đề xuất
 
-Thứ tự giai đoạn chờ chốt (xem mục 9). Mỗi giai đoạn làm Merchant trước, Collector sau.
+Đã chốt: làm toàn bộ Merchant trước, Collector sau, tích hợp sau cùng. Kế hoạch chi tiết:
+`docs/KE_HOACH_CHUAN_HOA_UI_V4.md`.
 
-1. **Dọn UI, rủi ro thấp:** gỡ phần giả khỏi bản thật (giữ trong chế độ demo), bỏ trùng lặp, thêm
+1. **Dọn UI, rủi ro thấp:** bỏ trùng lặp (phần giả hiện có giữ nguyên), thêm
    chữ cho tab, gộp thông báo của Collector.
 2. **Đổi cấu trúc:** thanh điều hướng 2 nhóm, thẻ điểm thu dạng menu thả xuống, mục Cài đặt chung,
    bỏ màn trung gian (Tóm tắt ca, gộp kết ca).
