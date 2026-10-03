@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { AdminWardSummary, AuthUser } from '@eco-oil/shared-types';
 import { api, ApiError } from '../lib/api';
 import { buildMerchantResubmitPayload } from '../lib/merchant-resubmit';
+import { profileSubmitBlockReason } from '../lib/merchant-blockers';
 import { zaloClient } from '../lib/zalo-client';
 import { useAuthStore } from '../stores/auth-store';
 
@@ -53,6 +54,8 @@ export function MerchantApprovalView({ user }: { user: AuthUser }) {
     }
   }
 
+  const blockReason = profileSubmitBlockReason({ name: form.name, address: form.address, wardId, requireWard: true });
+
   const fields = (
     <div className="approval-form">
       <label className="form-label">Tên quán<input className="input" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></label>
@@ -60,7 +63,8 @@ export function MerchantApprovalView({ user }: { user: AuthUser }) {
       <label className="form-label">Số điện thoại<input className="input" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} /></label>
       <label className="form-label">Loại hình<input className="input" value={form.business_type} onChange={(event) => setForm({ ...form, business_type: event.target.value })} /></label>
       {!user.merchantId ? <label className="form-label">Phường<select className="input" value={wardId} onChange={(event) => setWardId(event.target.value)} disabled={!wards.length}><option value="">Chọn phường</option>{wards.map((ward) => <option key={ward.id} value={ward.id}>{ward.name}, {ward.district}</option>)}</select></label> : null}
-      <button className="btn btn-primary btn-full" onClick={() => { void (user.merchantId ? save() : registerMerchant()); }} disabled={busy || (!user.merchantId && (!wardId || !form.name.trim() || !form.address.trim()))}>{busy ? 'Đang gửi…' : user.merchantId ? 'Gửi lại hồ sơ' : 'Gửi hồ sơ quán'}</button>
+      <button className="btn btn-primary btn-full" onClick={() => { void (user.merchantId ? save() : registerMerchant()); }} disabled={busy || (!user.merchantId && blockReason !== null)}>{busy ? 'Đang gửi…' : user.merchantId ? 'Gửi lại hồ sơ' : 'Gửi hồ sơ quán'}</button>
+      {!user.merchantId && blockReason ? <p className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>{blockReason}</p> : null}
     </div>
   );
 

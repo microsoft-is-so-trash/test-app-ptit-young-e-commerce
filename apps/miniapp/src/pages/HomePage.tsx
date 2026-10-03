@@ -7,6 +7,7 @@ import { OrderSheet } from '../components/OrderSheet';
 import { MerchantOrderList } from '../components/MerchantOrderList';
 import { splitMerchantOrders } from '../lib/merchant-nav';
 import { estimateReadyLiters } from '../lib/order-liters';
+import { readyButtonState } from '../lib/merchant-blockers';
 import { StatusView } from '../components/StatusView';
 import { useAuthStore } from '../stores/auth-store';
 import { Icon } from '../components/Icon';
@@ -42,7 +43,7 @@ export function HomePage() {
   const data = dashboard.data;
   const hasContainers = data.containers.length > 0;
   const availableContainer = data.containers.find((container) => container.state === 'AT_MERCHANT');
-  const isWaiting = data.pending_orders > 0;
+  const readyButton = readyButtonState({ pendingOrders: data.pending_orders, containers: data.containers });
   const openOrders = splitMerchantOrders(orders.data?.data ?? []).open;
   const hasClosedPayments = (weeklyPayments.data?.data.length ?? 0) > 0;
   const estimatedWeeklyLiters = weeklyTransactions.data?.data.filter((transaction) => transaction.quality === 'PASS').reduce((sum, transaction) => sum + transaction.actual_liters, 0) ?? 0;
@@ -211,19 +212,14 @@ export function HomePage() {
       <button
         className="btn btn-primary btn-full btn-lg"
         onClick={() => setSheetOpen(true)}
-        disabled={isWaiting || !availableContainer}
+        disabled={readyButton.disabled}
       >
-        <Icon name={isWaiting ? 'hourglass_top' : 'notifications_active'} size={22} />
-        <span>
-          {isWaiting
-            ? 'Đã báo, đang chờ thu gom'
-            : availableContainer
-              ? 'Sẵn sàng thu gom'
-              : hasContainers
-                ? 'Can đang trên đường về'
-                : 'Đang chờ được cấp can'}
-        </span>
+        <Icon name={readyButton.icon} size={22} />
+        <span>{readyButton.label}</span>
       </button>
+      {readyButton.reason ? (
+        <p className="text-label-sm" style={{ color: 'var(--on-surface-variant)', textAlign: 'center', marginTop: -8 }}>{readyButton.reason}</p>
+      ) : null}
 
       {orders.isError ? (
         <div className="notice error-panel" role="alert">

@@ -436,6 +436,7 @@ export function LoginScreen() {
           >
             Gửi hồ sơ đăng ký
           </button>
+          {!registerForm.ward_id ? <p className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>Chọn phường để gửi hồ sơ.</p> : null}
           {registerError && <p className="error-text">{registerError}</p>}
         </section>
       )}
