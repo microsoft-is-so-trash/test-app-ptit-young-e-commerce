@@ -386,9 +386,9 @@ export function MerchantSettingsSection() {
           <span style={{ fontFamily: 'monospace', fontSize: 10, color: 'var(--on-surface-variant)' }}>Build: v2.4.0</span>
         </div>
 
-        <button className="btn btn-danger btn-full btn-lg" onClick={() => { void signOut(); }}>
-          <Icon name="logout" size={20} />
-          <span>ĐĂNG XUẤT TÀI KHOẢN QUÁN</span>
+        <button className="btn btn-danger btn-full" onClick={() => { void signOut(); }}>
+          <Icon name="logout" size={20} decorative />
+          <span>Đăng xuất</span>
         </button>
       </div>
 
