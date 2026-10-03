@@ -59,6 +59,22 @@ test('searches once after the admin stops typing for 300 ms, then picks the coor
   expect(apiMock.placeDetails).toHaveBeenCalledWith('place-1', sessionToken);
 });
 
+test('does not search again after a suggestion is chosen', async () => {
+  apiMock.placesAutocomplete.mockResolvedValue([
+    { place_id: 'place-1', text: '22 Hàng Bạc, Hoàn Kiếm, Hà Nội', main_text: '22 Hàng Bạc', secondary_text: null },
+  ]);
+  apiMock.placeDetails.mockResolvedValue({ place_id: 'place-1', address: null, lat: 21.0341, lng: 105.8522 });
+  const { input, onPick } = renderPicker();
+  fireEvent.change(input, { target: { value: '22 Hàng' } });
+  await act(async () => { vi.advanceTimersByTime(300); });
+  vi.useRealTimers();
+  fireEvent.click(await screen.findByRole('button', { name: /22 Hàng Bạc/ }));
+  await waitFor(() => expect(onPick).toHaveBeenCalled());
+  await new Promise((resolve) => setTimeout(resolve, 400));
+  expect(apiMock.placesAutocomplete).toHaveBeenCalledTimes(1);
+  expect(screen.queryByRole('list', { name: 'Gợi ý địa chỉ' })).toBeNull();
+});
+
 test('shows the backend message so the admin knows to type coordinates by hand', async () => {
   apiMock.placesAutocomplete.mockRejectedValue(new Error('Chưa tìm được địa chỉ lúc này. Hãy nhập vĩ độ, kinh độ bằng tay.'));
   const { input } = renderPicker();

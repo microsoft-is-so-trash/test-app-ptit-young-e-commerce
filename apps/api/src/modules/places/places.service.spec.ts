@@ -6,17 +6,16 @@ import {
   PLACES_AUTOCOMPLETE_URL,
   PLACES_MONTHLY_REQUEST_LIMIT,
   PlacesService,
-  placesBudgetKey,
+  placesBudgetKeys,
 } from './places.service';
 
 class FakeRedis {
   configured = true;
   readonly counters = new Map<string, number>();
   isConfigured(): boolean { return this.configured; }
-  async reserveWithinLimit(key: string, amount: number, limit: number): Promise<boolean> {
-    const next = (this.counters.get(key) ?? 0) + amount;
-    if (next > limit) return false;
-    this.counters.set(key, next);
+  async reserveWithinLimit(keys: ReadonlyArray<string>, amount: number, limit: number): Promise<boolean> {
+    if (keys.some((key) => (this.counters.get(key) ?? 0) + amount > limit)) return false;
+    for (const key of keys) this.counters.set(key, (this.counters.get(key) ?? 0) + amount);
     return true;
   }
 }
@@ -49,7 +48,7 @@ describe('PlacesService (I1.1)', () => {
 
   it('stops calling Google when the monthly autocomplete budget is used up', async () => {
     const redis = new FakeRedis();
-    redis.counters.set(placesBudgetKey('autocomplete', new Date()), PLACES_MONTHLY_REQUEST_LIMIT);
+    redis.counters.set(placesBudgetKeys('autocomplete', new Date())[1], PLACES_MONTHLY_REQUEST_LIMIT);
     const fetch = jest.fn();
     await expect(service(redis, fetch).autocomplete('22 Hàng Bạc', session)).rejects.toMatchObject({ response: { code: 'PLACES_UNAVAILABLE' } });
     expect(fetch).not.toHaveBeenCalled();
@@ -70,7 +69,7 @@ describe('PlacesService (I1.1)', () => {
     expect(init.method).toBe('POST');
     expect(init.headers['X-Goog-Api-Key']).toBe('server-key');
     expect(JSON.parse(init.body)).toEqual({ input: '22 Hàng Bạc', sessionToken: session, languageCode: 'vi', includedRegionCodes: ['vn'] });
-    expect(redis.counters.get(placesBudgetKey('autocomplete', new Date()))).toBe(1);
+    expect(placesBudgetKeys('autocomplete', new Date()).map((key) => redis.counters.get(key))).toEqual([1, 1]);
   });
 
   it('reports PLACES_UNAVAILABLE when Google rejects the request', async () => {
@@ -89,7 +88,7 @@ describe('PlacesService (I1.1)', () => {
     expect(init.method).toBe('GET');
     expect(init.headers['X-Goog-FieldMask']).toBe(PLACE_DETAILS_FIELD_MASK);
     expect(PLACE_DETAILS_FIELD_MASK).toBe('id,formattedAddress,location');
-    expect(redis.counters.get(placesBudgetKey('details', new Date()))).toBe(1);
+    expect(placesBudgetKeys('details', new Date()).map((key) => redis.counters.get(key))).toEqual([1, 1]);
   });
 
   it('reports PLACES_UNAVAILABLE when the place has no coordinates', async () => {
@@ -99,7 +98,7 @@ describe('PlacesService (I1.1)', () => {
 
   it('keeps separate monthly counters per SKU under the maps: prefix', () => {
     const now = new Date('2026-10-03T00:00:00Z');
-    expect(placesBudgetKey('autocomplete', now)).toBe('maps:places:autocomplete:2026-10');
-    expect(placesBudgetKey('details', now)).toBe('maps:places:details:2026-10');
+    expect(placesBudgetKeys('autocomplete', now)).toEqual(['maps:places:autocomplete:utc:2026-10', 'maps:places:autocomplete:pt:2026-10']);
+    expect(placesBudgetKeys('details', now)).toEqual(['maps:places:details:utc:2026-10', 'maps:places:details:pt:2026-10']);
   });
 });

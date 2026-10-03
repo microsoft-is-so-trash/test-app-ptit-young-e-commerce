@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../../redis/redis.service';
-import { billingMonth, defaultGoogleHttp, GOOGLE_HTTP, MONTHLY_COUNTER_TTL_SECONDS, requestGoogleJson, type GoogleHttp } from '../google/google-http';
+import { billingMonthKeys, defaultGoogleHttp, GOOGLE_HTTP, MONTHLY_COUNTER_TTL_SECONDS, requestGoogleJson, type GoogleHttp } from '../google/google-http';
 
 /**
  * Gợi ý trạm theo quãng đường (I1.2). Dùng Routes API Compute Route Matrix gói Essentials
@@ -90,8 +90,8 @@ export function mergeRoadDistances(
   return [...withRoad, ...withoutRoad, ...rest];
 }
 
-export function monthlyElementsKey(now: Date): string {
-  return `maps:route-matrix:elements:${billingMonth(now)}`;
+export function monthlyElementsKeys(now: Date): string[] {
+  return billingMonthKeys('maps:route-matrix:elements', now);
 }
 
 export function routeMatrixCacheKey(origin: GeoPointInput, stationIds: ReadonlyArray<string>): string {
@@ -128,7 +128,7 @@ export class RoadDistanceService {
       const cached = await this.redis.getValue(cacheKey);
       if (cached) return new Map(JSON.parse(cached) as Array<[string, number]>);
       const reserved = await this.redis.reserveWithinLimit(
-        monthlyElementsKey(new Date()),
+        monthlyElementsKeys(new Date()),
         stationIds.length,
         ROUTE_MATRIX_MONTHLY_ELEMENT_LIMIT,
         MONTHLY_COUNTER_TTL_SECONDS,

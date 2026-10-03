@@ -53,7 +53,14 @@ function loadGoogleMaps(key: string): Promise<GoogleMapsNamespace> {
   if (window.google?.maps) return Promise.resolve(window.google);
   if (mapsLoader) return mapsLoader;
   mapsLoader = new Promise<GoogleMapsNamespace>((resolve, reject) => {
-    window.__ecoOilMapsReady = () => (window.google ? resolve(window.google) : reject(new Error('Google Maps không sẵn sàng')));
+    window.__ecoOilMapsReady = () => {
+      if (window.google) {
+        resolve(window.google);
+        return;
+      }
+      mapsLoader = null;
+      reject(new Error('Google Maps không sẵn sàng'));
+    };
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?${new URLSearchParams({ key, v: 'weekly', loading: 'async', callback: '__ecoOilMapsReady' })}`;
     script.async = true;
@@ -124,10 +131,12 @@ export function StationLocationPicker({ lat, lng, onPick }: { lat: string; lng: 
   const [error, setError] = useState<string | null>(null);
   const sessionTokenRef = useRef(newPlacesSessionToken());
   const requestIdRef = useRef(0);
+  // Chữ của gợi ý vừa chọn: điền vào ô tìm nhưng không tìm lại (review I1, mục 2).
+  const chosenTextRef = useRef<string | null>(null);
   const position = parseCoordinates(lat, lng);
 
   useEffect(() => {
-    if (DEMO_OFFLINE || !shouldSearchPlaces(query)) {
+    if (DEMO_OFFLINE || !shouldSearchPlaces(query) || query === chosenTextRef.current) {
       setSuggestions([]);
       return;
     }
@@ -157,6 +166,7 @@ export function StationLocationPicker({ lat, lng, onPick }: { lat: string; lng: 
     try {
       const place = await api.placeDetails(suggestion.place_id, sessionTokenRef.current);
       onPick({ lat: place.lat, lng: place.lng });
+      chosenTextRef.current = suggestion.text;
       setQuery(suggestion.text);
     } catch (detailsError) {
       setError(detailsError instanceof ApiError || detailsError instanceof Error ? detailsError.message : 'Không lấy được vị trí.');

@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger, Optional, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../../redis/redis.service';
-import { billingMonth, defaultGoogleHttp, GOOGLE_HTTP, MONTHLY_COUNTER_TTL_SECONDS, requestGoogleJson, type GoogleHttp } from '../google/google-http';
+import { billingMonthKeys, defaultGoogleHttp, GOOGLE_HTTP, MONTHLY_COUNTER_TTL_SECONDS, requestGoogleJson, type GoogleHttp } from '../google/google-http';
 
 /**
  * Gợi ý địa chỉ trạm cho admin bằng Places API (New), gọi qua backend (Q18). Mỗi SKU có bộ đếm
@@ -29,8 +29,8 @@ export interface PlaceLocation {
   lng: number;
 }
 
-export function placesBudgetKey(sku: PlacesSku, now: Date): string {
-  return `maps:places:${sku}:${billingMonth(now)}`;
+export function placesBudgetKeys(sku: PlacesSku, now: Date): string[] {
+  return billingMonthKeys(`maps:places:${sku}`, now);
 }
 
 function unavailable(): ServiceUnavailableException {
@@ -103,7 +103,7 @@ export class PlacesService {
     const apiKey = this.config.get<string>('GOOGLE_MAPS_SERVER_KEY')?.trim();
     if (!apiKey || !this.redis.isConfigured()) throw unavailable();
     const reserved = await this.redis
-      .reserveWithinLimit(placesBudgetKey(sku, new Date()), 1, PLACES_MONTHLY_REQUEST_LIMIT, MONTHLY_COUNTER_TTL_SECONDS)
+      .reserveWithinLimit(placesBudgetKeys(sku, new Date()), 1, PLACES_MONTHLY_REQUEST_LIMIT, MONTHLY_COUNTER_TTL_SECONDS)
       .catch((error: unknown) => {
         this.logger.warn(`Places budget check failed: ${error instanceof Error ? error.message : String(error)}`);
         return false;

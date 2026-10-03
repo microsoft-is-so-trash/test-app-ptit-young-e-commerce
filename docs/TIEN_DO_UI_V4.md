@@ -133,6 +133,8 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 - 03/10/2026 — Màn chọn trạm (`StationDeliveryFlow.tsx`) chỉ tìm trạm khi `waiting === 0` (mọi giao dịch đã đồng bộ). Khi mất mạng từ trước lúc đồng bộ xong, Collector không thấy danh sách trạm (kể cả bản lưu của I1.3) dù phiếu nộp trạm vẫn xếp hàng chờ được. Không đổi vì là quy tắc đối soát có sẵn; cần chủ dự án quyết nếu muốn hiện danh sách trạm đã lưu trong trường hợp này.
 
+- 03/10/2026 — Review I1 ghi nhận: `StationsService.recommend` không giới hạn số trạm trả về (từ I1.3, `liters=0` trả mọi trạm đang nhận); `google.maps.Marker` đã bị Google đánh dấu deprecated (khuyến nghị `AdvancedMarkerElement`, cần Map ID trên Google Cloud). Chưa sửa.
+
 ## Báo cáo giai đoạn
 
 ### Giai đoạn C — 03/10/2026
@@ -156,6 +158,9 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 ## Nhật ký
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
+
+- 03/10/2026 — B6 I1 — Sửa theo review (vòng 1–2): (mục 1) bộ đếm hạn mức giữ chỗ đồng thời trên hai khoá tháng UTC và tháng giờ Pacific (`billingMonthKeys`, Lua nhiều khoá) để dù Google tính theo mốc nào cũng không vượt 8.000; (mục 2) chọn gợi ý địa chỉ không còn gọi lại Autocomplete (`chosenTextRef`); `mapsLoader` đặt lại khi tải Google Maps lỗi. RED: test tháng Pacific/UTC fail; test "does not search again after a suggestion is chosen" fail "expected 1 times, got 2". Cổng: api 253 unit, admin 81 test pass. Không sửa: mục 3 (bộ đếm không hoàn lại khi Google lỗi — chỉ ảnh hưởng độ sẵn sàng), mục 4 (thử lại sau timeout có thể bị tính phí thêm — hiếm), mục 5 (bộ đếm chỉ ở Redis; chốt chặn thứ hai là hạn mức/ngày trên Google Cloud do chủ dự án đặt), mục 6 (token 8–64 ký tự, client luôn gửi UUID 36 ký tự).
+- 03/10/2026 — I1-I1.1+I1.2-sec-1 — security-reviewer (sonnet) — đầu vào 7b02f27..29aeda7 — 0 CRITICAL, 0 HIGH, 2 MEDIUM, 4 LOW — sửa 2 MEDIUM + 1 điểm ngoài phạm vi nhỏ của chính I1.1; kiểm chỉ đọc: `git status`/`diff --stat`/HEAD trước và sau giống nhau. Tác tử phụ đã gọi trong I1: 1/12 (security-reviewer 1/3). Không có lỗi MAST.
 
 - 03/10/2026 — I1.0 — xong. CI xanh lần đầu kể từ `ui_version_3` (run 37133576282).
 

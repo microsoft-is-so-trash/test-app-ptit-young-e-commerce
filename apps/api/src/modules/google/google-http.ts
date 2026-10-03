@@ -23,9 +23,22 @@ export const defaultGoogleHttp: GoogleHttp = {
   sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 };
 
-/** Tháng tính hạn mức miễn phí, dạng YYYY-MM (UTC). */
-export function billingMonth(now: Date): string {
-  return now.toISOString().slice(0, 7);
+const BILLING_MONTH_FORMAT = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit' });
+
+function pacificMonth(now: Date): string {
+  const parts = BILLING_MONTH_FORMAT.formatToParts(now);
+  const year = parts.find((part) => part.type === 'year')?.value;
+  const month = parts.find((part) => part.type === 'month')?.value;
+  return `${year}-${month}`;
+}
+
+/**
+ * Khoá bộ đếm hạn mức tháng theo cả tháng UTC lẫn tháng giờ Pacific (chưa xác minh Google dùng mốc
+ * nào). Chỉ gọi Google khi cả hai còn dưới hạn mức, nên tháng của Google luôn trùng một bộ đếm
+ * không vượt hạn mức (review I1, mục 1).
+ */
+export function billingMonthKeys(prefix: string, now: Date): string[] {
+  return [`${prefix}:utc:${now.toISOString().slice(0, 7)}`, `${prefix}:pt:${pacificMonth(now)}`];
 }
 
 /** Bộ đếm giữ hơn một tháng để không mất số liệu cuối tháng. */

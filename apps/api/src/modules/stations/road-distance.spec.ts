@@ -3,7 +3,7 @@ import type { RedisService } from '../../redis/redis.service';
 import {
   buildRouteMatrixRequest,
   mergeRoadDistances,
-  monthlyElementsKey,
+  monthlyElementsKeys,
   parseRouteMatrixResponse,
   ROUTE_MATRIX_MAX_STATIONS,
   ROUTE_MATRIX_MONTHLY_ELEMENT_LIMIT,
@@ -26,7 +26,7 @@ class FakeRedis {
   isConfigured(): boolean { return this.configured; }
   async getValue(key: string): Promise<string | null> { return this.values.get(key) ?? null; }
   async setExpiring(key: string, value: string): Promise<void> { this.values.set(key, value); }
-  async reserveWithinLimit(_key: string, amount: number, limit: number): Promise<boolean> {
+  async reserveWithinLimit(_keys: ReadonlyArray<string>, amount: number, limit: number): Promise<boolean> {
     if (!this.allowReserve || this.reserved + amount > limit) return false;
     this.reserved += amount;
     return true;
@@ -91,8 +91,13 @@ describe('road distance helpers (I1.2)', () => {
     expect(merged.map((row) => [row.id, row.distance_source])).toEqual([['b', 'road'], ['a', 'straight']]);
   });
 
+  it('counts against both the UTC and the Pacific billing month, so either Google convention stays under the limit', () => {
+    // 05:00 UTC ngày 1/11 vẫn là 31/10 ở Los Angeles.
+    expect(monthlyElementsKeys(new Date('2026-11-01T05:00:00Z'))).toEqual(['maps:route-matrix:elements:utc:2026-11', 'maps:route-matrix:elements:pt:2026-10']);
+  });
+
   it('counts elements per calendar month under the maps: prefix', () => {
-    expect(monthlyElementsKey(new Date('2026-10-03T12:00:00Z'))).toBe('maps:route-matrix:elements:2026-10');
+    expect(monthlyElementsKeys(new Date('2026-10-03T12:00:00Z'))).toEqual(['maps:route-matrix:elements:utc:2026-10', 'maps:route-matrix:elements:pt:2026-10']);
   });
 });
 

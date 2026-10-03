@@ -28,18 +28,21 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Cộng `amount` vào bộ đếm nếu tổng không vượt `limit` (nguyên tử). Dùng để giữ chi phí API
-   * trả phí trong mức miễn phí (Q26). Trả về false khi vượt hạn mức.
+   * Cộng `amount` vào mọi bộ đếm trong `keys` nếu không bộ đếm nào vượt `limit` (nguyên tử). Dùng để
+   * giữ chi phí API trả phí trong mức miễn phí (Q26). Trả về false khi vượt hạn mức.
    */
-  async reserveWithinLimit(key: string, amount: number, limit: number, ttlSeconds: number): Promise<boolean> {
+  async reserveWithinLimit(keys: ReadonlyArray<string>, amount: number, limit: number, ttlSeconds: number): Promise<boolean> {
     if (!this.client) throw new Error('Redis is not configured');
     const result = await this.client.eval(
-      'local current = redis.call("INCRBY", KEYS[1], ARGV[1]); ' +
-        'if current == tonumber(ARGV[1]) then redis.call("EXPIRE", KEYS[1], ARGV[3]); end; ' +
-        'if current > tonumber(ARGV[2]) then redis.call("DECRBY", KEYS[1], ARGV[1]); return 0; end; ' +
+      'for i = 1, #KEYS do ' +
+        'if tonumber(redis.call("GET", KEYS[i]) or "0") + tonumber(ARGV[1]) > tonumber(ARGV[2]) then return 0; end; ' +
+        'end; ' +
+        'for i = 1, #KEYS do ' +
+        'if redis.call("INCRBY", KEYS[i], ARGV[1]) == tonumber(ARGV[1]) then redis.call("EXPIRE", KEYS[i], ARGV[3]); end; ' +
+        'end; ' +
         'return 1',
-      1,
-      key,
+      keys.length,
+      ...keys,
       String(amount),
       String(limit),
       String(ttlSeconds),
