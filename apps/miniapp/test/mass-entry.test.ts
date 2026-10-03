@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { DEFAULT_DENSITY_KG_PER_LITER } from '@eco-oil/shared-types';
-import { EMPTY_MASS_ENTRY, editMassField, massEntryView } from '../src/lib/mass-entry';
+import { EMPTY_MASS_ENTRY, editMassField, litersForDeviationCheck, massEntryView } from '../src/lib/mass-entry';
 
 test('both fields start empty so declared liters are never saved as measured', () => {
   const view = massEntryView(EMPTY_MASS_ENTRY);
@@ -47,4 +47,10 @@ test('an invalid source shows no calculated value', () => {
 
   assert.equal(view.litersText, '');
   assert.equal(view.litersAuto, false);
+});
+
+test('no volume deviation check runs before a quantity is entered', () => {
+  assert.equal(litersForDeviationCheck(massEntryView(EMPTY_MASS_ENTRY)), null);
+  assert.equal(litersForDeviationCheck(massEntryView(editMassField(EMPTY_MASS_ENTRY, 'liters', '0'))), null);
+  assert.equal(litersForDeviationCheck(massEntryView(editMassField(EMPTY_MASS_ENTRY, 'liters', '12'))), 12);
 });

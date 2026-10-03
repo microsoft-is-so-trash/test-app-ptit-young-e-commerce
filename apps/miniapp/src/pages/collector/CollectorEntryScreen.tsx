@@ -18,12 +18,13 @@ import { syncOutbox } from '../../lib/outbox-sync';
 import { getCollectionSubmitBlockReasons, parseLocalizedDecimal } from '../../lib/collection-entry-validation';
 import { analyzeOilImages, type OilImageAnalysis } from '../../lib/oil-image-analyzer';
 import { pickZaloPhoto } from '../../lib/media-picker';
-import { compressImageBlob, isValidGeoPoint, zaloClient } from '../../lib/zalo-client';
+import { compressImageBlob, zaloClient } from '../../lib/zalo-client';
 import type { PhotoAsset } from '../../lib/zalo-client';
 import { OilGradeSelector } from '../../components/OilGradeSelector';
 import { GradePhotoPicker } from '../../components/GradePhotoPicker';
-import { EMPTY_MASS_ENTRY, editMassField, massEntryView } from '../../lib/mass-entry';
+import { EMPTY_MASS_ENTRY, editMassField, litersForDeviationCheck, massEntryView } from '../../lib/mass-entry';
 import { resolveQuality } from '../../lib/grade-automation';
+import { entryGpsStatus, requestEntryGps } from '../../lib/entry-gps';
 import type { MassEntryState, MassField } from '../../lib/mass-entry';
 
 export function CollectorEntryScreen({ stop, container, containerCode, onBack, onSuccess }: { stop: RouteStop; container: ContainerLookupResponse; containerCode: string; onBack: () => void; onSuccess: (liters: number, kilograms: number | null, clientUuid: string) => void }) {
@@ -47,7 +48,9 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [locationFallback, setLocationFallback] = useState(false);
-  const [locating, setLocating] = useState(false);
+  // Tự lấy GPS khi mở màn (C5.3).
+  const [locating, setLocating] = useState(true);
+  const [gpsError, setGpsError] = useState<string | null>(null);
   const [clientUuid] = useState(() => crypto.randomUUID());
   const [highDeviationAcknowledgement, setHighDeviationAcknowledgement] = useState<string | null>(null);
   const mountedRef = useRef(true);
@@ -58,6 +61,20 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
     analysisRunRef.current += 1;
     zaloClient.cancelMediaPicker?.();
   }, []);
+  useEffect(() => {
+    // Đồng bộ với hệ thống bên ngoài (GPS của máy) một lần khi mở màn.
+    let active = true;
+    void requestEntryGps(() => zaloClient.getLocation()).then((result) => {
+      if (!active) return;
+      if (result.point) setGeo(result.point);
+      setGpsError(result.error);
+      setLocating(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+  const gpsStatus = entryGpsStatus({ locating, hasGeo: geo !== null, error: gpsError, usedFallback: locationFallback });
   const capacity = Number(container.capacity_liters ?? 0);
   const mass = massEntryView(massEntry);
   const { enteredLiters, actualKg, hasLiters, hasKilograms, actualLiters } = mass;
@@ -69,7 +86,8 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
   const invalidKg = actualKg !== null && (!Number.isFinite(actualKg) || actualKg < 0);
   const invalidMass = (!hasLiters && !hasKilograms) || invalidLiters || invalidKg;
   const pickupVolumeForecast = getPickupVolumeForecastDisplay(stop);
-  const pickupVolumeDeviation = evaluatePickupVolumeDeviation(stop, actualLiters);
+  const deviationLiters = litersForDeviationCheck(mass);
+  const pickupVolumeDeviation = deviationLiters === null ? null : evaluatePickupVolumeDeviation(stop, deviationLiters);
   const highDeviationKey = getPickupVolumeDeviationKey(pickupVolumeDeviation);
   useEffect(() => {
     setHighDeviationAcknowledgement(null);
@@ -203,27 +221,15 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
   async function retryGps(): Promise<void> {
     if (locating || saving) return;
     setLocating(true);
-    setError(null);
-    try {
-      const point = await zaloClient.getLocation();
-      if (!point || !isValidGeoPoint(point)) {
-        throw new Error('GPS không trả về tọa độ hợp lệ.');
-      }
-      if (mountedRef.current) {
-        setGeo(point);
-        setLocationFallback(false);
-      }
-    } catch (locationError) {
-      if (mountedRef.current) {
-        setError(
-          locationError instanceof Error
-            ? locationError.message
-            : 'Không lấy được GPS. Hãy kiểm tra quyền vị trí rồi thử lại.',
-        );
-      }
-    } finally {
-      if (mountedRef.current) setLocating(false);
+    setGpsError(null);
+    const result = await requestEntryGps(() => zaloClient.getLocation());
+    if (!mountedRef.current) return;
+    if (result.point) {
+      setGeo(result.point);
+      setLocationFallback(false);
     }
+    setGpsError(result.error);
+    setLocating(false);
   }
 
   async function submit(): Promise<void> {
@@ -360,7 +366,7 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
         </section>
       ) : null}
       {error ? <div className="error-panel" role="alert">{error}</div> : null}
-      <section className="entry-meta-card"><small>Mã giao dịch: {clientUuid.slice(0, 8)}…</small>{locationFallback ? <p className="location-banner">Đang dùng vị trí dự phòng là tâm phường, không phải GPS thực tế.</p> : geo ? <p className="field-help">Đã lấy vị trí GPS thực tế.</p> : <p className="field-help">GPS sẽ được lấy khi xác nhận; bạn cũng có thể lấy trước ngay bây giờ.</p>}<button type="button" className="text-button" onClick={() => { void retryGps(); }} disabled={locating || saving}>{locating ? 'Đang lấy GPS…' : 'Lấy lại GPS'}</button></section>
+      <section className="entry-meta-card"><small>Mã giao dịch: {clientUuid.slice(0, 8)}…</small><p className={locationFallback ? 'location-banner' : 'field-help'}>{gpsStatus.text}</p>{gpsStatus.showRetry ? <button type="button" className="text-button" onClick={() => { void retryGps(); }} disabled={locating || saving}>Lấy lại GPS</button> : null}</section>
       {submitBlockReasons.length > 0 ? <div className="error-text submit-block-reason" role="alert"><strong>Còn thiếu:</strong><ul>{submitBlockReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></div> : null}
       <button className="submit-collection-button" onClick={() => { void submit(); }} disabled={saving || submitBlockReasons.length > 0}>{saving ? 'Đang lưu trên máy…' : 'Xác nhận thu gom'}</button>
     </div>

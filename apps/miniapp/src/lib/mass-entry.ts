@@ -66,3 +66,8 @@ export function massEntryView(state: MassEntryState, density: number = DEFAULT_D
   }
   return { kgText: '', litersText: '', kgAuto: false, litersAuto: false, hasKilograms: false, hasLiters: false, actualKg: null, enteredLiters: null, actualLiters: 0 };
 }
+
+/** Chỉ so với dự báo AI khi đã có số lượng hợp lệ; ô trống không phải là "chênh lệch 100%". */
+export function litersForDeviationCheck(view: MassEntryView): number | null {
+  return view.hasLiters || view.hasKilograms ? view.actualLiters : null;
+}
