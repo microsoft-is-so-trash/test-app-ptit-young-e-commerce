@@ -558,6 +558,20 @@ export const stationDeliveryCreateSchema = z.object({
 });
 export type StationDeliveryCreateInput = z.infer<typeof stationDeliveryCreateSchema>;
 
+const placesSessionTokenSchema = z
+  .string()
+  .trim()
+  .regex(/^[A-Za-z0-9-]{8,64}$/, 'Mã phiên tìm địa chỉ không hợp lệ');
+/** Admin tìm địa chỉ trạm (I1.1): gõ ít nhất 3 ký tự mới gọi Places API (Q27). */
+export const placesAutocompleteQuerySchema = z.object({
+  input: z.string().trim().min(3, 'Nhập ít nhất 3 ký tự để tìm địa chỉ').max(200, 'Địa chỉ tối đa 200 ký tự'),
+  session_token: placesSessionTokenSchema,
+});
+export const placeDetailsQuerySchema = z.object({
+  place_id: z.string().trim().regex(/^[A-Za-z0-9_-]{3,300}$/, 'Mã địa điểm không hợp lệ'),
+  session_token: placesSessionTokenSchema,
+});
+
 export const stationRecommendSchema = z.object({
   lat: z.coerce.number().finite().min(-90).max(90),
   lng: z.coerce.number().finite().min(-180).max(180),

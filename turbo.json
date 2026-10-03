@@ -14,7 +14,8 @@
         "NEXT_PUBLIC_ADMIN_ZALO_ID",
         "NEXT_PUBLIC_ADMIN_PHONE",
         "NEXT_PUBLIC_DEMO_OFFLINE",
-        "NEXT_PUBLIC_LOGIN_GATE_URL"
+        "NEXT_PUBLIC_LOGIN_GATE_URL",
+        "NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY"
       ]
     },
     "dev": {

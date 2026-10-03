@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { Inject, Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../../redis/redis.service';
+import { billingMonth, defaultGoogleHttp, GOOGLE_HTTP, MONTHLY_COUNTER_TTL_SECONDS, requestGoogleJson, type GoogleHttp } from '../google/google-http';
 
 /**
  * Gợi ý trạm theo quãng đường (I1.2). Dùng Routes API Compute Route Matrix gói Essentials
@@ -15,12 +16,7 @@ export const ROUTE_MATRIX_FIELD_MASK = 'originIndex,destinationIndex,distanceMet
 export const ROUTE_MATRIX_MAX_STATIONS = 5;
 /** Tự dừng gọi Google khi số phần tử trong tháng chạm mức này (mức miễn phí là 10.000) — Q26. */
 export const ROUTE_MATRIX_MONTHLY_ELEMENT_LIMIT = 8000;
-export const ROUTE_MATRIX_TIMEOUT_MS = 3000;
-export const ROUTE_MATRIX_MAX_RETRIES = 2;
 export const ROUTE_MATRIX_CACHE_TTL_SECONDS = 600;
-/** Bộ đếm giữ hơn một tháng để không mất số liệu cuối tháng. */
-const MONTHLY_COUNTER_TTL_SECONDS = 40 * 24 * 60 * 60;
-const RETRY_BASE_DELAY_MS = 200;
 
 export type DistanceSource = 'road' | 'straight';
 
@@ -43,23 +39,7 @@ export interface StraightStation {
 
 export type RankedStation = StraightStation & { distance_source: DistanceSource };
 
-interface HttpResponseLike {
-  ok: boolean;
-  status: number;
-  json(): Promise<unknown>;
-}
-
-export interface RouteMatrixHttp {
-  fetch(url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }): Promise<HttpResponseLike>;
-  sleep(ms: number): Promise<void>;
-}
-
-export const ROUTE_MATRIX_HTTP = Symbol('ROUTE_MATRIX_HTTP');
-
-const defaultHttp: RouteMatrixHttp = {
-  fetch: (url, init) => fetch(url, init),
-  sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-};
+export type RouteMatrixHttp = GoogleHttp;
 
 function waypoint(point: GeoPointInput) {
   return { waypoint: { location: { latLng: { latitude: point.lat, longitude: point.lng } } } };
@@ -111,7 +91,7 @@ export function mergeRoadDistances(
 }
 
 export function monthlyElementsKey(now: Date): string {
-  return `maps:route-matrix:elements:${now.toISOString().slice(0, 7)}`;
+  return `maps:route-matrix:elements:${billingMonth(now)}`;
 }
 
 export function routeMatrixCacheKey(origin: GeoPointInput, stationIds: ReadonlyArray<string>): string {
@@ -119,21 +99,17 @@ export function routeMatrixCacheKey(origin: GeoPointInput, stationIds: ReadonlyA
   return `maps:route-matrix:cache:${origin.lat.toFixed(3)},${origin.lng.toFixed(3)}:${digest}`;
 }
 
-function isRetryableStatus(status: number): boolean {
-  return status === 429 || status === 503 || status === 502 || status === 504;
-}
-
 @Injectable()
 export class RoadDistanceService {
   private readonly logger = new Logger(RoadDistanceService.name);
-  private readonly http: RouteMatrixHttp;
+  private readonly http: GoogleHttp;
 
   constructor(
     @Inject(ConfigService) private readonly config: ConfigService,
     @Inject(RedisService) private readonly redis: RedisService,
-    @Optional() @Inject(ROUTE_MATRIX_HTTP) http?: RouteMatrixHttp,
+    @Optional() @Inject(GOOGLE_HTTP) http?: GoogleHttp,
   ) {
-    this.http = http ?? defaultHttp;
+    this.http = http ?? defaultGoogleHttp;
   }
 
   async enrich(origin: GeoPointInput, rows: ReadonlyArray<StraightStation>): Promise<RankedStation[]> {
@@ -172,29 +148,11 @@ export class RoadDistanceService {
     }
   }
 
-  private async requestMatrix(apiKey: string, origin: GeoPointInput, candidates: ReadonlyArray<StraightStation>): Promise<unknown | null> {
-    const body = JSON.stringify(buildRouteMatrixRequest(origin, candidates));
-    for (let attempt = 0; attempt <= ROUTE_MATRIX_MAX_RETRIES; attempt += 1) {
-      if (attempt > 0) await this.http.sleep(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1) + Math.floor(Math.random() * RETRY_BASE_DELAY_MS));
-      try {
-        const response = await this.http.fetch(ROUTE_MATRIX_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': ROUTE_MATRIX_FIELD_MASK },
-          body,
-          signal: AbortSignal.timeout(ROUTE_MATRIX_TIMEOUT_MS),
-        });
-        if (response.ok) return await response.json();
-        if (!isRetryableStatus(response.status)) {
-          this.logger.warn(`Route matrix rejected with status ${response.status}`);
-          return null;
-        }
-      } catch (error) {
-        if (attempt === ROUTE_MATRIX_MAX_RETRIES) {
-          this.logger.warn(`Route matrix request failed: ${error instanceof Error ? error.message : String(error)}`);
-          return null;
-        }
-      }
-    }
-    return null;
+  private requestMatrix(apiKey: string, origin: GeoPointInput, candidates: ReadonlyArray<StraightStation>): Promise<unknown | null> {
+    return requestGoogleJson(this.http, this.logger, 'Route matrix', ROUTE_MATRIX_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': ROUTE_MATRIX_FIELD_MASK },
+      body: JSON.stringify(buildRouteMatrixRequest(origin, candidates)),
+    });
   }
 }

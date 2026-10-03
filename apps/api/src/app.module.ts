@@ -14,6 +14,7 @@ import { StationDeliveriesModule } from './modules/station-deliveries/station-de
 import { SyncModule } from './modules/sync/sync.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { PaymentsModule } from './modules/payments/payments.module';
+import { PlacesModule } from './modules/places/places.module';
 import { ZaloVerificationModule } from './verification/zalo-verification.module';
 
 @Module({
@@ -35,6 +36,7 @@ import { ZaloVerificationModule } from './verification/zalo-verification.module'
     SyncModule,
     AdminModule,
     PaymentsModule,
+    PlacesModule,
     ZaloVerificationModule,
     HealthModule,
   ],

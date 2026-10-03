@@ -9,7 +9,9 @@ import {
   type StationSummaryWithForecast,
 } from '../lib/api';
 import { formatLiters } from '../lib/dashboard-utils';
+import { formatCoordinate } from '../lib/place-search';
 import { AdminShell } from './admin-shell';
+import { StationLocationPicker } from './station-location-picker';
 import { EmptyState, ErrorState, Skeleton } from './ui';
 
 const formatDays = (value: number): string =>
@@ -608,6 +610,13 @@ export function StationsView() {
               onChange={(event) => setForm({ ...form, capacity_liters: event.target.value })}
             />
           </label>
+          <StationLocationPicker
+            lat={form.lat}
+            lng={form.lng}
+            onPick={(position) =>
+              setForm((current) => ({ ...current, lat: formatCoordinate(position.lat), lng: formatCoordinate(position.lng) }))
+            }
+          />
           <label className="grid gap-1 text-sm font-semibold text-on-surface-variant">
             Vĩ độ
             <input

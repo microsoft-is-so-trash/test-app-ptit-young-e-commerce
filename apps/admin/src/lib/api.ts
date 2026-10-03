@@ -28,6 +28,7 @@ import type {
 } from '@eco-oil/shared-types';
 import { browserTokenStorage } from './storage';
 import { DEMO_OFFLINE } from './demo-mode';
+import type { PlaceLocation, PlaceSuggestion } from './place-search';
 /**
  * Dữ liệu mẫu nạp động. Ở bản chạy thật DEMO_OFFLINE là hằng false ngay lúc
  * build, nên nhánh demo bị loại khỏi gói và người dùng không phải tải về.
@@ -210,6 +211,15 @@ export const api = {
     DEMO_OFFLINE
       ? loadDemoStore().then((module) => module.demoUpdateStation(id, body))
       : client.request<StationSummaryWithForecast>(`/stations/${id}`, { method: 'PATCH', body }),
+  /** I1.1: gợi ý địa chỉ qua backend (Places API New). Bản demo offline không có backend nên không dùng. */
+  placesAutocomplete: (input: string, sessionToken: string) =>
+    client.request<PlaceSuggestion[]>(
+      `/admin/places/autocomplete?${new URLSearchParams({ input, session_token: sessionToken })}`,
+    ),
+  placeDetails: (placeId: string, sessionToken: string) =>
+    client.request<PlaceLocation>(
+      `/admin/places/details?${new URLSearchParams({ place_id: placeId, session_token: sessionToken })}`,
+    ),
   updateStationStatus: (id: string, status: 'ACTIVE' | 'INACTIVE') =>
     DEMO_OFFLINE
       ? loadDemoStore().then((module) => module.demoUpdateStationStatus(id, status))
