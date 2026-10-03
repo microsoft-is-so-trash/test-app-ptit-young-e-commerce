@@ -243,6 +243,11 @@ Lấy cảm hứng từ app lập task: chỉnh thời lượng thì thời đi�
 
 ## 7. Đọc giọng nói (TTS): Zalo AI và Gemini
 
+> **Cập nhật 03/10/2026:** nghiên cứu Google TTS chi tiết (Cloud Text-to-Speech Chirp 3: HD, giá,
+> vị trí đặt tính năng ở Merchant và Collector) nằm ở `docs/NGHIEN_CUU_TTS_GOOGLE.md`. Một số điểm
+> dưới đây đã được thay thế: Cloud TTS trả MP3 trực tiếp (mục 7.2), và miniapp phát âm thanh qua API
+> của dự án nên không cần khai báo tên miền âm thanh (mục 7.6).
+
 ### 7.1. Zalo AI TTS
 
 Thông tin xác minh qua mã nguồn mở đang dùng API này (trang tài liệu chính thức zalo.ai bị chặn

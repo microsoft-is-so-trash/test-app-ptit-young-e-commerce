@@ -3,6 +3,10 @@
 Kế hoạch thực hiện các kết luận trong `docs/NGHIEN_CUU_UI_NON_FICTION_VA_GOOGLE_API.md`.
 Quy tắc agent phải tuân theo: `.claude/rules/ui-non-fiction.md` và `.claude/rules/external-apis.md`.
 
+**Cách chạy:** gọi `/ui-v4`. Agent tự thực thi theo `.claude/rules/ui-v4-workflow.md`, ghi trạng
+thái vào `docs/TIEN_DO_UI_V4.md`, chỉ nhắn khi cần hỏi hoặc khi xong một giai đoạn. Câu hỏi đang
+mở và quyết định đã có nằm trong file tiến độ, không nằm trong file này.
+
 ## 0. Quyết định của chủ dự án (02/10/2026)
 
 | Chủ đề | Quyết định |
@@ -61,7 +65,7 @@ Quy tắc agent phải tuân theo: `.claude/rules/ui-non-fiction.md` và `.claud
 ### M3. Hằng số nghiệp vụ một nguồn (nhóm B, nhỏ)
 
 - Hệ số CO2: `HistoryPage.tsx:48` dùng 2.65, nơi khác dùng 2.5. Đưa về một hằng số dùng chung.
-- **Cần chủ dự án chọn** giá trị đúng (2.5 hay 2.65) trước khi làm, vì số trên màn Lịch sử sẽ đổi.
+- Giá trị đúng: **2.5** kg CO2/lít (chủ dự án chốt 03/10/2026). Số trên màn Lịch sử sẽ đổi theo.
 - **Nghiệm thu:** `grep` không còn hệ số CO2 khai báo riêng trong từng màn.
 
 ### M4. Thanh điều hướng 2 nhóm cho Merchant (nhóm B)
@@ -173,18 +177,27 @@ Quy tắc agent phải tuân theo: `.claude/rules/ui-non-fiction.md` và `.claud
 
 ## Giai đoạn I2: Đọc giọng nói (TTS)
 
+Chi tiết kỹ thuật, chi phí và vị trí đặt tính năng: `docs/NGHIEN_CUU_TTS_GOOGLE.md` (cập nhật
+03/10/2026). Bị chặn bởi câu hỏi T1–T7 trong `docs/TIEN_DO_UI_V4.md`.
+
 | Task | Việc |
 |---|---|
-| I2.1 | Backend module `tts`: `POST /api/v1/tts` (JWT, rate limit), nhận mẫu câu + tham số; lớp `TtsProvider` với 2 nhà cung cấp Zalo AI và Gemini; lưu âm thanh theo hash |
-| I2.2 | So sánh thử 2 nhà cung cấp với các câu mẫu của Collector (chất lượng giọng, độ trễ, tỷ lệ lỗi), chủ dự án chọn nhà cung cấp chính |
-| I2.3 | Collector: tạo sẵn âm thanh cho từng điểm lúc "Bắt đầu ca", lưu trên máy; đọc khi lưu giao dịch xong ("Đã lưu… Điểm tiếp theo…"), khi sai can, khi còn giao dịch chưa đồng bộ lúc kết ca |
-| I2.4 | Cài đặt chung: công tắc bật/tắt giọng đọc (thật). Mặc định không đọc số tiền |
-| I2.5 | Merchant: nút "Nghe" trên thông báo |
+| I2.1 | Backend module `apps/api/src/modules/tts`: `POST /api/v1/tts` (JWT, rate limit), nhận `template_id` + tham số (mẫu câu đặt ở `packages/shared-types`), trả `{ text, audio_base64, mime, cache_hit }`; lớp `TtsProvider` với nhà cung cấp Google Cloud TTS (Chirp 3: HD, MP3) và Zalo AI; cache theo hash (câu + giọng + tốc độ + nhà cung cấp) |
+| I2.2 | Lấy danh sách giọng `vi-VN` bằng `voices.list`; nghe thử 2 nhà cung cấp với câu mẫu và tên quán thật trong dataset demo (chất lượng, phát âm tên riêng, độ trễ, tỷ lệ lỗi); chủ dự án chọn nhà cung cấp chính và giọng |
+| I2.3 | Collector: lúc "Bắt đầu ca" mở khoá âm thanh và tạo sẵn đoạn âm thanh (câu tĩnh + "Điểm tiếp theo: {quán}" cho từng điểm), lưu trong Dexie. Đọc tại các điểm C-T2…C-T6 của tài liệu TTS mục 4.1. Không đưa số liệu chỉ có lúc chạy tuyến (số lít vừa nhập, khoảng cách, số giao dịch chờ) vào âm thanh |
+| I2.4 | "Của tôi → Cài đặt chung" của cả hai vai trò: công tắc "Giọng đọc" (thật, lưu trên máy); Merchant thêm công tắc "Đọc số tiền", mặc định tắt |
+| I2.5 | Merchant: nút "Nghe" (biểu tượng loa + chữ) trên từng thông báo trong `NotificationBell`, tạo âm thanh khi bấm, lưu theo hash trên máy |
 
-- Key: `ZALO_AI_API_KEY`, `GEMINI_API_KEY`, `GEMINI_TTS_MODEL`.
+- Key/biến: `GOOGLE_TTS_API_KEY` (hoặc service account, theo câu T2), `GOOGLE_TTS_VOICE`,
+  `TTS_PRIMARY_PROVIDER`, `ZALO_AI_API_KEY`. Gemini TTS chỉ thêm (`GEMINI_API_KEY`,
+  `GEMINI_TTS_MODEL`) nếu chủ dự án chọn ở câu T1.
 - Dự phòng: âm thanh đã lưu → nhà cung cấp chính → nhà cung cấp phụ → `speechSynthesis` → chỉ chữ.
+- Miniapp phát âm thanh lấy từ API của dự án bằng `blob:` URL, không phát link của nhà cung cấp,
+  nên không cần khai báo thêm tên miền âm thanh trong Zalo Mini App.
+- Thêm bảng Dexie mới cho âm thanh là đổi schema trên máy (điều kiện S5): đã được duyệt cùng
+  giai đoạn I2 khi chủ dự án trả lời T1–T7.
 - **Cần thử trên máy thật trong Zalo:** chính sách tự phát âm thanh của iOS ("mở khoá" khi bấm
-  Bắt đầu ca), khai báo tên miền chứa file âm thanh trong cấu hình Zalo Mini App.
+  Bắt đầu ca), `speechSynthesis` có giọng `vi-VN` trong WebView của Zalo hay không.
 
 ## Giai đoạn I3 (tuỳ chọn): Gợi ý hạng dầu bằng Gemini
 
@@ -195,4 +208,5 @@ Quy tắc agent phải tuân theo: `.claude/rules/ui-non-fiction.md` và `.claud
 
 ## Câu hỏi còn chờ trả lời
 
-1. **M3:** hệ số CO2 đúng là 2.5 hay 2.65 kg/lít?
+Chuyển sang mục "Câu hỏi đang mở" của `docs/TIEN_DO_UI_V4.md` (Q1–Q4 cho giai đoạn M, T1–T7 cho
+giai đoạn I2).
