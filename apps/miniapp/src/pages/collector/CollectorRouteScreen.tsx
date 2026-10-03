@@ -67,7 +67,7 @@ export function CollectorRouteScreen({ online, stops, route, location, locationD
   const emptyState = getEmptyRouteState(route.route, stops.length, completedOrderIds);
   const [view, setView] = useState<'list' | 'map'>('list');
   const completedCount = Object.keys(completed).length;
-  const deliveryEntry = stationDeliveryEntry({ completedCount, remainingStops: stops.length });
+  const deliveryEntry = stationDeliveryEntry({ completedCount, remainingStops: stops.filter((stop) => !completed[stop.order_id]).length });
   const statusItems = buildRouteStatusItems({
     online,
     loadError,
@@ -252,25 +252,13 @@ function CollectorStopCard({ stop, outboxRow, onOpenQr }: { stop: RouteStop; out
     <article className="collector-stop-card">
       <div className={`stop-number ${status ? `stop-number-${status}` : ''}`}>{stop.seq}</div>
       <div className="stop-body">
-        <div
-          className="stop-card-toggle"
-          role="button"
-          tabIndex={0}
-          aria-expanded={menuOpen}
-          aria-controls={menuOpen ? menuId : undefined}
-          onClick={() => setMenuOpen((open) => !open)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              setMenuOpen((open) => !open);
-            }
-          }}
-        >
+        {/* Bấm vào phần thông tin thẻ cũng mở menu; người dùng bàn phím/trình đọc màn hình dùng nút bên dưới. */}
+        <div className="stop-card-toggle" onClick={() => setMenuOpen((open) => !open)}>
           <div className="stop-title-row"><h2>{stop.merchant.name}</h2><span className="distance-label">{formatDistance(stop.distance_m)}</span></div>
           <p className="stop-address">{stop.merchant.address ?? 'Chưa có địa chỉ'}</p>
           <strong className="stop-liters">{formatLiters(stop.expected_liters)} dự kiến</strong>
-          <span className="stop-card-more">{menuOpen ? 'Thu gọn' : 'Gọi quán, chỉ đường…'}<span aria-hidden="true">{menuOpen ? ' ▲' : ' ▼'}</span></span>
         </div>
+        <button type="button" className="text-button stop-card-more" aria-expanded={menuOpen} aria-controls={menuOpen ? menuId : undefined} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? 'Thu gọn' : 'Gọi quán, chỉ đường…'}<span aria-hidden="true">{menuOpen ? ' ▲' : ' ▼'}</span></button>
         {status ? <p className={`transaction-status transaction-status-${status}`}>{statusLabel(status)}</p> : null}
         <div className="stop-actions stop-actions-single">
           <button className="collect-action" onClick={onOpenQr} disabled={status === 'pending' || status === 'syncing'}>{status === 'synced' ? 'Đã thu' : 'Thu gom'}</button>

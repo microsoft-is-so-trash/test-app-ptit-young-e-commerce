@@ -36,6 +36,8 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
   const [grade, setGrade] = useState<OilGrade | null>(null);
   // Người thu gom đã tự chọn/đổi hạng thì AI không chọn sẵn nữa (C5.4).
   const [gradeTouched, setGradeTouched] = useState(false);
+  // Bản ref để lệnh phân tích ảnh chạy nền đọc đúng giá trị mới nhất.
+  const gradeTouchedRef = useRef(false);
   const [suspectedAdulteration, setSuspectedAdulteration] = useState(false);
   const [gradeNote, setGradeNote] = useState('');
   const { quality, isAuto: qualityAuto } = resolveQuality({ grade, suspectedAdulteration, manual: manualQuality });
@@ -128,6 +130,7 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
     if (nextPhotos.length === 0) {
       if (mountedRef.current) {
         setImageAnalysis(null);
+        if (!gradeTouchedRef.current) setGrade(null);
         setAnalysisError(null);
         setAnalyzingImages(false);
       }
@@ -136,11 +139,13 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
     setAnalyzingImages(true);
     setAnalysisError(null);
     setImageAnalysis(null);
+    // Hạng do AI chọn sẵn chỉ đúng với ảnh cũ; người thu gom chưa tự chọn thì bỏ để chờ kết quả mới.
+    if (!gradeTouchedRef.current) setGrade(null);
     try {
       const result = await analyzeOilImages(nextPhotos.map((item) => item.url));
       if (mountedRef.current && run === analysisRunRef.current) {
         setImageAnalysis(result);
-        setGrade((current) => aiPreselectGrade(current, result) ?? current);
+        if (!gradeTouchedRef.current) setGrade(aiPreselectGrade(null, result));
       }
     } catch {
       if (mountedRef.current && run === analysisRunRef.current) {
@@ -336,10 +341,10 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
       <section className="entry-target-card"><span>Số lít quán khai</span><strong>{formatLiters(stop.expected_liters)}</strong>{pickupVolumeForecast ? <div className="entry-volume-forecast"><strong>{pickupVolumeForecast.predictedLiters === null ? 'AI chưa đủ dữ liệu để dự báo sản lượng.' : `AI dự báo: khoảng ${formatPickupVolumeLiters(pickupVolumeForecast.predictedLiters)}`}</strong><small>{pickupVolumeForecast.confidenceLabel}</small>{pickupVolumeForecast.declaredOnly ? <small>AI chưa có đủ lịch sử riêng cho quán này.</small> : null}</div> : null}</section>
       <section className="liter-entry-card">
         <label htmlFor="actual-kilograms">{mass.kgAuto ? 'Khối lượng (tự tính)' : 'Khối lượng (kg đã cân)'}</label>
-        <div className="large-number-input"><button onClick={() => adjustMass('kg', -0.5)} disabled={saving}>−</button><input id="actual-kilograms" aria-describedby="actual-kilograms-help" type="text" inputMode="decimal" value={mass.kgText} onChange={(event) => setMassEntry((state) => editMassField(state, 'kg', event.target.value))} placeholder="0,0" /><span>kg</span><button onClick={() => adjustMass('kg', 0.5)} disabled={saving}>+</button></div>
+        <div className="large-number-input"><button onClick={() => adjustMass('kg', -0.5)} disabled={saving || mass.kgAuto} aria-label="Giảm 0,5 kg">−</button><input id="actual-kilograms" aria-describedby="actual-kilograms-help" type="text" inputMode="decimal" value={mass.kgText} onChange={(event) => setMassEntry((state) => editMassField(state, 'kg', event.target.value))} placeholder="0,0" /><span>kg</span><button onClick={() => adjustMass('kg', 0.5)} disabled={saving || mass.kgAuto} aria-label="Tăng 0,5 kg">+</button></div>
         <p id="actual-kilograms-help" className={invalidKg ? 'error-text' : 'field-help'}>{mass.kgAuto ? 'Tự tính từ số lít, không phải số cân. Có số cân thì nhập vào ô này.' : actualKg === null ? 'Không có số cân? Nhập số lít bên dưới, kg sẽ tự tính.' : 'SCALE — số kg này là số cân thực tế.'}</p>
         <label htmlFor="actual-liters">Số lít thực tế{mass.litersAuto ? ' (tự tính)' : ''}</label>
-        <div className="large-number-input"><button onClick={() => adjustMass('liters', -0.5)} disabled={saving}>−</button><input id="actual-liters" aria-describedby="actual-liters-help" type="text" inputMode="decimal" value={mass.litersText} onChange={(event) => setMassEntry((state) => editMassField(state, 'liters', event.target.value))} placeholder="0,0" /><span>lít</span><button onClick={() => adjustMass('liters', 0.5)} disabled={saving}>+</button></div>
+        <div className="large-number-input"><button onClick={() => adjustMass('liters', -0.5)} disabled={saving || mass.litersAuto} aria-label="Giảm 0,5 lít">−</button><input id="actual-liters" aria-describedby="actual-liters-help" type="text" inputMode="decimal" value={mass.litersText} onChange={(event) => setMassEntry((state) => editMassField(state, 'liters', event.target.value))} placeholder="0,0" /><span>lít</span><button onClick={() => adjustMass('liters', 0.5)} disabled={saving || mass.litersAuto} aria-label="Tăng 0,5 lít">+</button></div>
         <p id="actual-liters-help" className={invalidLiters && (massEntry.sourceText || litersDerivedFromKilograms) ? 'error-text' : 'field-help'}>{litersDerivedFromKilograms ? `Số lít ước tính từ khối lượng: ${actualLiters.toFixed(2)} lít · dung tích tối đa ${maxLiters.toFixed(1)} lít` : `Dung tích ${formatLiters(capacity)} · tối đa ${maxLiters.toFixed(1)} lít`}</p>
         {pickupVolumeDeviation?.level === 'NORMAL' ? <p className="pickup-volume-deviation pickup-volume-deviation-normal">Sản lượng nằm gần mức AI dự báo.</p> : null}
         {pickupVolumeDeviation?.level === 'REVIEW' ? <p className="pickup-volume-deviation pickup-volume-deviation-review">Số lít đang chênh {formatDeviationPercent(pickupVolumeDeviation.deviation_pct)} so với AI dự báo. Hãy kiểm tra lại số nhập và mức dầu trong can.</p> : null}
@@ -347,7 +352,7 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
       </section>
       <section className="quality-card">
         <p className="section-label">Phân hạng dầu</p>
-        <OilGradeSelector value={grade} disabled={saving} onChange={(nextGrade) => { setGrade(nextGrade); setGradeTouched(true); setOverrideAcknowledged(false); }} />
+        <OilGradeSelector value={grade} disabled={saving} onChange={(nextGrade) => { setGrade(nextGrade); setGradeTouched(true); gradeTouchedRef.current = true; setOverrideAcknowledged(false); }} />
         {isAiPreselected({ grade, gradeTouched, analysis: imageAnalysis }) ? <p className="field-help">AI chọn sẵn hạng {grade} (tin cậy cao). Bấm hạng khác nếu thấy không đúng.</p> : null}
         <label className="toggle-row"><input type="checkbox" checked={suspectedAdulteration} onChange={(event) => setSuspectedAdulteration(event.target.checked)} disabled={saving} /><span>Nghi ngờ pha lẫn</span></label>
         <p className="field-help">Bật nếu thấy có nước, dầu nhớt hoặc mùi lạ không phải dầu ăn.</p>
@@ -369,7 +374,7 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
           <small>{imageGradeDisplay.summary}</small>
           {imageGradeDisplay.reasons.length > 0 ? <div className="image-grade-reasons">{imageGradeDisplay.reasons.map((reason, index) => <span key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
           {suggestedGrade && grade && suggestedGrade !== grade ? <p className="image-grade-disagreement" role="status"><strong>Khác gợi ý:</strong> bạn chọn hạng {grade}, AI gợi ý hạng {suggestedGrade}. Lý do AI: {imageGradeDisplay.reasons.join(', ') || 'tín hiệu hình ảnh hạn chế'}.</p> : null}
-          {imageGradeDisplay.canUseSuggestion && imageAnalysis?.suggested_grade ? <button type="button" className="secondary-button image-grade-use-button" onClick={() => { setGrade(imageAnalysis.suggested_grade as OilGrade); setGradeTouched(true); setOverrideAcknowledged(false); }} disabled={saving}>Dùng gợi ý này</button> : null}
+          {imageGradeDisplay.canUseSuggestion && imageAnalysis?.suggested_grade ? <button type="button" className="secondary-button image-grade-use-button" onClick={() => { setGrade(imageAnalysis.suggested_grade as OilGrade); setGradeTouched(true); gradeTouchedRef.current = true; setOverrideAcknowledged(false); }} disabled={saving}>Dùng gợi ý này</button> : null}
           {needsImageGradeOverrideAcknowledgement ? <label className="image-grade-override"><input type="checkbox" checked={overrideAcknowledged} onChange={(event) => setOverrideAcknowledged(event.target.checked)} disabled={saving} /><span>Tôi đã kiểm tra và xác nhận giữ phân hạng đã chọn.</span></label> : null}
         </section>
       ) : null}
