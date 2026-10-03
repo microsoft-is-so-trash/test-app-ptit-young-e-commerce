@@ -26,6 +26,7 @@ import { buildRouteStatusItems } from '../../lib/collector-status';
 import type { RouteStatusActionId } from '../../lib/collector-status';
 import { Icon } from '../../components/Icon';
 import { StatusView } from '../../components/StatusView';
+import { CollectorMapPage } from './CollectorMapPage';
 
 interface CollectorRouteScreenProps {
   online: boolean;
@@ -61,6 +62,7 @@ export function CollectorRouteScreen({ online, stops, route, location, locationD
   const routeOptimization = getRouteOptimizationDisplay(route.route.route_optimization);
   const routeCapacityRisk = getRouteCapacityRiskDisplay(route.route.route_capacity_risk, vehicleCapacity);
   const emptyState = getEmptyRouteState(route.route, stops.length, completedOrderIds);
+  const [view, setView] = useState<'list' | 'map'>('list');
   const statusItems = buildRouteStatusItems({
     online,
     loadError,
@@ -128,9 +130,19 @@ export function CollectorRouteScreen({ online, stops, route, location, locationD
       ) : emptyState === 'incomplete-active' ? (
         <StatusView title="Chưa tải đủ điểm của tuyến ACTIVE" message="Ca vẫn đang hoạt động nhưng chưa nhận được danh sách điểm. Dữ liệu ca không bị xóa; hãy thử tải lại." action={{ label: 'Thử lại', onClick: onRefresh }} />
       ) : (
-        <section className="collector-stop-list">
-          {stops.map((stop) => <CollectorStopCard key={stop.order_id} stop={stop} outboxRow={findRowForStop(outboxRows, stop)} onOpenQr={() => onOpenQr(stop)} />)}
-        </section>
+        <>
+          <div className="segment-tabs" role="tablist" aria-label="Cách xem điểm thu">
+            <button role="tab" aria-selected={view === 'list'} className={`segment-tab ${view === 'list' ? 'active' : ''}`} onClick={() => setView('list')}>Danh sách</button>
+            <button role="tab" aria-selected={view === 'map'} className={`segment-tab ${view === 'map' ? 'active' : ''}`} onClick={() => setView('map')}>Bản đồ</button>
+          </div>
+          {view === 'list' ? (
+            <section className="collector-stop-list">
+              {stops.map((stop) => <CollectorStopCard key={stop.order_id} stop={stop} outboxRow={findRowForStop(outboxRows, stop)} onOpenQr={() => onOpenQr(stop)} />)}
+            </section>
+          ) : (
+            <CollectorMapPage />
+          )}
+        </>
       )}
     </div>
   );

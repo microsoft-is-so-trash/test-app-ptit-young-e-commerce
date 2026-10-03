@@ -1,11 +1,11 @@
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
-import { MERCHANT_MINE_SECTIONS, splitMerchantOrders, toggleMineSection } from '../lib/merchant-nav';
+import { MERCHANT_MINE_SECTIONS, splitMerchantOrders } from '../lib/merchant-nav';
 import type { MineSectionKey } from '../lib/merchant-nav';
 import { useAuthStore } from '../stores/auth-store';
 import { Icon } from '../components/Icon';
 import { MerchantOrderList } from '../components/MerchantOrderList';
+import { MineAccordion } from '../components/MineAccordion';
 import { StatusView } from '../components/StatusView';
 import { HistoryPage } from './HistoryPage';
 import { PaymentsPage } from './PaymentsPage';
@@ -14,36 +14,9 @@ import { MerchantContainersSection, MerchantProfileSection, MerchantReferralSect
 
 /** Tab "Của tôi": mỗi mục mở rộng ra nội dung của một tab/khối cũ. */
 export function MinePage() {
-  const [openSection, setOpenSection] = useState<MineSectionKey | null>(null);
-
   return (
     <div className="page-content">
-      <div className="mine-list">
-        {MERCHANT_MINE_SECTIONS.map((section) => {
-          const expanded = openSection === section.key;
-          return (
-            <section className={`mine-item ${expanded ? 'expanded' : ''}`} key={section.key}>
-              <button
-                className="mine-item-header"
-                aria-expanded={expanded}
-                aria-controls={expanded ? `mine-section-${section.key}` : undefined}
-                onClick={() => setOpenSection((current) => toggleMineSection(current, section.key))}
-              >
-                <span className="section-icon">
-                  <Icon name={section.icon} size={20} decorative />
-                </span>
-                <span className="settings-row-title mine-item-title">{section.title}</span>
-                <Icon name={expanded ? 'expand_less' : 'expand_more'} size={22} decorative />
-              </button>
-              {expanded ? (
-                <div className="mine-item-body" id={`mine-section-${section.key}`}>
-                  <MineSectionContent sectionKey={section.key} />
-                </div>
-              ) : null}
-            </section>
-          );
-        })}
-      </div>
+      <MineAccordion sections={MERCHANT_MINE_SECTIONS} renderContent={(key) => <MineSectionContent sectionKey={key} />} />
     </div>
   );
 }

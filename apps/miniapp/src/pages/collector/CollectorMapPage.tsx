@@ -52,11 +52,7 @@ export function CollectorMapPage() {
   const inRoute = data.filter((order) => order.in_current_route).length;
 
   return (
-    <div className="page-content collector-content collector-map-screen">
-      <header className="collector-screen-heading">
-        <p className="eyebrow">BẢN ĐỒ ĐIỂM THU</p>
-        <h1>Điểm chờ thu quanh địa bàn</h1>
-      </header>
+    <div className="mine-section-body collector-map-screen">
 
       {data.length === 0 ? (
         <StatusView title="Chưa có điểm nào chờ thu" message="Khi có quán báo sẵn sàng, điểm sẽ hiện trên bản đồ." />

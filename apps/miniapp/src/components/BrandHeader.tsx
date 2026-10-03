@@ -7,9 +7,11 @@ interface BrandHeaderProps {
   withNotifications?: boolean;
   /** Hành động thay cho chuông thông báo, dùng cho vai trò chưa có trung tâm thông báo. */
   action?: ReactNode;
+  /** Collector không hiện avatar (Q16); Merchant giữ avatar như cũ. */
+  showAvatar?: boolean;
 }
 
-export function BrandHeader({ title, withNotifications = false, action }: BrandHeaderProps) {
+export function BrandHeader({ title, withNotifications = false, action, showAvatar = true }: BrandHeaderProps) {
   return (
     <header className="brand-header">
       <div className="brand-header-inner">
@@ -30,9 +32,11 @@ export function BrandHeader({ title, withNotifications = false, action }: BrandH
               <Icon name="notifications" size={22} />
             </button>
           ))}
-          <div className="header-avatar">
-            <Icon name="person" size={18} />
-          </div>
+          {showAvatar ? (
+            <div className="header-avatar">
+              <Icon name="person" size={18} />
+            </div>
+          ) : null}
         </div>
       </div>
     </header>

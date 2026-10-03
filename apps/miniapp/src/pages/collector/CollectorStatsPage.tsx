@@ -39,11 +39,7 @@ export function CollectorStatsPage() {
   );
 
   return (
-    <div className="page-content collector-content collector-stats-screen">
-      <header className="collector-screen-heading">
-        <p className="eyebrow">THỐNG KÊ CỦA TÔI</p>
-        <h1>Kết quả thu gom</h1>
-      </header>
+    <div className="mine-section-body collector-stats-screen">
 
       <section className="collector-stats-hero">
         <span>Tổng dầu đã thu</span>

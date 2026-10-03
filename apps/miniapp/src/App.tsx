@@ -16,7 +16,6 @@ import { CollectorShell } from './pages/collector/CollectorShell';
 import { StatusView } from './components/StatusView';
 import { MerchantApprovalView } from './components/MerchantApprovalView';
 import { startOutboxSyncWorker } from './lib/outbox-sync';
-import { useOutboxStats } from './lib/outbox-hooks';
 import { Icon } from './components/Icon';
 import { BrandHeader } from './components/BrandHeader';
 
@@ -46,7 +45,6 @@ export function App() {
   const hydrate = useAuthStore((state) => state.hydrate);
   const acceptCollectorInvite = useAuthStore((state) => state.acceptCollectorInvite);
   const signOut = useAuthStore((state) => state.signOut);
-  const outboxStats = useOutboxStats();
   const [tab, setTab] = useState<MerchantTab>('today');
   const [collectorInviteError, setCollectorInviteError] = useState<string | null>(null);
   const [collectorInviteRetry, setCollectorInviteRetry] = useState(0);
@@ -142,19 +140,8 @@ export function App() {
   }
 
   if (user.role === Role.COLLECTOR) {
-    async function handleCollectorSignOut(): Promise<void> {
-      const unsynced = outboxStats.pending + outboxStats.syncing + outboxStats.failed;
-      if (
-        unsynced > 0 &&
-        !window.confirm(
-          `Còn ${unsynced} giao dịch chưa đồng bộ. Bạn có chắc muốn thoát? Dữ liệu vẫn được giữ an toàn trong hàng chờ trên máy.`,
-        )
-      )
-        return;
-      // Deliberately keep IndexedDB outbox rows; logout only clears auth state and tokens.
-      await signOut();
-    }
-    return <CollectorShell userId={user.id} onSignOut={() => { void handleCollectorSignOut(); }} />;
+    // Đăng xuất chỉ xoá phiên đăng nhập; hàng chờ IndexedDB vẫn giữ. Hộp xác nhận nằm trong CollectorShell.
+    return <CollectorShell userId={user.id} onSignOut={() => { void signOut(); }} />;
   }
 
   if (user.role !== Role.MERCHANT) {

@@ -22,6 +22,7 @@ import {
 import { useAuthStore } from '../stores/auth-store';
 import { StatusView } from '../components/StatusView';
 import { CollectorNotice } from '../components/CollectorNotice';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { CollectorRouteScreen } from './collector/CollectorRouteScreen';
 import { CollectorQrScreen } from './collector/CollectorQrScreen';
 import { CollectorEntryScreen } from './collector/CollectorEntryScreen';
@@ -60,6 +61,7 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
   const [finishing, setFinishing] = useState(false);
   const [lastReceipt, setLastReceipt] = useState<StoredStationReceipt | null>(null);
   const [prefetching, setPrefetching] = useState(false);
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [refreshNotice, setRefreshNotice] = useState<RouteRefreshNotice | null>(null);
   const refreshRunner = useRef<(() => Promise<void>) | null>(null);
@@ -235,8 +237,8 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
   }
 
   async function cancelShift(): Promise<void> {
+    setConfirmingCancel(false);
     if (!shiftStarted || Object.keys(completed).length > 0 || prefetching) return;
-    if (typeof window !== 'undefined' && !window.confirm('Bạn có chắc muốn hủy ca thu gom này không?')) return;
     setPrefetching(true);
     setShiftError(null);
     try {
@@ -356,7 +358,7 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
         shiftError={shiftError}
         prefetching={prefetching}
         onStartShift={() => { void startShift(); }}
-        onCancelShift={() => { void cancelShift(); }}
+        onCancelShift={() => setConfirmingCancel(true)}
         onOpenQr={(stop) => setScreen({ name: 'qr', stop })}
         onOpenSummary={() => setScreen({ name: 'summary' })}
         onOpenOutbox={() => setScreen({ name: 'outbox' })}
@@ -381,6 +383,16 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
         </CollectorNotice>
       ) : null}
       {content}
+      {confirmingCancel ? (
+        <ConfirmDialog
+          title="Hủy ca thu gom?"
+          message="Bạn có chắc muốn hủy ca thu gom này không?"
+          confirmLabel="Hủy ca"
+          cancelLabel="Để lại"
+          onCancel={() => setConfirmingCancel(false)}
+          onConfirm={() => { void cancelShift(); }}
+        />
+      ) : null}
     </div>
   );
 }

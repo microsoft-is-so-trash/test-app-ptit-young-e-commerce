@@ -20,7 +20,7 @@ export const MERCHANT_MINE_SECTIONS: ReadonlyArray<{ key: MineSectionKey; icon: 
 ];
 
 /** Chỉ một mục mở tại một thời điểm; bấm lại mục đang mở thì đóng. */
-export function toggleMineSection(current: MineSectionKey | null, key: MineSectionKey): MineSectionKey | null {
+export function toggleMineSection<K extends string = MineSectionKey>(current: K | null, key: K): K | null {
   return current === key ? null : key;
 }
 

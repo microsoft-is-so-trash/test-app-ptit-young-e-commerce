@@ -8,43 +8,37 @@ import { CollectorNotice } from '../../components/CollectorNotice';
 import { StatusView } from '../../components/StatusView';
 import { Icon } from '../../components/Icon';
 import { useAuthStore } from '../../stores/auth-store';
-import { useOnlineStatus, useOutboxStats } from '../../lib/outbox-hooks';
+import { useOnlineStatus } from '../../lib/outbox-hooks';
 
-interface CollectorAccountPageProps {
-  onSignOut: () => void;
+function useCollectorProfile() {
+  const collectorId = useAuthStore((state) => state.user?.collectorId ?? state.user?.id ?? 'unknown');
+  return { collectorId, profile: useQuery({ queryKey: ['collector-profile', collectorId], queryFn: api.collectorProfile }) };
 }
 
-export function CollectorAccountPage({ onSignOut }: CollectorAccountPageProps) {
-  const collectorId = useAuthStore((state) => state.user?.collectorId ?? state.user?.id ?? 'unknown');
+function ProfileLoadState({ profile }: { profile: ReturnType<typeof useCollectorProfile>['profile'] }) {
+  if (profile.isPending) return <StatusView title="Đang tải thông tin tài khoản…" />;
+  return (
+    <StatusView
+      title="Chưa tải được hồ sơ"
+      message={profile.error instanceof ApiError ? profile.error.message : 'Kiểm tra kết nối rồi thử lại.'}
+      action={{ label: 'Thử lại', onClick: () => { void profile.refetch(); } }}
+    />
+  );
+}
+
+/** Mục "Hồ sơ và xe" trong "Của tôi". */
+export function CollectorProfileSection() {
+  const { collectorId, profile } = useCollectorProfile();
   const queryClient = useQueryClient();
   const online = useOnlineStatus();
-  const outboxStats = useOutboxStats();
   const [editing, setEditing] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const profile = useQuery({ queryKey: ['collector-profile', collectorId], queryFn: api.collectorProfile });
-
-  if (profile.isPending) return <StatusView title="Đang tải thông tin tài khoản…" />;
-  if (profile.isError) {
-    return (
-      <StatusView
-        title="Chưa tải được hồ sơ"
-        message={profile.error instanceof ApiError ? profile.error.message : 'Kiểm tra kết nối rồi thử lại.'}
-        action={{ label: 'Thử lại', onClick: () => { void profile.refetch(); } }}
-      />
-    );
-  }
-
+  if (!profile.data) return <ProfileLoadState profile={profile} />;
   const data = profile.data;
-  const unsynced = outboxStats.pending + outboxStats.syncing + outboxStats.failed;
 
   return (
-    <div className="page-content collector-content collector-account-screen">
-      <header className="collector-screen-heading">
-        <p className="eyebrow">TÀI KHOẢN</p>
-        <h1>{data.display_name}</h1>
-      </header>
-
+    <div className="mine-section-body collector-account-screen">
       {notice ? <CollectorNotice tone="success" title={notice} /> : null}
       {!online ? (
         <CollectorNotice tone="warning" icon="wifi_off" title="Đang ngoại tuyến">
@@ -77,6 +71,29 @@ export function CollectorAccountPage({ onSignOut }: CollectorAccountPageProps) {
         </button>
       </section>
 
+      {editing ? (
+        <EditProfileSheet
+          profile={data}
+          onClose={() => setEditing(false)}
+          onSaved={(updated) => {
+            queryClient.setQueryData(['collector-profile', collectorId], updated);
+            setEditing(false);
+            setNotice('Đã lưu thông tin tài khoản');
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/** Mục "Địa bàn" trong "Của tôi". */
+export function CollectorWardsSection() {
+  const { profile } = useCollectorProfile();
+  if (!profile.data) return <ProfileLoadState profile={profile} />;
+  const data = profile.data;
+
+  return (
+    <div className="mine-section-body">
       <section className="info-card">
         <div className="section-heading-left">
           <div className="section-icon">
@@ -98,36 +115,18 @@ export function CollectorAccountPage({ onSignOut }: CollectorAccountPageProps) {
         )}
         <p className="field-help">Địa bàn và trạng thái hoạt động do quản trị viên phân công.</p>
       </section>
+    </div>
+  );
+}
 
-      <section className="info-card">
-        <div className="section-heading-left">
-          <div className="section-icon">
-            <Icon name="cloud_sync" size={20} />
-          </div>
-          <h3 className="section-title">Dữ liệu trên máy</h3>
-        </div>
-        <dl className="collector-profile-list">
-          <ProfileRow label="Giao dịch chưa đồng bộ" value={`${unsynced}`} />
-          <ProfileRow label="Kết nối" value={online ? 'Đang trực tuyến' : 'Đang ngoại tuyến'} />
-        </dl>
-      </section>
-
-      <button className="btn btn-danger btn-full btn-lg" style={{ marginBottom: 16 }} onClick={onSignOut}>
-        <Icon name="logout" size={20} />
-        <span>ĐĂNG XUẤT</span>
+/** Mục "Cài đặt chung": nơi duy nhất để đăng xuất (U4). */
+export function CollectorSettingsSection({ onSignOut }: { onSignOut: () => void }) {
+  return (
+    <div className="mine-section-body">
+      <button className="btn btn-danger btn-full" onClick={onSignOut}>
+        <Icon name="logout" size={20} decorative />
+        <span>Đăng xuất</span>
       </button>
-
-      {editing ? (
-        <EditProfileSheet
-          profile={data}
-          onClose={() => setEditing(false)}
-          onSaved={(updated) => {
-            queryClient.setQueryData(['collector-profile', collectorId], updated);
-            setEditing(false);
-            setNotice('Đã lưu thông tin tài khoản');
-          }}
-        />
-      ) : null}
     </div>
   );
 }
