@@ -26,7 +26,6 @@ import { ConfirmDialog } from '../components/ConfirmDialog';
 import { CollectorRouteScreen } from './collector/CollectorRouteScreen';
 import { CollectorQrScreen } from './collector/CollectorQrScreen';
 import { CollectorEntryScreen } from './collector/CollectorEntryScreen';
-import { CollectorSummaryScreen } from './collector/CollectorSummaryScreen';
 import { SavedStationReceiptView } from './collector/SavedStationReceiptView';
 import { OutboxQueueScreen } from './collector/OutboxQueueScreen';
 import { StationDeliveryFlow } from './StationDeliveryFlow';
@@ -35,7 +34,6 @@ type CollectorScreen =
   | { name: 'route' }
   | { name: 'qr'; stop: RouteStop }
   | { name: 'entry'; stop: RouteStop; container: ContainerLookupResponse; containerCode: string }
-  | { name: 'summary' }
   | { name: 'station-delivery' }
   | { name: 'receipt-view' }
   | { name: 'outbox' };
@@ -49,7 +47,7 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
   const collectorStorageId = useAuthStore((state) => state.user?.collectorId ?? state.user?.id ?? null);
   const [restoredShift] = useState(() => collectorStorageId ? pendingStationDeliveryStorage.load(collectorStorageId) : null);
   const restoredRouteId = restoredShift?.routeId ?? restoredShift?.activeRoute?.route_id ?? undefined;
-  const [screen, setScreen] = useState<CollectorScreen>(() => restoredRouteId && Object.keys(restoredShift?.completed ?? {}).length > 0 ? { name: 'summary' } : { name: 'route' });
+  const [screen, setScreen] = useState<CollectorScreen>({ name: 'route' });
   const [location, setLocation] = useState<GeoPoint | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
   const [completed, setCompleted] = useState<Record<string, CompletedStop>>(restoredShift?.completed ?? {});
@@ -326,10 +324,8 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
         onSuccess={(liters, kilograms, clientUuid) => onCollectionSaved(screen.stop, liters, kilograms, clientUuid)}
       />
     );
-  } else if (screen.name === 'summary') {
-    content = <CollectorSummaryScreen route={route.data?.route} completed={routeProgress.completed} completedCount={routeProgress.completedOrderIds.length} totalStops={initialStopCount ?? route.data?.route.stops.length ?? 0} onBack={() => setScreen({ name: 'route' })} onOpenDelivery={() => setScreen({ name: 'station-delivery' })} />;
   } else if (screen.name === 'station-delivery') {
-    content = <StationDeliveryFlow completed={routeProgress.completed} pendingDelivery={pendingDelivery} collectorId={collectorStorageId} routeId={route.data?.route.route_id ?? restoredRouteId} onPendingDelivery={(draft) => setPendingDelivery(draft)} onReceiptSaved={setLastReceipt} onBack={() => setScreen({ name: 'summary' })} onFinish={finishShift} />;
+    content = <StationDeliveryFlow completed={routeProgress.completed} pendingDelivery={pendingDelivery} collectorId={collectorStorageId} routeId={route.data?.route.route_id ?? restoredRouteId} onPendingDelivery={(draft) => setPendingDelivery(draft)} onReceiptSaved={setLastReceipt} onBack={() => setScreen({ name: 'route' })} onFinish={finishShift} />;
   } else if (route.isPending && !route.data) {
     content = <StatusView title="Đang tải tuyến hôm nay…" />;
   } else if (route.isError && !route.data) {
@@ -360,7 +356,7 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
         onStartShift={() => { void startShift(); }}
         onCancelShift={() => setConfirmingCancel(true)}
         onOpenQr={(stop) => setScreen({ name: 'qr', stop })}
-        onOpenSummary={() => setScreen({ name: 'summary' })}
+        onOpenDelivery={() => setScreen({ name: 'station-delivery' })}
         onOpenOutbox={() => setScreen({ name: 'outbox' })}
         refreshing={refreshing}
         refreshNotice={refreshNotice}

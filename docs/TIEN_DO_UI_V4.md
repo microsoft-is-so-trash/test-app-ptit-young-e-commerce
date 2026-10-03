@@ -72,7 +72,7 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 | C3 | B | xong | (commit này) | Thẻ điểm thu khi đóng chỉ còn 1 nút "Thu gom" (kèm lý do khi bị khoá). Bấm vào phần thông tin thẻ (bàn phím: Enter/Space) mở menu Gọi quán, Chỉ đường, Sao chép số, Chi tiết AI; nút không dùng được ghi lý do (lib/stop-card-menu.ts). Test stop-card-menu (4; viết cùng lúc với hàm, không có bước RED riêng). Ảnh: design/snapshots/ui-v4/C3/. |
 | C4.1 | B | xong | (commit này) | Mã can khớp điểm thì tự chuyển sang màn nhập; bỏ thẻ "Đã đối chiếu" và nút "Tiếp tục nhập giao dịch" (containerMatchOutcome). Không khớp vẫn dừng với thông báo "Đây không phải can của điểm này". Dòng "Dữ liệu lúc …" của thẻ đối chiếu (khi dùng dữ liệu can đã lưu) không còn hiện ở màn này. Đã thử trên demo: mã sai báo lỗi, mã đúng sang màn Ghi nhận thu gom. Test thêm trong container-code.test.ts. |
 | C4.2 | B | xong | (commit này) | Ô nhập tay mã can để trống (INITIAL_MANUAL_CONTAINER_CODE), không còn điền sẵn mã của điểm; nhãn đổi thành "Không quét được? Nhập mã in trên can". Test trong container-code.test.ts. Cùng commit với C4.1. |
-| C4.3 | B | chưa làm | | |
+| C4.3 | B | xong | (commit này) | Bỏ màn Tóm tắt ca (xoá CollectorSummaryScreen). Màn Tuyến: dòng "x / y điểm đã thu · z lít"; đã thu ≥ 1 điểm có nút chữ "Đi nộp trạm", thu hết điểm thì thành nút chính (lib/route-delivery.ts, Q12). "Về tóm tắt ca" → "Về tuyến hôm nay"; mở lại app khi ca dở vào thẳng màn Tuyến. Đã thử trên demo: sau 1 giao dịch dòng tiến độ hiện "1 / 4 điểm đã thu · 20 lít | Đi nộp trạm". Test thêm 3 trong collector-flow.test.ts. Phát hiện màn nhập kẹt "Đang lưu…" khi khung ẩn, có từ trước (xem Phát hiện ngoài phạm vi). |
 | C4.4 | B | chưa làm | | |
 | C5.1 | B | chưa làm | | |
 | C5.2 | B | chưa làm | | |
@@ -109,6 +109,7 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 
 Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; không tự sửa.
 
+- 03/10/2026 — Màn nhập thu gom: khi khung trình duyệt bị ẩn (`document.hidden = true`), bấm "Xác nhận thu gom" thì giao dịch được lưu và đồng bộ nhưng màn hình kẹt ở "Đang lưu trên máy…". Đã thử trên bản gốc trước v4 (commit 68d5325) cũng bị y hệt, nên không do thay đổi v4. Chưa rõ có xảy ra khi màn hình đang hiện hay không; cần thử trên máy thật.
 - 03/10/2026 — Trang chủ Merchant tính "tiền ước tính" bằng `VITE_ESTIMATED_PRICE_PER_LITER` (8.000đ) trong khi giá dầu từ API là 20.000đ (`HomePage.tsx:11`); vi phạm U11 nhưng không thuộc task nào của giai đoạn M.
 - 03/10/2026 — `apps/api` chưa có cơ chế rate limit cho bất kỳ endpoint nào (liên quan quy tắc
   bảo mật chung, không chỉ TTS).
@@ -128,6 +129,7 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
 
+- 03/10/2026 — C4.3 — xong. Bỏ màn Tóm tắt ca (xoá CollectorSummaryScreen). Màn Tuyến: dòng "x / y điểm đã thu · z lít"; đã thu ≥ 1 điểm có nút chữ "Đi nộp trạm", thu hết điểm thì thành nút chính (lib/route-delivery.ts, Q12). "Về tóm tắt ca" → "Về tuyến hôm nay"; mở lại app khi ca dở vào thẳng màn Tuyến. Đã thử trên demo: sau 1 giao dịch dòng tiến độ hiện "1 / 4 điểm đã thu · 20 lít | Đi nộp trạm". Test thêm 3 trong collector-flow.test.ts. Phát hiện màn nhập kẹt "Đang lưu…" khi khung ẩn, có từ trước (xem Phát hiện ngoài phạm vi).
 - 03/10/2026 — C4.2 — xong. Ô nhập tay mã can để trống (INITIAL_MANUAL_CONTAINER_CODE), không còn điền sẵn mã của điểm; nhãn đổi thành "Không quét được? Nhập mã in trên can". Test trong container-code.test.ts. Cùng commit với C4.1.
 - 03/10/2026 — C4.1 — xong. Mã can khớp điểm thì tự chuyển sang màn nhập; bỏ thẻ "Đã đối chiếu" và nút "Tiếp tục nhập giao dịch" (containerMatchOutcome). Không khớp vẫn dừng với thông báo "Đây không phải can của điểm này". Dòng "Dữ liệu lúc …" của thẻ đối chiếu (khi dùng dữ liệu can đã lưu) không còn hiện ở màn này. Đã thử trên demo: mã sai báo lỗi, mã đúng sang màn Ghi nhận thu gom. Test thêm trong container-code.test.ts.
 - 03/10/2026 — C3 — xong. Thẻ điểm thu khi đóng chỉ còn 1 nút "Thu gom" (kèm lý do khi bị khoá). Bấm vào phần thông tin thẻ (bàn phím: Enter/Space) mở menu Gọi quán, Chỉ đường, Sao chép số, Chi tiết AI; nút không dùng được ghi lý do (lib/stop-card-menu.ts). Test stop-card-menu (4; viết cùng lúc với hàm, không có bước RED riêng). Ảnh: design/snapshots/ui-v4/C3/.

@@ -663,3 +663,20 @@ test('pickup volume deviation uses derived liters and safely skips low-confidenc
   const changedHigh = evaluatePickupVolumeDeviation(highConfidenceStop, 60);
   assert.equal(requiresPickupVolumeAcknowledgement(changedHigh, highKey), true);
 });
+
+test('the station delivery entry is hidden until a stop is collected', async () => {
+  const { stationDeliveryEntry } = await import('../src/lib/route-delivery');
+  assert.equal(stationDeliveryEntry({ completedCount: 0, remainingStops: 3 }), 'hidden');
+});
+
+test('the station delivery entry is a text link while stops remain and the main button after the last stop', async () => {
+  const { stationDeliveryEntry } = await import('../src/lib/route-delivery');
+  assert.equal(stationDeliveryEntry({ completedCount: 1, remainingStops: 2 }), 'secondary');
+  assert.equal(stationDeliveryEntry({ completedCount: 3, remainingStops: 0 }), 'primary');
+});
+
+test('the route progress line shows collected stops and collected liters together', async () => {
+  const { routeProgressLine } = await import('../src/lib/route-delivery');
+  assert.equal(routeProgressLine({ completedCount: 2, totalStops: 4, collectedLiters: 44 }), '2 / 4 điểm đã thu · 44 lít');
+  assert.equal(routeProgressLine({ completedCount: 0, totalStops: 4, collectedLiters: 0 }), '0 / 4 điểm đã thu');
+});

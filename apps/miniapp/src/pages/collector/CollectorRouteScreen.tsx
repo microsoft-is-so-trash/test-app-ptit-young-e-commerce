@@ -28,6 +28,7 @@ import { Icon } from '../../components/Icon';
 import { StatusView } from '../../components/StatusView';
 import { CollectorMapPage } from './CollectorMapPage';
 import { stopCardMenuItems } from '../../lib/stop-card-menu';
+import { routeProgressLine, stationDeliveryEntry } from '../../lib/route-delivery';
 import type { StopCardMenuItemId } from '../../lib/stop-card-menu';
 
 interface CollectorRouteScreenProps {
@@ -51,13 +52,13 @@ interface CollectorRouteScreenProps {
   onStartShift: () => void;
   onCancelShift: () => void;
   onOpenQr: (stop: RouteStop) => void;
-  onOpenSummary: () => void;
+  onOpenDelivery: () => void;
   onOpenOutbox: () => void;
   onRefresh: () => void;
   onOpenLastReceipt: () => void;
 }
 
-export function CollectorRouteScreen({ online, stops, route, location, locationDenied, completed, completedOrderIds, totalStops, outboxRows, outboxStats, shiftStarted, shiftError, prefetching, refreshing, refreshNotice, loadError, lastReceipt, onStartShift, onCancelShift, onOpenQr, onOpenSummary, onOpenOutbox, onRefresh, onOpenLastReceipt }: CollectorRouteScreenProps) {
+export function CollectorRouteScreen({ online, stops, route, location, locationDenied, completed, completedOrderIds, totalStops, outboxRows, outboxStats, shiftStarted, shiftError, prefetching, refreshing, refreshNotice, loadError, lastReceipt, onStartShift, onCancelShift, onOpenQr, onOpenDelivery, onOpenOutbox, onRefresh, onOpenLastReceipt }: CollectorRouteScreenProps) {
   const vehicleCapacity = route.route.total_expected_liters + route.route.remaining_capacity_l;
   const routeFill = vehicleCapacity > 0 ? Math.min(100, Math.round((route.route.total_expected_liters / vehicleCapacity) * 100)) : 0;
   const completedLiters = Object.values(completed).reduce((sum, item) => sum + item.liters, 0);
@@ -65,6 +66,8 @@ export function CollectorRouteScreen({ online, stops, route, location, locationD
   const routeCapacityRisk = getRouteCapacityRiskDisplay(route.route.route_capacity_risk, vehicleCapacity);
   const emptyState = getEmptyRouteState(route.route, stops.length, completedOrderIds);
   const [view, setView] = useState<'list' | 'map'>('list');
+  const completedCount = Object.keys(completed).length;
+  const deliveryEntry = stationDeliveryEntry({ completedCount, remainingStops: stops.length });
   const statusItems = buildRouteStatusItems({
     online,
     loadError,
@@ -124,11 +127,12 @@ export function CollectorRouteScreen({ online, stops, route, location, locationD
           {routeOptimization.detail ? <small>{routeOptimization.detail}</small> : null}
         </section>
       ) : null}
-      <div className="route-summary-line"><strong>{Object.keys(completed).length} / {Math.max(totalStops, Object.keys(completed).length)} điểm đã thu</strong><button className="text-button" onClick={onOpenSummary}>Tóm tắt ca</button></div>
+      <div className="route-summary-line"><strong>{routeProgressLine({ completedCount, totalStops, collectedLiters: completedLiters })}</strong>{deliveryEntry === 'secondary' ? <button className="text-button" onClick={onOpenDelivery}>Đi nộp trạm</button> : null}</div>
+      {deliveryEntry === 'primary' ? <button className="station-button" onClick={onOpenDelivery}>Đi nộp trạm <small>Đã thu hết điểm · đối soát và chọn trạm</small></button> : null}
       {emptyState === 'no-ready' ? (
         <StatusView title="Hiện chưa có điểm READY" message="Chưa có quán nào trong phường yêu cầu thu gom. Hãy tải lại khi có đơn mới." action={{ label: 'Tải lại tuyến', onClick: onRefresh }} />
       ) : emptyState === 'completed' ? (
-        <StatusView title="Đã hoàn thành tuyến" message={completedLiters > 0 ? `Đã thu ${formatLiters(completedLiters)}. Bạn có thể xem lại tóm tắt ca.` : 'Server xác nhận toàn bộ điểm trong tuyến đã được xử lý.'} action={{ label: 'Xem tóm tắt ca', onClick: onOpenSummary }} />
+        <StatusView title="Đã hoàn thành tuyến" message={completedLiters > 0 ? `Đã thu ${formatLiters(completedLiters)}. Hãy đi nộp trạm.` : 'Server xác nhận toàn bộ điểm trong tuyến đã được xử lý.'} action={completedCount > 0 ? { label: 'Đi nộp trạm', onClick: onOpenDelivery } : undefined} />
       ) : emptyState === 'incomplete-active' ? (
         <StatusView title="Chưa tải đủ điểm của tuyến ACTIVE" message="Ca vẫn đang hoạt động nhưng chưa nhận được danh sách điểm. Dữ liệu ca không bị xóa; hãy thử tải lại." action={{ label: 'Thử lại', onClick: onRefresh }} />
       ) : (

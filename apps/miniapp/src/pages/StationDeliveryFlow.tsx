@@ -158,7 +158,7 @@ export function StationSelectScreen({ expectedLiters, expectedKg, waiting, locat
 }) {
   return (
     <div className="page-content collector-content station-page collector-station-select-screen">
-      <button className="back-button" onClick={onBack}>Về tóm tắt ca</button>
+      <button className="back-button" onClick={onBack}>Về tuyến hôm nay</button>
       <header className="collector-screen-heading"><p className="eyebrow">NỘP TRẠM</p><h1>Chọn trạm tiếp nhận</h1><p>Đang mang {formatLiters(expectedLiters)} (~{expectedKg.toFixed(1)} kg) cần đối soát</p></header>
       {locationDenied ? (
         <CollectorNotice tone="warning" icon="location_off" title="Đang dùng vị trí tâm phường">
@@ -464,7 +464,7 @@ export function StationDeliveryReceipt({ station, clientUuid, collectorId, expec
       {receiptError ? <div className="error-panel" role="alert">{receiptError}</div> : null}
       {imageNotice ? <p className="field-help" role="status">{imageNotice}</p> : null}
       <div className="receipt-actions"><button className="secondary-button" onClick={saveReceiptImage}>Lưu ảnh biên nhận</button><button className="primary-button" onClick={() => { void closeOut(); }} disabled={!canCloseOut || receiptSaveState === 'saving' || closing}>{closing ? 'Đang kết ca…' : receiptSaveState === 'saving' ? 'Đang lưu biên nhận…' : canCloseOut ? 'Kết ca' : 'Đang chờ giao trạm thành công…'}</button></div>
-      <button className="back-button" onClick={onBack} disabled={closing}>Về tóm tắt ca</button>
+      <button className="back-button" onClick={onBack} disabled={closing}>Về tuyến hôm nay</button>
     </div>
   );
 }

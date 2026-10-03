@@ -17,7 +17,6 @@ import { createRoot } from 'react-dom/client';
 import { CollectorEntryScreen } from '../pages/collector/CollectorEntryScreen';
 import { CollectorQrScreen } from '../pages/collector/CollectorQrScreen';
 import { CollectorRouteScreen } from '../pages/collector/CollectorRouteScreen';
-import { CollectorSummaryScreen } from '../pages/collector/CollectorSummaryScreen';
 import { OutboxQueueScreen } from '../pages/collector/OutboxQueueScreen';
 import { SavedStationReceiptView } from '../pages/collector/SavedStationReceiptView';
 import {
@@ -78,7 +77,7 @@ const ENTRIES: PreviewEntry[] = [
         onStartShift={fx.noop}
         onCancelShift={fx.noop}
         onOpenQr={fx.noop}
-        onOpenSummary={fx.noop}
+        onOpenDelivery={fx.noop}
         onOpenOutbox={fx.noop}
         onRefresh={fx.noop}
         onOpenLastReceipt={fx.noop}
@@ -104,22 +103,6 @@ const ENTRIES: PreviewEntry[] = [
         containerCode="ECO-1001"
         onBack={fx.noop}
         onSuccess={fx.noop}
-      />
-    ),
-  },
-  {
-    id: 'summary',
-    group: 'Màn chính',
-    label: 'Tóm tắt ca',
-    fullScreen: true,
-    render: () => (
-      <CollectorSummaryScreen
-        route={fx.route}
-        completed={fx.completed}
-        completedCount={Object.keys(fx.completed).length}
-        totalStops={fx.stops.length}
-        onBack={fx.noop}
-        onOpenDelivery={fx.noop}
       />
     ),
   },
