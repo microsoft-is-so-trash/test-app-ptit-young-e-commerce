@@ -3,11 +3,12 @@
   "configurations": [
     {
       "name": "eco-oil-miniapp",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "env",
       "runtimeArgs": [
-        "--prefix",
-        "apps/miniapp",
-        "run",
+        "PATH=/home/ADMIN/.local/share/pnpm/bin:/home/ADMIN/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "pnpm",
+        "--filter",
+        "@eco-oil/miniapp",
         "dev"
       ],
       "port": 5173
@@ -28,11 +29,12 @@
     },
     {
       "name": "eco-oil-admin",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "env",
       "runtimeArgs": [
-        "--prefix",
-        "apps/admin",
-        "run",
+        "PATH=/home/ADMIN/.local/share/pnpm/bin:/home/ADMIN/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "pnpm",
+        "--filter",
+        "@eco-oil/admin",
         "dev"
       ],
       "port": 3001
@@ -53,8 +55,10 @@
     },
     {
       "name": "eco-oil-miniapp-zmp-preview",
-      "runtimeExecutable": "pnpm",
+      "runtimeExecutable": "env",
       "runtimeArgs": [
+        "PATH=/home/ADMIN/.local/share/pnpm/bin:/home/ADMIN/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "pnpm",
         "--filter",
         "@eco-oil/miniapp",
         "exec",
@@ -69,11 +73,12 @@
     },
     {
       "name": "eco-oil-api",
-      "runtimeExecutable": "npm",
+      "runtimeExecutable": "env",
       "runtimeArgs": [
-        "--prefix",
-        "apps/api",
-        "run",
+        "PATH=/home/ADMIN/.local/share/pnpm/bin:/home/ADMIN/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "pnpm",
+        "--filter",
+        "@eco-oil/api",
         "dev"
       ],
       "port": 3000
