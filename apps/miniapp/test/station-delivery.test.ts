@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canSubmitStationDelivery, closeShiftAfterReceipt, loadStationRecommendations, resolveStationSearchLocation, retryStationDeliverySync } from '../src/lib/station-delivery';
+import { canSubmitStationDelivery, closeShiftAfterReceipt, loadStationRecommendations, orderStationsForDelivery, resolveStationSearchLocation, retryStationDeliverySync } from '../src/lib/station-delivery';
 import { EcoOilDatabase, ecoOilDb, getLatestStationReceipt, saveStationReceipt, type StoredStationReceipt } from '../src/lib/outbox-db';
 
 const station = {
@@ -320,4 +320,20 @@ test('the shift is not finished when the receipt could not be saved', async () =
     /disk full/,
   );
   assert.equal(finished, false);
+});
+
+const stationAt = (id: string, distance_m: number, remaining_capacity_l: number) => ({ ...station, id, distance_m, remaining_capacity_l });
+
+test('the nearest station with enough room is recommended and listed first; the rest keep the server order', () => {
+  const result = orderStationsForDelivery([stationAt('far-ok', 900, 500), stationAt('near-full', 100, 10), stationAt('mid-ok', 400, 300)], 50);
+
+  assert.equal(result.recommendedId, 'mid-ok');
+  assert.deepEqual(result.ordered.map((item) => item.id), ['mid-ok', 'far-ok', 'near-full']);
+});
+
+test('no station is recommended when none has enough room', () => {
+  const result = orderStationsForDelivery([stationAt('a', 100, 10), stationAt('b', 200, 20)], 50);
+
+  assert.equal(result.recommendedId, null);
+  assert.deepEqual(result.ordered.map((item) => item.id), ['a', 'b']);
 });

@@ -14,7 +14,7 @@ import { pickZaloPhoto } from '../lib/media-picker';
 import { StatusView } from '../components/StatusView';
 import { CollectorNotice } from '../components/CollectorNotice';
 import type { CompletedStop } from '../lib/collector-metrics';
-import { canSubmitStationDelivery, closeShiftAfterReceipt, loadStationRecommendations, resolveStationSearchLocation, retryStationDeliverySync } from '../lib/station-delivery';
+import { canSubmitStationDelivery, closeShiftAfterReceipt, loadStationRecommendations, orderStationsForDelivery, resolveStationSearchLocation, retryStationDeliverySync } from '../lib/station-delivery';
 import { parseLocalizedDecimal } from '../lib/collection-entry-validation';
 import type { PendingStationDeliveryDraft } from '../lib/storage';
 
@@ -156,6 +156,7 @@ export function StationSelectScreen({ expectedLiters, expectedKg, waiting, locat
   onChoose: (station: StationRecommendation) => void;
   onRetry: () => void;
 }) {
+  const stationOrder = orderStationsForDelivery(recommendations, expectedLiters);
   return (
     <div className="page-content collector-content station-page collector-station-select-screen">
       <button className="back-button" onClick={onBack}>Về tuyến hôm nay</button>
@@ -178,17 +179,17 @@ export function StationSelectScreen({ expectedLiters, expectedKg, waiting, locat
       {loading ? <StatusView title="Đang tìm trạm còn chỗ…" /> : null}
       {!loading && status === 'error' ? <StatusView title="Chưa tìm được trạm" message={error ?? 'Kiểm tra kết nối rồi thử lại.'} action={{ label: 'Thử lại', onClick: onRetry }} /> : null}
       {!loading && status === 'empty' ? <StatusView title="Hiện chưa có trạm phù hợp để tiếp nhận" message="Thử lại sau hoặc liên hệ điều phối để được hướng dẫn." action={{ label: 'Thử lại', onClick: onRetry }} /> : null}
-      {!loading && waiting === 0 && status === 'success' ? <section className="station-list">{recommendations.map((station) => <StationCard key={station.id} station={station} liters={expectedLiters} onChoose={() => onChoose(station)} />)}</section> : null}
+      {!loading && waiting === 0 && status === 'success' ? <section className="station-list">{stationOrder.ordered.map((station) => <StationCard key={station.id} station={station} liters={expectedLiters} recommended={station.id === stationOrder.recommendedId} onChoose={() => onChoose(station)} />)}</section> : null}
     </div>
   );
 }
 
-function StationCard({ station, liters, onChoose }: { station: StationRecommendation; liters: number; onChoose: () => void }) {
+function StationCard({ station, liters, recommended, onChoose }: { station: StationRecommendation; liters: number; recommended: boolean; onChoose: () => void }) {
   const [mapError, setMapError] = useState<string | null>(null);
   const afterDelivery = station.current_volume_l + liters;
   const fill = station.capacity_l > 0 ? Math.min(100, Math.round((afterDelivery / station.capacity_l) * 100)) : 100;
   const enough = station.remaining_capacity_l >= liters;
-  return <article className={`station-card ${enough ? '' : 'station-card-unavailable'}`}><div className="station-card-top"><div><h2>{station.name}</h2><p>{station.address ?? 'Chưa có địa chỉ'}</p><small className="station-receiving-status">Đang nhận dầu</small></div><strong>{formatDistance(station.distance_m)}</strong></div><div className="station-capacity-label"><span>Còn lại sau khi nộp</span><b>{formatLiters(Math.max(station.remaining_capacity_l - liters, 0))}</b></div><div className="progress-track station-progress"><span style={{ width: `${fill}%` }} /></div>{!enough ? <p className="station-unavailable-label">Không đủ sức chứa</p> : null}{mapError ? <p className="error-text">{mapError}</p> : null}<div className="station-card-actions"><button className="map-action" onClick={() => { setMapError(null); void zaloClient.openDirections({ lat: station.lat, lng: station.lng }, station.address).catch((error: unknown) => setMapError(error instanceof Error ? error.message : 'Không mở được bản đồ.')); }}>Chỉ đường</button><button className="primary-button" onClick={onChoose} disabled={!enough}>Chọn trạm này</button></div></article>;
+  return <article className={`station-card ${enough ? '' : 'station-card-unavailable'}`}><div className="station-card-top"><div><h2>{station.name}</h2><p>{station.address ?? 'Chưa có địa chỉ'}</p><small className="station-receiving-status">{recommended ? 'Gần nhất còn đủ chỗ · Đang nhận dầu' : 'Đang nhận dầu'}</small></div><strong>{formatDistance(station.distance_m)}</strong></div><div className="station-capacity-label"><span>Còn lại sau khi nộp</span><b>{formatLiters(Math.max(station.remaining_capacity_l - liters, 0))}</b></div><div className="progress-track station-progress"><span style={{ width: `${fill}%` }} /></div>{!enough ? <p className="station-unavailable-label">Không đủ sức chứa</p> : null}{mapError ? <p className="error-text">{mapError}</p> : null}<div className="station-card-actions"><button className="map-action" onClick={() => { setMapError(null); void zaloClient.openDirections({ lat: station.lat, lng: station.lng }, station.address).catch((error: unknown) => setMapError(error instanceof Error ? error.message : 'Không mở được bản đồ.')); }}>Chỉ đường</button><button className={recommended ? 'primary-button' : 'secondary-button'} onClick={onChoose} disabled={!enough}>Chọn trạm này</button></div></article>;
 }
 
 export function StationDeliveryReview({ station, candidates, expectedLiters, expectedKg, onBack, onSubmitted }: { station: StationRecommendation; candidates: DeliveryCandidate[]; expectedLiters: number; expectedKg: number; onBack: () => void; onSubmitted: (clientUuid: string) => void }) {

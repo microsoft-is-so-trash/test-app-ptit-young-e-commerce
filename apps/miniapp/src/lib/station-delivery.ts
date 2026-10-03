@@ -122,3 +122,12 @@ export async function closeShiftAfterReceipt(persistReceipt: () => Promise<unkno
   const closed = await finishShift();
   if (!closed) throw new Error('Không thể kết ca. Vui lòng thử lại.');
 }
+
+/** Trạm gần nhất còn đủ chỗ cho số lít đang mang được chọn sẵn và đưa lên đầu (C5.5, Q15); không tự chuyển màn. */
+export function orderStationsForDelivery<T extends { id: string; distance_m: number; remaining_capacity_l: number }>(stations: ReadonlyArray<T>, liters: number): { ordered: T[]; recommendedId: string | null } {
+  const recommended = [...stations]
+    .filter((item) => item.remaining_capacity_l >= liters)
+    .sort((a, b) => a.distance_m - b.distance_m)[0];
+  if (!recommended) return { ordered: [...stations], recommendedId: null };
+  return { ordered: [recommended, ...stations.filter((item) => item.id !== recommended.id)], recommendedId: recommended.id };
+}
