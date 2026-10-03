@@ -11,7 +11,7 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 |---|---|
 | Giai đoạn | M (đang làm) |
 | Task đang làm | — |
-| Đang chờ chủ dự án | Trả lời Q5–Q9 (rà soát đầu giai đoạn M) |
+| Đang chờ chủ dự án | — |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — rà soát đầu giai đoạn M (B2) |
 
@@ -28,16 +28,13 @@ Ghi theo dạng: ngày — mã câu hỏi — nội dung đã chọn.
 - 03/10/2026 — Q2 — Chọn (a): khi gửi lại hồ sơ, không gửi `ward_id` (bỏ hằng số `WARD_ID` viết cứng), giữ phường hiện tại; không thêm ô chọn phường.
 - 03/10/2026 — Q3 — Theo đề xuất: M2 chỉ bỏ ô "Tiền ước tính tuần" ở Trang chủ; việc chuyển danh sách can (kể cả chữ giả "Can HDPE ISCC", "QR-ISCC") từ Tài khoản sang "Của tôi" làm trong M4.
 - 03/10/2026 — Q4 — Giữ M5.2 (nhắc báo thu gom khi can ước tính đầy từ 85%). Chỉ thêm điều kiện: can có `capacity_l = null` thì không nhắc.
+- 03/10/2026 — Q5–Q9 — Theo đề xuất: (Q5) "Lịch sử thu gom" = nội dung tab Lịch sử + danh sách "Đơn đã huỷ"; đơn đang chờ/đã phân công ở "Hôm nay". (Q6) Mục riêng "Can chuẩn được cấp" ngay sau "Hồ sơ quán", giữ nguyên chữ và nút. (Q7) M6 chỉ đổi nút đăng xuất Merchant thành chữ thường, không thêm hộp xác nhận; 2 `window.confirm` của Collector làm ở giai đoạn C. (Q8) Mục mở rộng mặc định đóng, mở mục này thì mục khác đóng. (Q9) Chỉ nhắc khi can `AT_MERCHANT` và chưa có đơn đang chờ.
+- 03/10/2026 — Ràng buộc chung — **Giữ nguyên font**: không đổi font chữ (họ font, cỡ, độ đậm) của phần tử đang có; phần tử mới dùng lại class chữ sẵn có.
 
 ## Câu hỏi đang mở
 
 | Mã | Chặn task | Câu hỏi | Đề xuất |
 |---|---|---|---|
-| Q5 | M4 | "Lịch sử thu gom" gộp tab Đơn (đơn đã xong/huỷ) và tab Lịch sử. Nhưng đơn "Đã thu gom" chính là giao dịch đã có ở tab Lịch sử, gộp nguyên sẽ hiện trùng (U5). Hiển thị thế nào? | Phần trên: nội dung tab Lịch sử như hiện tại (tổng lít, lượt, CO2, danh sách giao dịch). Phần dưới: "Đơn đã huỷ" (chỉ đơn CANCELLED). Đơn đang chờ/đã phân công chuyển sang "Hôm nay" |
-| Q6 | M4 | Khối "Can chuẩn được cấp" ở Tài khoản (chữ giả "Can HDPE ISCC", "QR-ISCC", nút giả "Đăng ký cấp thêm can chuẩn") đặt ở đâu trong "Của tôi"? | Thành mục riêng "Can chuẩn được cấp", nằm ngay sau "Hồ sơ quán", giữ nguyên chữ và nút |
-| Q7 | M6 | Merchant không có `window.confirm` nào; 2 chỗ còn lại thuộc Collector (`App.tsx:172` đăng xuất, `CollectorFlow.tsx:239` huỷ ca). Đăng xuất Merchant hiện bấm là thoát ngay | M6 chỉ đổi nút đăng xuất Merchant thành chữ thường, không thêm hộp xác nhận; 2 chỗ `window.confirm` của Collector làm ở giai đoạn C (C2 và cùng task gần nhất) |
-| Q8 | M4 | Các mục mở rộng ở "Của tôi": mặc định đóng hết? Mở được nhiều mục cùng lúc? | Mặc định đóng hết; mở mục này thì mục khác tự đóng (màn ngắn, đỡ cuộn) |
-| Q9 | M5.2 | Ngoài điều kiện ≥ 85% và có dung tích: có nhắc khi quán **đã** báo thu gom (đang có đơn chờ) hoặc can đang vận chuyển không? | Không: chỉ nhắc khi can ở quán (`AT_MERCHANT`) và quán chưa có đơn đang chờ |
 | T1 | I2.1 | Nhà cung cấp Google cho TTS: Cloud TTS Chirp 3: HD, Gemini 3.8 Flash TTS, hay thử cả hai? | Chirp 3: HD (xem `docs/NGHIEN_CUU_TTS_GOOGLE.md` mục 2.3) |
 | T2 | I2.1 | Xác thực với Google: API key chỉ bật Cloud TTS, hay service account (thêm `google-auth-library`)? | API key + hạn mức/ngày + cảnh báo ngân sách |
 | T3 | I2.1 | Cache âm thanh phía server bằng Redis (cần `REDIS_URL` trên Render) hay chỉ cache trên máy? | Redis nếu Render đã có `REDIS_URL`; nếu không thì chỉ cache trên máy |
@@ -54,15 +51,15 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 
 | Mã | Nhóm | Trạng thái | Commit | Ghi chú |
 |---|---|---|---|---|
-| M1 | B | chưa làm | | Q2: a |
+| M1 | B | xong | (commit này) | Bỏ WARD_ID cứng; payload gửi lại hồ sơ tạo bằng lib/merchant-resubmit.ts, test merchant-resubmit.test.ts (3). Không đổi giao diện nên không chụp ảnh. Cổng kiểm tra pass (153 test). |
 | M2 | A | chưa làm | | Q3: phần chuyển danh sách can làm trong M4 |
 | M3 | B | chưa làm | | Q1: dùng 2.5 |
-| M4 | B | bị chặn (Q5, Q6, Q8) | | Gồm cả phần chuyển danh sách can từ M2 (Q3) |
+| M4 | B | chưa làm | | Gồm cả phần chuyển danh sách can từ M2 (Q3) |
 | M5.1 | B | chưa làm | | |
-| M5.2 | B | bị chặn (Q9) | | Q4: can thiếu dung tích thì không nhắc |
+| M5.2 | B | chưa làm | | Q4: can thiếu dung tích thì không nhắc |
 | M5.3 | B | chưa làm | | |
 | M5.4 | B | chưa làm | | |
-| M6 | A/B | bị chặn (Q7) | | |
+| M6 | A | chưa làm | | Q7: chỉ đổi nút đăng xuất |
 
 ### Giai đoạn C — Collector
 
@@ -122,6 +119,7 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
 
+- 03/10/2026 — M1 — xong. Bỏ WARD_ID cứng; payload gửi lại hồ sơ tạo bằng lib/merchant-resubmit.ts, test merchant-resubmit.test.ts (3). Không đổi giao diện nên không chụp ảnh. Cổng kiểm tra pass (153 test).
 - 03/10/2026 — B2 giai đoạn M — Đọc toàn bộ file của M1–M6, chụp ảnh trước (`design/snapshots/ui-v4/M-before/`), thêm cấu hình `eco-oil-miniapp-demo` vào `.claude/launch.json`. Dừng hỏi Q5–Q9.
 - 03/10/2026 — B0 — Tạo branch `ui_version_4` từ `ui_version_3`. Cài Node 22.23.3 (`pnpm env use --global 22`) và wrapper git của host ở `~/.local/share/agent-tools/bin`. `pnpm install` xong. Cổng kiểm tra miniapp trên code gốc: typecheck, lint, build pass; test 150/150 pass. Repo không có Playwright; có `google-chrome` để chụp màn hình headless.
 - 03/10/2026 — Tạo file tiến độ, quy trình tự thực thi và nghiên cứu TTS Google. Chưa sửa code.

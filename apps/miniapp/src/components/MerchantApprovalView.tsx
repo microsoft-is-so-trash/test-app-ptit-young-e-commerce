@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { AdminWardSummary, AuthUser } from '@eco-oil/shared-types';
 import { api, ApiError } from '../lib/api';
+import { buildMerchantResubmitPayload } from '../lib/merchant-resubmit';
 import { zaloClient } from '../lib/zalo-client';
 import { useAuthStore } from '../stores/auth-store';
-
-const WARD_ID = '10000000-0000-4000-8000-000000000001';
 
 export function MerchantApprovalView({ user }: { user: AuthUser }) {
   const signOut = useAuthStore((state) => state.signOut);
@@ -28,7 +27,7 @@ export function MerchantApprovalView({ user }: { user: AuthUser }) {
     try {
       const point = await zaloClient.getLocation();
       if (!point) throw new Error('Không lấy được vị trí GPS. Vui lòng bật quyền vị trí rồi thử lại.');
-      await api.updateMerchant(user.merchantId, { ...form, lat: point.lat, lng: point.lng, ward_id: WARD_ID });
+      await api.updateMerchant(user.merchantId, buildMerchantResubmitPayload(form, point));
       setEditing(false);
       setMessage('Đã gửi lại hồ sơ. ECOllect sẽ xem xét trong thời gian sớm nhất.');
     } catch (error) {
