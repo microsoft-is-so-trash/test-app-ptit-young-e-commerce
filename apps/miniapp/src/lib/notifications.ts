@@ -1,6 +1,9 @@
-import { PaymentStatus, PriceUnit } from '@eco-oil/shared-types';
+import { ContainerState, PaymentStatus, PriceUnit } from '@eco-oil/shared-types';
 import type { MerchantDashboardResponse, OilPriceRecord, PaymentListResponse } from '@eco-oil/shared-types';
-import { formatCurrency, formatDate } from './formatters';
+import { fillPercent, formatCurrency, formatDate } from './formatters';
+
+/** Nhắc báo thu gom khi can ở quán ước tính đầy từ mức này (%). */
+export const CONTAINER_FULL_REMINDER_PERCENT = 85;
 
 export interface NotificationItem {
   id: string;
@@ -16,10 +19,24 @@ export interface NotificationSources {
   oilPrice?: OilPriceRecord | null;
 }
 
-export function buildNotifications(sources: NotificationSources): NotificationItem[] {
+export function buildNotifications(sources: NotificationSources, now: Date = new Date()): NotificationItem[] {
   const items: NotificationItem[] = [];
 
   if (sources.dashboard) {
+    if (sources.dashboard.pending_orders === 0) {
+      for (const container of sources.dashboard.containers) {
+        if (container.state !== ContainerState.AT_MERCHANT || !container.capacity_l) continue;
+        const percent = fillPercent(container.estimated_liters, container.capacity_l);
+        if (percent < CONTAINER_FULL_REMINDER_PERCENT) continue;
+        items.push({
+          id: `container-full-${container.code}`,
+          icon: 'propane_tank',
+          title: 'Can sắp đầy',
+          description: `Can ${container.code} ước tính đầy ${percent}%. Bấm "Sẵn sàng thu gom" ở mục Hôm nay để báo thu gom.`,
+          time: now.toISOString(),
+        });
+      }
+    }
     if (sources.dashboard.pending_orders > 0) {
       items.push({
         id: 'pending-orders',

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { PaymentStatus, PriceUnit } from '@eco-oil/shared-types';
+import { ContainerState, PaymentStatus, PriceUnit } from '@eco-oil/shared-types';
+import type { MerchantContainerSummary } from '@eco-oil/shared-types';
 import { buildNotifications } from '../src/lib/notifications';
 
 test('returns an empty list when no sources are provided', () => {
@@ -84,4 +85,43 @@ test('surfaces the current oil price with the correct unit label', () => {
 
   assert.equal(items.length, 1);
   assert.match(items[0].description, /\/lít/);
+});
+
+const NOW = new Date('2026-10-03T08:00:00.000Z');
+const container = (overrides: Partial<MerchantContainerSummary> = {}): MerchantContainerSummary => ({
+  code: 'ECO-0142',
+  state: ContainerState.AT_MERCHANT,
+  capacity_l: 30,
+  estimated_liters: 26,
+  ...overrides,
+});
+const dashboardWith = (containers: MerchantContainerSummary[], pendingOrders = 0) => ({
+  dashboard: { containers, pending_orders: pendingOrders, liters_this_month: 0, last_collected_at: null },
+});
+
+test('reminds the shop to report when a container at the shop is estimated at least 85% full', () => {
+  const items = buildNotifications(dashboardWith([container({ estimated_liters: 25.5 })]), NOW);
+
+  assert.equal(items.length, 1);
+  assert.equal(items[0].id, 'container-full-ECO-0142');
+  assert.match(items[0].description, /85%/);
+  assert.match(items[0].description, /Sẵn sàng thu gom/);
+});
+
+test('does not remind below 85%', () => {
+  assert.deepEqual(buildNotifications(dashboardWith([container({ estimated_liters: 25 })]), NOW), []);
+});
+
+test('does not remind when the container capacity is unknown', () => {
+  assert.deepEqual(buildNotifications(dashboardWith([container({ capacity_l: null })]), NOW), []);
+});
+
+test('does not remind when the container is not at the shop', () => {
+  assert.deepEqual(buildNotifications(dashboardWith([container({ state: ContainerState.IN_TRANSIT })]), NOW), []);
+});
+
+test('does not remind when the shop already has an open order', () => {
+  const items = buildNotifications(dashboardWith([container()], 1), NOW);
+
+  assert.equal(items.some((item) => item.id.startsWith('container-full')), false);
 });
