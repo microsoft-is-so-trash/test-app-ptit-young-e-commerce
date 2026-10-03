@@ -53,7 +53,7 @@ Ghi theo dạng: ngày — mã câu hỏi — nội dung đã chọn.
 | Q26 | I1.2 | S15: Routes chế độ xe máy (`TWO_WHEELER`) tính vào SKU **Enterprise** của Compute Route Matrix: 1.000 phần tử miễn phí/tháng, sau đó 15 USD/1.000 (trang giá chính thức của Google, đọc 03/10/2026). Ước tính 20 Collector × 26 ngày × 1 lần nộp × 25 trạm ≈ 13.000 phần tử/tháng ≈ 180 USD/tháng; chỉ 2 trạm/lần cũng đã vượt 1.000. Làm sao giữ 0 đồng? | (a) Routes **Essentials**: `DRIVE` + `TRAFFIC_UNAWARE` (10.000 phần tử miễn phí/tháng), tối đa 5 trạm gần nhất mỗi lần (thay 25 của Q23) ≈ 2.600 phần tử/tháng; 3 lớp chặn: bộ đếm tháng trong Redis (`maps:route-matrix:elements:<YYYY-MM>`) tự dừng ở 8.000 rồi dùng `ST_Distance`, hạn mức trên Google Cloud, cảnh báo ngân sách. Đánh đổi: quãng đường theo đường ô tô, có thể dài hơn đường xe máy trong hẻm; ghi "đường ô tô" cạnh số km. (b) Bỏ Routes, giữ `ST_Distance` (0 đồng tuyệt đối, đang chạy ổn): I1.2 chỉ còn ghi "đường chim bay". (c) Dịch vụ ngoài Google (OpenRouteService/OSRM công cộng): không cam kết hoạt động, chưa xác minh có chế độ xe máy — không đề xuất. Lưu ý: mức miễn phí tính theo tài khoản thanh toán cho mỗi SKU; tài khoản dùng cho dự án khác thì phần miễn phí bị chia |
 | Q27 | I1.1 | S15: Places Autocomplete Requests 10.000 miễn phí/tháng; Autocomplete Session Usage miễn phí không giới hạn; Place Details Essentials (có `location`, `formattedAddress`) 10.000/tháng; Maps JavaScript Dynamic Maps 10.000 lượt tải/tháng (trang giá chính thức, 03/10/2026). Admin dùng vài chục lần/tháng nên nằm trong mức miễn phí, nhưng có thể vượt nếu lỗi lặp hoặc bị lạm dụng. Có làm không? | (a) Làm, kèm chặn: session token; gõ ≥ 3 ký tự và dừng 300 ms mới gọi; endpoint chỉ ADMIN và có rate limit; bộ đếm tháng trong Redis tự dừng ở 8.000 mỗi SKU (sau đó chỉ còn nhập tay); bản đồ chỉ tải khi mở form trạm; chủ dự án đặt hạn mức/ngày trên Google Cloud (ví dụ Autocomplete 300, Place Details 100, Maps JS 100 lượt tải) và cảnh báo ngân sách. (b) Không dùng Google cho I1.1: kéo ghim trên bản đồ Leaflet có sẵn (không có tìm địa chỉ), giữ ô nhập tay — 0 đồng tuyệt đối |
 
-, chưa cần trả lời trước khi làm M và C.
+T1, T2, T5, T6, T7 chỉ chặn giai đoạn I2. T3, T4 đã có câu trả lời cho I1 qua Q21 (Redis có sẵn trên Render, `@nestjs/throttler`).
 
 ## Bảng task
 
@@ -157,6 +157,8 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 ## Nhật ký
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
+
+- 03/10/2026 — Kế hoạch — Theo yêu cầu chủ dự án: rà toàn bộ thay đổi của `docs/KE_HOACH_CHUAN_HOA_UI_V4.md` và ghi vào kế hoạch: bảng quy tắc bắt buộc R1–R8 cho Society Charter (mục 2), quy tắc 8–10 ở mục 1, quyết định Q18–Q23 và trạng thái I1, sổ câu hỏi (mục 3) và nhật ký thay đổi kế hoạch (mục 4); sửa cách chụp ảnh (không có Playwright). Sửa dòng thừa trong mục "Câu hỏi đang mở" của file này.
 
 - 03/10/2026 — Dừng hỏi Q25 (I1.0 hết 2 vòng, S7), Q26 (I1.2, S15: chế độ xe máy là SKU Enterprise), Q27 (I1.1, S15). Đọc giá trên developers.google.com/maps/billing-and-pricing/pricing và sku-details. Số lần gọi tác tử phụ của I1: 0/12.
 - 03/10/2026 — I1.3 — xong (4405ef8). Chi tiết ở bảng task.

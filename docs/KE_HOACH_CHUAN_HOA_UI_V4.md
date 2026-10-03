@@ -4,8 +4,14 @@ Kế hoạch thực hiện các kết luận trong `docs/NGHIEN_CUU_UI_NON_FICTI
 Quy tắc agent phải tuân theo: `.claude/rules/ui-non-fiction.md` và `.claude/rules/external-apis.md`.
 
 **Cách chạy:** gọi `/ui-v4`. Agent tự thực thi theo `.claude/rules/ui-v4-workflow.md`, ghi trạng
-thái vào `docs/TIEN_DO_UI_V4.md`, chỉ nhắn khi cần hỏi hoặc khi xong một giai đoạn. Câu hỏi đang
-mở và quyết định đã có nằm trong file tiến độ, không nằm trong file này.
+thái vào `docs/TIEN_DO_UI_V4.md`, chỉ nhắn khi cần hỏi hoặc khi xong một giai đoạn.
+
+**Câu hỏi và quyết định:** bản đầy đủ, có ngày, nằm ở mục "Quyết định" và "Câu hỏi đang mở" của
+`docs/TIEN_DO_UI_V4.md`. File này giữ bản sao tóm tắt ở mục 3 ("Sổ câu hỏi và quyết định") và
+nhật ký thay đổi của chính kế hoạch ở mục 4. Hai nơi lệch nhau thì file tiến độ thắng (theo thứ tự
+ưu tiên của quy trình), và agent phải sửa lại file này cho khớp.
+
+**Dùng nhiều tác tử:** bắt buộc theo Society Charter ở mục 2.
 
 ## 0. Quyết định của chủ dự án (02/10/2026)
 
@@ -37,13 +43,20 @@ mở và quyết định đã có nằm trong file tiến độ, không nằm tr
 
    Task có sửa `apps/api` hoặc `apps/admin` thì chạy thêm lệnh tương ứng của package đó.
 4. **Kiểm tra trực quan bắt buộc** cho mọi thay đổi giao diện: chạy miniapp với
-   `VITE_DEMO_MODE=true VITE_DEMO_OFFLINE=true`, chụp màn hình khung 375×812 bằng Playwright
-   (Chromium có sẵn), so trước/sau. Chưa nhìn thấy kết quả thì chưa coi là xong.
+   `VITE_DEMO_MODE=true VITE_DEMO_OFFLINE=true` (cấu hình `eco-oil-miniapp-demo`), chụp màn hình
+   khung 375×812 bằng `google-chrome --headless` hoặc browser pane của phiên (repo không có
+   Playwright), so trước/sau. Chưa nhìn thấy kết quả thì chưa coi là xong.
 5. **Test mới** của miniapp phải được thêm vào script `test` trong `apps/miniapp/package.json`.
 6. **Commit** theo dạng `<type>: <mô tả>` (feat, fix, refactor, docs, test, chore), mỗi task một
    commit, push lên `origin ui_version_4`.
 7. **Không đụng:** `prisma/` và migration, `docker-compose.yml`, file deploy/`.env` thật, dataset
    demo. Nếu một task buộc phải sửa những chỗ này thì hỏi trước.
+8. **Dùng tác tử phụ** (subagent) chỉ theo Society Charter ở mục 2: một luồng ghi duy nhất, tác tử
+   phụ chỉ đọc, đúng vai, đúng trần số lần gọi.
+9. **Chi phí Google bằng 0:** mọi bước gọi Google Maps API hoặc Google AI API phải nằm trong mức
+   miễn phí và có lớp chặn; có dấu hiệu phát sinh phí thì dừng hỏi (S15) kèm phương án thay thế.
+10. **Kiểu xuống dòng:** nhiều file lẫn CRLF và LF; khi sửa phải giữ kiểu xuống dòng gốc của từng
+    dòng để diff chỉ chứa thay đổi thật (kiểm bằng `git diff --stat`).
 
 ---
 
@@ -52,6 +65,19 @@ mở và quyết định đã có nằm trong file tiến độ, không nằm tr
 > **Trạng thái:** chủ dự án **duyệt ngày 03/10/2026** (S-1, S-3, S-4 theo đề xuất; S-2: trần 12 lần
 > gọi tác tử phụ mỗi giai đoạn). Áp dụng từ giai đoạn I1. Các bước tương ứng đã được đưa vào
 > `.claude/rules/ui-v4-workflow.md` (B2, B3, B6, B8).
+
+**Quy tắc bắt buộc (tóm tắt; chi tiết ở 2.1–2.6):**
+
+| # | Quy tắc |
+|---|---|
+| R1 | Chỉ **một luồng ghi**: tác tử chính (phiên `/ui-v4`) là nơi duy nhất sửa code, test, tài liệu, commit, push. Không dựng nhiều tác tử cùng viết code |
+| R2 | Tác tử phụ chỉ là **công cụ chỉ đọc, ngữ cảnh sạch**, và chỉ ở 3 chỗ: rà soát đầu giai đoạn khi khối lượng đọc lớn (hiện chỉ I2), review sau khi viết (`code-reviewer`, `security-reviewer`), verifier nghiệm thu cuối giai đoạn (`ui-v4-verifier`) |
+| R3 | Không dùng tác tử phụ để viết test, chụp ảnh, sửa lỗi build; không tự gọi `planner`, `architect`, `tdd-guide`; không chạy "ALWAYS parallel" hay phân tích 5 vai của ECC |
+| R4 | Kiểm chỉ đọc bằng máy: so `git status --porcelain` và `git diff --stat` trước/sau mỗi lần gọi; khác nhau → dừng hỏi (S8) |
+| R5 | Brief theo mẫu trường 4 (mục 2.3): chỉ gửi khoảng commit/file và quy tắc, không gửi lập luận của tác tử chính; kết quả không có bằng chứng file:dòng hoặc lệnh thì bỏ |
+| R6 | Trần: tối đa **12 lần gọi mỗi giai đoạn**, mỗi vai tối đa 3 lần, tối đa 3 tác tử chạy cùng lúc, model sonnet; tác tử phụ không gọi tác tử khác |
+| R7 | Phân xử: test/lệnh tái lập được > file:dòng > kế hoạch và quy tắc U/E > ý kiến reviewer; bất đồng với verifier thì ghi cả hai lập luận cho chủ dự án quyết |
+| R8 | Mỗi lần gọi ghi 1 dòng nhật ký trong file tiến độ, lỗi của tác tử phụ gắn nhãn MAST (FM1/FM2/FM3); I1 là pilot, số liệu đưa vào báo cáo giai đoạn |
 
 Cơ sở: tài liệu "Society of Agents" chủ dự án gửi trong chat ngày 03/10/2026 (cổng 6 câu, bảng
 Charter 11 trường), áp vào số liệu thật của dự án. Số liệu bên ngoài trong mục này (chi phí khoảng
@@ -203,7 +229,8 @@ Không có dòng này thì task chưa xong.
   `security-reviewer`.
 - Tác tử phụ dùng sonnet (theo frontmatter có sẵn); không dùng opus cho tác tử phụ.
 - Tác tử phụ chạy nền; tác tử chính không gửi tin nhắn hỏi thăm định kỳ trong lúc chờ.
-- Trần token/tiền theo con số chủ dự án đặt (câu hỏi S-2).
+- Chưa có trần token riêng (S-2 chỉ chốt số lần gọi). Chi phí API Google theo ràng buộc 0 đồng
+  ở mục 0 (S15).
 
 **10. Điểm dừng cho con người.** Giữ nguyên: duyệt giai đoạn, câu hỏi S1–S14, vùng cấm. Thêm:
 
@@ -392,22 +419,33 @@ Thứ tự ưu tiên đã có: kế hoạch đứng trên quy tắc ECC. Khi Cha
 
 | Task | Việc | File |
 |---|---|---|
-| I1.0 | Sửa test api đang đỏ trên CI (thêm theo Q17), để cổng kiểm tra của I1.2 chạy được | `turbo.json`, `apps/api/test/` |
-| I1.1 | Admin nhập vị trí trạm: gõ địa chỉ → gợi ý Places API (New) → chọn → kéo ghim xác nhận. Giữ ô nhập tay lat/lng làm dự phòng | `apps/admin/src/components/stations-view.tsx` |
-| I1.2 | Backend: gợi ý trạm theo đường đi xe máy bằng Routes API (Compute Route Matrix, `TWO_WHEELER`); lỗi/timeout thì dùng `ST_Distance` hiện có | `apps/api/src/modules/stations/` |
-| I1.3 | Collector: tính gợi ý trạm lúc "Bắt đầu ca" và lưu trên máy; mất mạng dùng bản đã lưu | `apps/miniapp/src/lib/offline-cache.ts`, `StationDeliveryFlow.tsx` |
+| Task | Việc | File | Trạng thái (03/10/2026) |
+|---|---|---|---|
+| I1.0 | Sửa test api đang đỏ trên CI (thêm theo Q17), để cổng kiểm tra của I1.2 chạy được | `turbo.json`, `apps/api/jest.config.js`, `apps/api/test/`, có thể `.github/workflows/ci.yml` (Q25) | Đã sửa 2 vòng; chờ Q25 |
+| I1.1 | Admin nhập vị trí trạm: gõ địa chỉ → gợi ý Places API (New) **qua backend** (Q18) → chọn → kéo ghim trên **Google Maps JavaScript** (Q19) xác nhận. Giữ ô nhập tay lat/lng làm dự phòng | `apps/admin/src/components/stations-view.tsx`, `apps/api` | Chờ Q27 (chi phí) |
+| I1.2 | Backend: gợi ý trạm theo đường đi bằng Routes API (Compute Route Matrix); lỗi/timeout thì dùng `ST_Distance` hiện có. Bản gốc dùng `TWO_WHEELER`, nhưng chế độ này là SKU Enterprise có tính phí → chế độ đi đường chờ Q26 | `apps/api/src/modules/stations/` | Chờ Q25, Q26 |
+| I1.3 | Collector: lúc "Bắt đầu ca" lưu danh sách trạm đang nhận trên máy (Dexie version 3, bảng `stationCache`); mất mạng thì dùng bản đã lưu, khoảng cách đường chim bay tính trên máy (Q20) | `apps/miniapp/src/lib/offline-cache.ts`, `station-cache.ts`, `outbox-db.ts`, `StationDeliveryFlow.tsx`, `packages/validation` | Xong (4405ef8) |
 
 - Key: `GOOGLE_MAPS_SERVER_KEY` (backend, chỉ bật Routes + Places New, không giới hạn IP vì Render
-  Free không có IP cố định — Q22), `NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY` (admin, giới hạn referrer,
-  chỉ Maps JavaScript). Đặt hạn mức/ngày và cảnh báo ngân sách trên Google Cloud.
-- Quyết định chi tiết Q17–Q23 nằm trong mục "Quyết định" của `docs/TIEN_DO_UI_V4.md`.
+  Free không có IP cố định — Q22), `NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY` (admin, giới hạn referrer
+  tên miền admin + `localhost`, chỉ Maps JavaScript). Chủ dự án tự tạo key, đặt hạn mức/ngày và cảnh
+  báo ngân sách; không có key thì agent dùng nhà cung cấp giả lập (Q22).
+- Rate limit và cache (Q21): thêm `@nestjs/throttler`, chỉ gắn cho endpoint gọi API trả phí; cache
+  trong Redis đã có trên Render. Khoá Redis mới dùng tiền tố `maps:` (khoá hiện có đều là `auth:`),
+  không xoá/đổi khoá cũ, không dùng `FLUSHDB`/`FLUSHALL`.
+- Tham số Routes (Q23): timeout 3 s, thử lại tối đa 2 lần, làm tròn vị trí 3 chữ số thập phân để
+  cache, giữ cache 10 phút, khi dùng dự phòng ghi "đường chim bay" (trường `distance_source`). Số
+  trạm mỗi lần (25) và chế độ đi đường có thể đổi theo Q26.
+- Chi phí bằng 0 (mục 0): I1.1 và I1.2 chỉ làm sau khi chủ dự án trả lời Q26, Q27.
 - **Nghiệm thu:** tắt mạng hoặc dùng key sai thì app vẫn gợi ý trạm (đường chim bay); có test e2e
   backend cho nhánh dự phòng.
 
 ## Giai đoạn I2: Đọc giọng nói (TTS)
 
 Chi tiết kỹ thuật, chi phí và vị trí đặt tính năng: `docs/NGHIEN_CUU_TTS_GOOGLE.md` (cập nhật
-03/10/2026). Bị chặn bởi câu hỏi T1–T7 trong `docs/TIEN_DO_UI_V4.md`.
+03/10/2026). Bị chặn bởi câu hỏi T1, T2, T5, T6, T7 trong `docs/TIEN_DO_UI_V4.md`. T3 (Redis) và
+T4 (`@nestjs/throttler`) đã có câu trả lời qua Q21 của I1. Ràng buộc chi phí Google bằng 0 (mục 0)
+áp dụng cho cả Cloud TTS và Gemini.
 
 | Task | Việc |
 |---|---|
@@ -435,7 +473,74 @@ Chi tiết kỹ thuật, chi phí và vị trí đặt tính năng: `docs/NGHIEN
 
 ---
 
-## Câu hỏi còn chờ trả lời
+## 3. Sổ câu hỏi và quyết định (bản sao tóm tắt, 03/10/2026)
 
-Chuyển sang mục "Câu hỏi đang mở" của `docs/TIEN_DO_UI_V4.md` (Q1–Q4 cho giai đoạn M, T1–T7 cho
-giai đoạn I2).
+Bản đầy đủ: mục "Quyết định" và "Câu hỏi đang mở" của `docs/TIEN_DO_UI_V4.md`.
+
+### 3.1. Duyệt giai đoạn và ràng buộc chung
+
+| Ngày | Nội dung |
+|---|---|
+| 02/10/2026 | Branch `ui_version_4` từ `ui_version_3`; thứ tự M → C → I1 → I2 → I3; giữ nguyên phần giả và dataset demo; thanh điều hướng kiểu A; đã có Google Cloud và Zalo AI |
+| 03/10/2026 | Agent tự chạy theo `.claude/rules/ui-v4-workflow.md`; chỉ nhắn khi hỏi hoặc xong giai đoạn; mọi thay đổi nằm trên `ui_version_4` |
+| 03/10/2026 | **Giữ nguyên font**: không đổi họ font, cỡ, độ đậm của phần tử đang có; phần tử mới dùng lại class chữ sẵn có |
+| 03/10/2026 | **Duyệt M** (sau khi xem kết quả kiểm thử) |
+| 03/10/2026 | **Duyệt Society Charter** (S-1…S-4, mục 2) |
+| 03/10/2026 | **Duyệt C**, sang I1 |
+| 03/10/2026 | **Chi phí Google bằng 0** cho Google Maps API và Google AI API; có dấu hiệu phát sinh phí thì dừng hỏi (S15) kèm phương án thay thế |
+
+### 3.2. Câu hỏi đã trả lời
+
+| Mã | Giai đoạn | Câu hỏi | Trả lời |
+|---|---|---|---|
+| Q1 | M | Hệ số CO2 2.5 hay 2.65 kg/lít? | 2.5 |
+| Q2 | M | Gửi lại hồ sơ quán xử lý phường thế nào? | Không gửi `ward_id`, giữ phường hiện tại |
+| Q3 | M | Danh sách can ở Tài khoản chuyển đi đâu? | Sang "Của tôi" trong M4; M2 chỉ bỏ ô tiền tuần trùng |
+| Q4 | M | Giữ nhắc "can đầy 85%"? | Giữ; can không có dung tích thì không nhắc |
+| Q5 | M | "Lịch sử thu gom" gồm gì? | Lịch sử giao dịch + "Đơn đã huỷ"; đơn đang mở ở "Hôm nay" |
+| Q6 | M | "Can chuẩn được cấp" đặt ở đâu? | Mục riêng ngay sau "Hồ sơ quán" |
+| Q7 | M | Hộp xác nhận đăng xuất Merchant? | Không thêm; 2 `window.confirm` của Collector làm ở C |
+| Q8 | M | Mục mở rộng mặc định? | Đóng; mở mục này thì mục khác đóng |
+| Q9 | M | Khi nào nhắc can đầy? | Can ở quán và chưa có đơn đang chờ |
+| Q10 | C | Nút "Hàng chờ N" và khối "Dữ liệu trên máy"? | Giữ nút; bỏ khối |
+| Q11 | C | Thứ tự dải trạng thái màn Tuyến? | Lỗi > mất mạng > hàng chờ > GPS > dữ liệu cũ > biên nhận > ca sẵn sàng > tải lại thành công |
+| Q12 | C | Nút "Đi nộp trạm"? | Đã thu ≥ 1 điểm có nút chữ; thu hết thì thành nút chính |
+| Q13 | C | Gộp kết ca? | Không đổi luồng (đã 1 lần bấm), chỉ thêm test |
+| Q14 | C | Ô kg và lít lúc đầu? | Để trống; chỉ gửi ô người dùng nhập |
+| Q15 | C | Chọn sẵn trạm? | Trạm gần nhất còn đủ chỗ lên đầu, không tự chuyển màn |
+| Q16 | C | Bỏ avatar? | Chỉ bỏ ở Collector; Merchant giữ |
+| S-1 | Charter | Một luồng ghi, tác tử phụ chỉ đọc ở B2 (I2), B6, B8? | Đồng ý |
+| S-2 | Charter | Trần gọi tác tử phụ mỗi giai đoạn? | 12 lần (đề xuất ban đầu 9) |
+| S-3 | Charter | Tạo agent `ui-v4-verifier`? | Đồng ý |
+| S-4 | Charter | Sửa `ui-v4-workflow.md` (B2, B3, B6, B8)? | Đồng ý |
+| Q17 | I1 | Chạy test api ở đâu khi container không có PostGIS và CI đang đỏ? | Thêm task I1.0 sửa test api trước |
+| Q18 | I1 | Places gọi từ đâu? | Qua backend, endpoint chỉ ADMIN |
+| Q19 | I1 | Bản đồ kéo ghim dùng gì? | Google Maps JavaScript |
+| Q20 | I1 | Lúc Bắt đầu ca lưu gì? | Danh sách trạm trên máy (Dexie v3); mất mạng tính đường chim bay; cho hỏi trạm với 0 lít |
+| Q21 | I1 | Rate limit và cache? | Render đã có `REDIS_URL`; `@nestjs/throttler` cho endpoint trả phí; khoá Redis tiền tố `maps:`, không đụng khoá của `ui_version_3` |
+| Q22 | I1 | Key và hạn mức? | Giới hạn theo API + hạn mức/ngày, không giới hạn IP; chủ dự án tự tạo key; không có key thì dùng giả lập |
+| Q23 | I1 | Tham số Routes? | Timeout 3 s, thử lại 2 lần, 25 trạm, làm tròn 3 chữ số, cache 10 phút, ghi "đường chim bay" khi dự phòng (có thể đổi theo Q26) |
+| Q24 | I1 | 3 phát hiện ngoài phạm vi? | Kẹt "Đang lưu…": chủ dự án thử máy thật; giá ước tính: task nhỏ sau I1; rate limit toàn API: ngoài I1; CI đỏ: I1.0 |
+
+### 3.3. Câu hỏi đang mở
+
+| Mã | Chặn | Câu hỏi | Đề xuất |
+|---|---|---|---|
+| Q25 | I1.0, I1.2 | Test e2e api hỏng vì CI seed bằng dataset demo `scripts/seed-demo.ts`, trong khi test cần fixture `apps/api/test/fixtures/hcm-legacy-seed.ts` | (a) CI seed bằng fixture thay cho `pnpm db:seed`, không đụng seed demo |
+| Q26 | I1.2 | Chế độ xe máy `TWO_WHEELER` là SKU Enterprise: 1.000 phần tử miễn phí/tháng rồi 15 USD/1.000; ước tính ~180 USD/tháng | (a) Routes Essentials (`DRIVE`, `TRAFFIC_UNAWARE`, 10.000 miễn phí/tháng), 5 trạm/lần, bộ đếm Redis tự dừng ở 8.000; (b) chỉ giữ `ST_Distance` |
+| Q27 | I1.1 | Places + Maps JavaScript nằm trong mức miễn phí (10.000/tháng mỗi loại) nhưng có thể vượt nếu lỗi lặp | (a) Làm kèm các lớp chặn; (b) chỉ kéo ghim trên Leaflet, không tìm địa chỉ |
+| T1 | I2.1 | Nhà cung cấp TTS của Google | Cloud TTS Chirp 3: HD |
+| T2 | I2.1 | API key hay service account | API key + hạn mức/ngày + cảnh báo ngân sách |
+| T5 | I2.3, I2.4 | Giọng đọc mặc định bật hay tắt | Bật cho Collector, tắt cho Merchant; số tiền luôn tắt |
+| T6 | I2.2 | Giọng Bắc/Nam, nam/nữ | Chọn sau khi nghe thử |
+| T7 | I2.1 | Ngân sách cảnh báo tháng | 5 USD |
+
+## 4. Nhật ký thay đổi của kế hoạch
+
+| Ngày | Commit | Thay đổi |
+|---|---|---|
+| 02/10/2026 | `68d5325` | Tạo kế hoạch: quyết định ban đầu, cách làm chung, giai đoạn M, C, I1, I2, I3 |
+| 03/10/2026 | `2a72b8b` | Thêm "Cách chạy" (`/ui-v4`, file tiến độ); chốt CO2 = 2.5 (Q1); viết lại I2 theo nghiên cứu TTS (Cloud TTS Chirp 3: HD, `template_id`, cache theo hash, `blob:` URL, Dexie cho âm thanh); câu hỏi chuyển sang file tiến độ |
+| 03/10/2026 | `c0c4d1c` | Thêm mục 2 Society Charter (cổng 6 câu, Charter 11 trường, áp dụng từng giai đoạn, pilot I1) và câu trả lời S-1…S-4 |
+| 03/10/2026 | `6de287c` | Thêm ràng buộc chi phí Google bằng 0 (mục 0, S15); thêm task I1.0 (Q17); key backend không giới hạn IP (Q22) |
+| 03/10/2026 | (commit này) | Ghi chép đầy đủ: mục 1 thêm quy tắc dùng tác tử phụ, chi phí bằng 0, giữ kiểu xuống dòng; sửa cách chụp ảnh (không có Playwright); mục 2 thêm bảng quy tắc bắt buộc R1–R8 và sửa dòng trần token; I1 ghi quyết định Q18–Q23, trạng thái từng task, I1.2 chờ Q26 về chi phí; I2 ghi T3, T4 đã trả lời qua Q21; thêm mục 3 (sổ câu hỏi) và mục 4 (nhật ký này) |
