@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { PAID_API_RATE_LIMITS } from './common/guards/user-throttler.guard';
 import { HealthModule } from './health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ContainersModule } from './modules/containers/containers.module';
@@ -23,6 +25,8 @@ import { ZaloVerificationModule } from './verification/zalo-verification.module'
       isGlobal: true,
       cache: true,
     }),
+    // Chỉ dùng cho endpoint gọi API trả phí qua UserThrottlerGuard (Q28), không áp cho toàn API.
+    ThrottlerModule.forRoot([PAID_API_RATE_LIMITS.stationsRecommend]),
     PrismaModule,
     RedisModule,
     AuthModule,

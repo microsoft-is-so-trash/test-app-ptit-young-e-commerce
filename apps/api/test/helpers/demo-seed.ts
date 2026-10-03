@@ -57,6 +57,9 @@ export const DEMO_COLLECTOR = {
   wardCode: 'HB-HK-DEMO' as DemoWardCode,
 } as const;
 
+/** Người thu gom demo thứ hai (phường Nguyễn Du), dùng khi test cần bộ đếm theo tài khoản riêng. */
+export const DEMO_SECOND_COLLECTOR = { zaloId: 'zalo_demo_collector_02', phone: '0911000002' } as const;
+
 export const DEMO_STATION = {
   id: '74000000-0000-4000-8000-000000000001',
   name: 'Trạm ECollect Hồ Gươm',

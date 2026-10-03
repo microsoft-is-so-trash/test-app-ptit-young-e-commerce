@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Inject, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { Role } from '@prisma/client';
 import { entityStatusSchema, personListQuerySchema, stationCreateSchema, stationPatchSchema, stationRecommendSchema } from '@eco-oil/validation';
+import { PAID_API_RATE_LIMITS, UserThrottlerGuard } from '../../common/guards/user-throttler.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RoadDistanceService } from './road-distance';
 import { StationsService } from './stations.service';
@@ -26,6 +28,8 @@ export class StationsController {
 
   @Roles(Role.COLLECTOR, Role.ADMIN)
   @Get('recommend')
+  @UseGuards(UserThrottlerGuard)
+  @Throttle({ default: PAID_API_RATE_LIMITS.stationsRecommend })
   async recommend(@Query() query: Record<string, unknown>) {
     const input = stationRecommendSchema.parse(query);
     // Đường chim bay từ PostGIS, rồi xếp lại các trạm gần nhất theo quãng đường nếu được (I1.2).

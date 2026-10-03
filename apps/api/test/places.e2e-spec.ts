@@ -47,6 +47,18 @@ describe('Admin place search (e2e, I1.1)', () => {
     expect(response.status).toBeLessThan(500);
   });
 
+  it('limits place details to 10 calls per minute per account (Q28)', async () => {
+    const call = () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/admin/places/details?place_id=place-1&session_token=${session}`)
+        .set('Authorization', `Bearer ${adminToken}`);
+    for (let index = 0; index < 10; index += 1) {
+      expect((await call()).status).toBe(503);
+    }
+    const limited = await call().expect(429);
+    expect(limited.body).toMatchObject({ code: 'RATE_LIMITED' });
+  });
+
   it('forbids non-admin roles', async () => {
     const response = await request(app.getHttpServer())
       .get(`/api/v1/admin/places/details?place_id=place-1&session_token=${session}`)

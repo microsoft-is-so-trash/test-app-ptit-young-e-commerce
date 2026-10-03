@@ -433,12 +433,18 @@ Thứ tự ưu tiên đã có: kế hoạch đứng trên quy tắc ECC. Khi Cha
 - Rate limit và cache (Q21): thêm `@nestjs/throttler`, chỉ gắn cho endpoint gọi API trả phí; cache
   trong Redis đã có trên Render. Khoá Redis mới dùng tiền tố `maps:` (khoá hiện có đều là `auth:`),
   không xoá/đổi khoá cũ, không dùng `FLUSHDB`/`FLUSHALL`.
+- Rate limit (Q28): `@nestjs/throttler` theo từng tài khoản, chỉ gắn cho endpoint gọi API trả phí: `/stations/recommend` 20 lần/phút, `/admin/places/autocomplete` 30 lần/phút, `/admin/places/details` 10 lần/phút.
 - Tham số Routes (Q23): timeout 3 s, thử lại tối đa 2 lần, làm tròn vị trí 3 chữ số thập phân để
   cache, giữ cache 10 phút, khi dùng dự phòng ghi "đường chim bay" (trường `distance_source`). Số
   trạm mỗi lần là 5 theo Q26 (thay 25 của Q23).
 - Chi phí bằng 0 (mục 0): I1.1 và I1.2 phải có lớp chặn theo Q26, Q27 (bộ đếm tháng trong Redis tự dừng ở 8.000, hạn mức trên Google Cloud, cảnh báo ngân sách).
 - **Nghiệm thu:** tắt mạng hoặc dùng key sai thì app vẫn gợi ý trạm (đường chim bay); có test e2e
   backend cho nhánh dự phòng.
+
+## Task bổ sung X1 (sau khi I1 được duyệt, trước I2)
+
+- **X1 (nhóm B, Q29):** theo nguyên tắc offline-first, Collector chọn trạm và lưu phiếu nộp trạm được cả khi giao dịch chưa đồng bộ. Phiếu nằm trong hàng chờ trên máy, chỉ gửi sau khi mọi giao dịch của nó đã đồng bộ (đổi `client_uuid` sang id máy chủ lúc gửi). Màn chọn trạm dùng danh sách trạm đã lưu (I1.3) khi mất mạng.
+- **Nghiệm thu:** mất mạng từ trước khi đồng bộ vẫn chọn trạm và lưu được phiếu; có mạng lại thì giao dịch gửi trước, phiếu nộp trạm gửi sau, không trùng; có test cho thứ tự gửi.
 
 ## Giai đoạn I2: Đọc giọng nói (TTS)
 
@@ -525,6 +531,8 @@ Bản đầy đủ: mục "Quyết định" và "Câu hỏi đang mở" của `d
 | Q25 | I1 | Test e2e api hỏng vì lệch dữ liệu seed | (a) nhưng dùng **seed-demo**: CI giữ `pnpm db:seed`, sửa test e2e cho khớp seed-demo, dữ liệu thêm do test tự tạo |
 | Q26 | I1 | Chế độ xe máy là SKU Enterprise có phí | (a) Routes Essentials `DRIVE` + `TRAFFIC_UNAWARE`, 5 trạm/lần, bộ đếm Redis tự dừng ở 8.000, ghi "đường ô tô" |
 | Q27 | I1 | Places + Maps JavaScript có thể vượt mức miễn phí | (a) Làm kèm các lớp chặn |
+| Q28 | I1 | Số giới hạn rate limit | Theo tài khoản: `/stations/recommend` 20/phút, `/admin/places/autocomplete` 30/phút, `/admin/places/details` 10/phút; vượt thì 429 và app dùng dự phòng |
+| Q29 | I1 | Offline-first mâu thuẫn với quy tắc chỉ nộp trạm khi đã đồng bộ | Thêm task X1 sau khi I1 được duyệt |
 
 ### 3.3. Câu hỏi đang mở
 
@@ -545,4 +553,5 @@ Bản đầy đủ: mục "Quyết định" và "Câu hỏi đang mở" của `d
 | 03/10/2026 | `c0c4d1c` | Thêm mục 2 Society Charter (cổng 6 câu, Charter 11 trường, áp dụng từng giai đoạn, pilot I1) và câu trả lời S-1…S-4 |
 | 03/10/2026 | `6de287c` | Thêm ràng buộc chi phí Google bằng 0 (mục 0, S15); thêm task I1.0 (Q17); key backend không giới hạn IP (Q22) |
 | 03/10/2026 | `3d2bde4` | Ghi chép đầy đủ: mục 1 thêm quy tắc dùng tác tử phụ, chi phí bằng 0, giữ kiểu xuống dòng; sửa cách chụp ảnh (không có Playwright); mục 2 thêm bảng quy tắc bắt buộc R1–R8 và sửa dòng trần token; I1 ghi quyết định Q18–Q23, trạng thái từng task, I1.2 chờ Q26 về chi phí; I2 ghi T3, T4 đã trả lời qua Q21; thêm mục 3 (sổ câu hỏi) và mục 4 (nhật ký này) |
-| 03/10/2026 | (commit này) | Ghi câu trả lời Q25 (test e2e dùng seed-demo), Q26 (Routes Essentials), Q27 (I1.1 kèm lớp chặn); thêm nguyên tắc offline-first vào mục 3.1; cập nhật bảng I1 |
+| 03/10/2026 | `3772889` | Ghi câu trả lời Q25 (test e2e dùng seed-demo), Q26 (Routes Essentials), Q27 (I1.1 kèm lớp chặn); thêm nguyên tắc offline-first vào mục 3.1; cập nhật bảng I1 |
+| 03/10/2026 | (commit này) | Ghi Q28 (số rate limit) và Q29 (task X1 nộp trạm offline-first) |

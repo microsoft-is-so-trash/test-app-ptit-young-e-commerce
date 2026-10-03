@@ -5,7 +5,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { ROUTE_MATRIX_URL } from '../src/modules/stations/road-distance';
-import { DEMO_COLLECTOR, DEMO_ORIGIN, DEMO_STATION, loginZalo } from './helpers/demo-seed';
+import { DEMO_COLLECTOR, DEMO_ORIGIN, DEMO_SECOND_COLLECTOR, DEMO_STATION, loginZalo } from './helpers/demo-seed';
 
 // Nghiệm thu I1: dùng key sai hoặc mất mạng tới Google thì vẫn gợi ý trạm theo đường chim bay.
 describe('Station recommendation fallback (e2e, I1.2)', () => {
@@ -57,6 +57,20 @@ describe('Station recommendation fallback (e2e, I1.2)', () => {
     const distances = response.body.map((station: { distance_m: number }) => station.distance_m);
     expect(distances).toEqual([...distances].sort((a: number, b: number) => a - b));
     expect(fetchSpy.mock.calls.filter(([input]) => String(input) === ROUTE_MATRIX_URL)).toHaveLength(1);
+  });
+
+  it('limits station recommendations to 20 calls per minute per account (Q28)', async () => {
+    googleOnly(async () => new Response('{}', { status: 403 }));
+    const token = await loginZalo(app, DEMO_SECOND_COLLECTOR.zaloId, DEMO_SECOND_COLLECTOR.phone);
+    const call = () =>
+      request(app.getHttpServer())
+        .get(`/api/v1/stations/recommend?lat=${DEMO_ORIGIN.lat}&lng=${DEMO_ORIGIN.lng}&liters=10`)
+        .set('Authorization', `Bearer ${token}`);
+    for (let index = 0; index < 20; index += 1) {
+      expect((await call()).status).toBe(200);
+    }
+    const limited = await call().expect(429);
+    expect(limited.body).toMatchObject({ code: 'RATE_LIMITED' });
   });
 
   it('recommends stations by straight line distance when Google cannot be reached', async () => {
