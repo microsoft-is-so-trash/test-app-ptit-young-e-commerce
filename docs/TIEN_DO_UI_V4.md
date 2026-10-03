@@ -146,8 +146,8 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 ### Giai đoạn I1 — 03/10/2026
 
-- Đã làm: I1.0 sửa CI api (6de287c, 73ad335, 638f2da, 3772889, 5f221ee), I1.1 tìm vị trí trạm cho admin (29aeda7, 314041e, 9e23e3e), I1.2 gợi ý trạm theo quãng đường (6087cf7, 314041e, 9e23e3e), I1.3 lưu trạm khi Bắt đầu ca (4405ef8); sửa sau review (314041e, commit này).
-- Cổng kiểm tra cuối: api typecheck/lint/257 unit; admin 82 test, build; miniapp 244 test, build; CI e2e api 349/349 (run 37135660023, trước các sửa review cuối — CI của commit báo cáo ghi ở nhật ký).
+- Đã làm: I1.0 sửa CI api (6de287c, 73ad335, 638f2da, 3772889, 5f221ee), I1.1 tìm vị trí trạm cho admin (29aeda7, 314041e, 9e23e3e), I1.2 gợi ý trạm theo quãng đường (6087cf7, 314041e, 9e23e3e), I1.3 lưu trạm khi Bắt đầu ca (4405ef8); sửa sau review (314041e, 86288a8).
+- Cổng kiểm tra cuối: api typecheck/lint/257 unit; admin 82 test, build; miniapp 244 test, build; CI run 37136383107 trên 86288a8 xanh: api 349/349, miniapp 244/244.
 - Verifier: I1.0, I1.1, I1.2, I1.3, rate limit Q28, nghiệm thu chung: đạt. Chi phí bằng 0: chưa đủ bằng chứng — bộ đếm Redis đạt, nhưng hạn mức/ngày và cảnh báo ngân sách trên Google Cloud cần chủ dự án tự đặt và xác nhận.
 - Pilot Society Charter (mục 2.5): 3/12 lần gọi (security-reviewer 1, code-reviewer 1, verifier 1). Lỗi có giá trị: security 2 MEDIUM (sửa cả 2: bộ đếm tháng có thể reset sớm hơn Google; chọn gợi ý gọi Autocomplete lần nữa), code 1 MEDIUM + 3 LOW (sửa cả 4). Tổng 6/10 lỗi báo ra được sửa; 4 LOW của security chỉ ghi nhận. Verifier không phát hiện lỗi mà tác tử chính bỏ sót, nhưng tách rõ phần không kiểm chứng được (cấu hình Google Cloud, giao diện với key thật).
 - Chưa xem được trên màn hình: ô tìm địa chỉ và bản đồ ghim (cần API + DB đang chạy và key Google; máy không có PostGIS), nhãn "đường ô tô"/"đường chim bay" (dataset demo không có `distance_source`), thông báo danh sách trạm đã lưu khi mất mạng (demo không mất mạng). Đã kiểm bằng test component/unit/e2e.
