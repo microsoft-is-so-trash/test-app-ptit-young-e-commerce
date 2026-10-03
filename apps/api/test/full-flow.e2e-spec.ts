@@ -82,8 +82,9 @@ describe('Full merchant-to-station working shift (e2e)', () => {
       .set('Authorization', `Bearer ${collectorToken}`)
       .expect(200);
     expect(route.body.stops).toHaveLength(3);
-    expect(route.body.stops.map((stop: { priority: number }) => stop.priority)).toEqual(
-      [...route.body.stops.map((stop: { priority: number }) => stop.priority)].sort((a, b) => b - a),
+    // Tuyến xếp theo điểm ưu tiên thu gom (có tính khoảng cách), không chỉ theo priority của đơn.
+    expect(route.body.stops.map((stop: { pickup_priority_score: number }) => stop.pickup_priority_score)).toEqual(
+      [...route.body.stops.map((stop: { pickup_priority_score: number }) => stop.pickup_priority_score)].sort((a, b) => b - a),
     );
     expect(route.body.stops.map((stop: { order_id: string }) => stop.order_id).sort()).toEqual([...orderIds].sort());
 

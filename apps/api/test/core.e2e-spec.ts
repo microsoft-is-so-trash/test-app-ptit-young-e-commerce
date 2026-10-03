@@ -56,7 +56,7 @@ describe('Core CRUD and PostGIS (e2e)', () => {
       .post('/api/v1/stations')
       .set('Authorization', `Bearer ${adminToken}`)
       .send({
-        user_id: testStationUserId,
+        capacity_liters: 1000,
         name: 'Trạm Test CRUD',
         address: '1 Đường Test, Phường 7, Quận 3',
         lat: 21.0321,
@@ -71,7 +71,7 @@ describe('Core CRUD and PostGIS (e2e)', () => {
       .post('/api/v1/stations')
       .set('Authorization', `Bearer ${merchantToken}`)
       .send({
-        user_id: testStationUserId,
+        capacity_liters: 1000,
         name: 'Should Fail',
         address: '1 Đường Test',
         lat: 21.0321,
