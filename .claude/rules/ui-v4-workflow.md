@@ -110,7 +110,11 @@ git diff --stat HEAD
   - Màn mở được bằng URL: `google-chrome --headless --window-size=375,812 --screenshot=<file> <url>`.
   - Màn cần thao tác (bấm, nhập): trình duyệt có sẵn trong phiên (browser pane), chỉnh khung 375×812,
     chụp và ghi rõ các bước thao tác vào cột "Ghi chú" của task.
-- Lưu ảnh vào `design/snapshots/ui-v4/<mã task>/before.png` và `after.png`.
+- Chạy app bằng `preview_start` với cấu hình `eco-oil-miniapp-demo` trong `.claude/launch.json`
+  (đã bật sẵn hai cờ demo). Ảnh chụp từ browser pane được lưu thành file `.jpg` trong thư mục
+  `tool-results` của phiên; chép file đó vào repo. Browser pane chụp chậm một nhịp sau khi bấm:
+  chụp lại lần nữa nếu ảnh vẫn là màn trước.
+- Lưu ảnh vào `design/snapshots/ui-v4/<mã task hoặc giai đoạn>/` (ví dụ `M-before/`, `M-after/`).
 - Xem ảnh và đối chiếu tiêu chí nghiệm thu của task. Chưa nhìn thấy kết quả thì chưa coi là xong.
 - Không chạy được app hoặc không chụp được ảnh → dừng hỏi (S9).
 

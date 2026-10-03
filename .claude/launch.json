@@ -4,25 +4,64 @@
     {
       "name": "eco-oil-miniapp",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "apps/miniapp", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "apps/miniapp",
+        "run",
+        "dev"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "eco-oil-miniapp-demo",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "PATH=/home/ADMIN/.local/share/pnpm/bin:/home/ADMIN/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "VITE_DEMO_MODE=true",
+        "VITE_DEMO_OFFLINE=true",
+        "pnpm",
+        "--filter",
+        "@eco-oil/miniapp",
+        "dev"
+      ],
       "port": 5173
     },
     {
       "name": "eco-oil-admin",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "apps/admin", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "apps/admin",
+        "run",
+        "dev"
+      ],
       "port": 3001
     },
     {
       "name": "eco-oil-miniapp-zmp-preview",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "@eco-oil/miniapp", "exec", "vite", "preview", "--outDir", "dist", "--port", "4173"],
+      "runtimeArgs": [
+        "--filter",
+        "@eco-oil/miniapp",
+        "exec",
+        "vite",
+        "preview",
+        "--outDir",
+        "dist",
+        "--port",
+        "4173"
+      ],
       "port": 4173
     },
     {
       "name": "eco-oil-api",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "apps/api", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "apps/api",
+        "run",
+        "dev"
+      ],
       "port": 3000
     }
   ]
