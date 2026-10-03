@@ -234,16 +234,6 @@ export function HomePage() {
         </div>
         <div className="stat-card">
           <div className="stat-card-header">
-            <span className="stat-card-title">{hasClosedPayments ? 'Tiền chốt tuần' : 'Tiền ước tính tuần'}</span>
-            <div className="stat-card-icon-wrap">
-              <Icon name="payments" size={18} />
-            </div>
-          </div>
-          <div className="stat-card-value">{formatCurrency(weeklyMoney)}</div>
-          <div className="stat-card-caption">Tuần {week.period}</div>
-        </div>
-        <div className="stat-card stat-card-wide">
-          <div className="stat-card-header">
             <span className="stat-card-title">Lần thu gom gần nhất</span>
             <div className="stat-card-icon-wrap">
               <Icon name="schedule" size={18} />

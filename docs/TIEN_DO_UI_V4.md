@@ -52,7 +52,7 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 | Mã | Nhóm | Trạng thái | Commit | Ghi chú |
 |---|---|---|---|---|
 | M1 | B | xong | (commit này) | Bỏ WARD_ID cứng; payload gửi lại hồ sơ tạo bằng lib/merchant-resubmit.ts, test merchant-resubmit.test.ts (3). Không đổi giao diện nên không chụp ảnh. Cổng kiểm tra pass (153 test). |
-| M2 | A | chưa làm | | Q3: phần chuyển danh sách can làm trong M4 |
+| M2 | A | xong | (commit này) | Bỏ ô "Tiền ước tính tuần"/"Tiền chốt tuần" ở lưới thống kê Trang chủ (tiền tuần chỉ còn ở thẻ lớn); "Lần thu gom gần nhất" xếp cạnh "Lít tháng này". Phần chuyển danh sách can làm trong M4 (Q3). Ảnh: design/snapshots/ui-v4/M2/. Cổng kiểm tra pass. |
 | M3 | B | chưa làm | | Q1: dùng 2.5 |
 | M4 | B | chưa làm | | Gồm cả phần chuyển danh sách can từ M2 (Q3) |
 | M5.1 | B | chưa làm | | |
@@ -119,6 +119,7 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
 
+- 03/10/2026 — M2 — xong. Bỏ ô "Tiền ước tính tuần"/"Tiền chốt tuần" ở lưới thống kê Trang chủ (tiền tuần chỉ còn ở thẻ lớn); "Lần thu gom gần nhất" xếp cạnh "Lít tháng này". Phần chuyển danh sách can làm trong M4 (Q3). Ảnh: design/snapshots/ui-v4/M2/. Cổng kiểm tra pass.
 - 03/10/2026 — M1 — xong. Bỏ WARD_ID cứng; payload gửi lại hồ sơ tạo bằng lib/merchant-resubmit.ts, test merchant-resubmit.test.ts (3). Không đổi giao diện nên không chụp ảnh. Cổng kiểm tra pass (153 test).
 - 03/10/2026 — B2 giai đoạn M — Đọc toàn bộ file của M1–M6, chụp ảnh trước (`design/snapshots/ui-v4/M-before/`), thêm cấu hình `eco-oil-miniapp-demo` vào `.claude/launch.json`. Dừng hỏi Q5–Q9.
 - 03/10/2026 — B0 — Tạo branch `ui_version_4` từ `ui_version_3`. Cài Node 22.23.3 (`pnpm env use --global 22`) và wrapper git của host ở `~/.local/share/agent-tools/bin`. `pnpm install` xong. Cổng kiểm tra miniapp trên code gốc: typecheck, lint, build pass; test 150/150 pass. Repo không có Playwright; có `google-chrome` để chụp màn hình headless.
