@@ -112,3 +112,13 @@ export function stationRecommendationErrorMessage(error: unknown): string {
   }
   return message || 'Không thể tải danh sách trạm. Vui lòng thử lại.';
 }
+
+/**
+ * Nút "Kết ca" ở biên nhận nộp trạm: lưu biên nhận rồi kết ca ngay, một lần bấm (C4.4).
+ * Không chuyển sang màn kết ca trung gian.
+ */
+export async function closeShiftAfterReceipt(persistReceipt: () => Promise<unknown>, finishShift: () => Promise<boolean>): Promise<void> {
+  await persistReceipt();
+  const closed = await finishShift();
+  if (!closed) throw new Error('Không thể kết ca. Vui lòng thử lại.');
+}

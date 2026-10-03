@@ -14,7 +14,7 @@ import { pickZaloPhoto } from '../lib/media-picker';
 import { StatusView } from '../components/StatusView';
 import { CollectorNotice } from '../components/CollectorNotice';
 import type { CompletedStop } from '../lib/collector-metrics';
-import { canSubmitStationDelivery, loadStationRecommendations, resolveStationSearchLocation, retryStationDeliverySync } from '../lib/station-delivery';
+import { canSubmitStationDelivery, closeShiftAfterReceipt, loadStationRecommendations, resolveStationSearchLocation, retryStationDeliverySync } from '../lib/station-delivery';
 import { parseLocalizedDecimal } from '../lib/collection-entry-validation';
 import type { PendingStationDeliveryDraft } from '../lib/storage';
 
@@ -421,9 +421,7 @@ export function StationDeliveryReceipt({ station, clientUuid, collectorId, expec
     setClosing(true);
     setReceiptError(null);
     try {
-      await persistReceipt();
-      const closed = await onCloseOut();
-      if (!closed) throw new Error('Không thể kết ca. Vui lòng thử lại.');
+      await closeShiftAfterReceipt(persistReceipt, onCloseOut);
     } catch (error: unknown) {
       if (mountedRef.current) setReceiptError(error instanceof Error ? error.message : 'Không thể kết ca. Vui lòng thử lại.');
     } finally {

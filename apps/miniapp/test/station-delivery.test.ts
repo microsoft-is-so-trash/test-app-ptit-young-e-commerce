@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canSubmitStationDelivery, loadStationRecommendations, resolveStationSearchLocation, retryStationDeliverySync } from '../src/lib/station-delivery';
+import { canSubmitStationDelivery, closeShiftAfterReceipt, loadStationRecommendations, resolveStationSearchLocation, retryStationDeliverySync } from '../src/lib/station-delivery';
 import { EcoOilDatabase, ecoOilDb, getLatestStationReceipt, saveStationReceipt, type StoredStationReceipt } from '../src/lib/outbox-db';
 
 const station = {
@@ -294,4 +294,30 @@ test('structured station receipt survives reload and stays isolated per collecto
   await saveStationReceipt(otherReceipt.collector_id, otherReceipt);
   assert.equal((await getLatestStationReceipt(receipt.collector_id))?.receipt_id, receipt.receipt_id);
   assert.equal((await getLatestStationReceipt(otherReceipt.collector_id))?.receipt_id, otherReceipt.receipt_id);
+});
+
+test('closing the shift from the receipt saves the receipt then finishes the shift in one tap', async () => {
+  const calls: string[] = [];
+  await closeShiftAfterReceipt(
+    async () => { calls.push('persist-receipt'); },
+    async () => { calls.push('finish-shift'); return true; },
+  );
+
+  assert.deepEqual(calls, ['persist-receipt', 'finish-shift']);
+});
+
+test('a refused shift finish is reported instead of showing an extra closeout step', async () => {
+  await assert.rejects(
+    closeShiftAfterReceipt(async () => undefined, async () => false),
+    /Không thể kết ca/,
+  );
+});
+
+test('the shift is not finished when the receipt could not be saved', async () => {
+  let finished = false;
+  await assert.rejects(
+    closeShiftAfterReceipt(async () => { throw new Error('disk full'); }, async () => { finished = true; return true; }),
+    /disk full/,
+  );
+  assert.equal(finished, false);
 });
