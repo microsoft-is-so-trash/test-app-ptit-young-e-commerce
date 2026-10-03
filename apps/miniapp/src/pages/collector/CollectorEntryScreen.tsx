@@ -23,15 +23,18 @@ import type { PhotoAsset } from '../../lib/zalo-client';
 import { OilGradeSelector } from '../../components/OilGradeSelector';
 import { GradePhotoPicker } from '../../components/GradePhotoPicker';
 import { EMPTY_MASS_ENTRY, editMassField, massEntryView } from '../../lib/mass-entry';
+import { resolveQuality } from '../../lib/grade-automation';
 import type { MassEntryState, MassField } from '../../lib/mass-entry';
 
 export function CollectorEntryScreen({ stop, container, containerCode, onBack, onSuccess }: { stop: RouteStop; container: ContainerLookupResponse; containerCode: string; onBack: () => void; onSuccess: (liters: number, kilograms: number | null, clientUuid: string) => void }) {
   // Kg và lít để trống lúc đầu (Q14); ô nhập sau cùng là ô gốc, ô kia tự tính.
   const [massEntry, setMassEntry] = useState<MassEntryState>(EMPTY_MASS_ENTRY);
-  const [quality, setQuality] = useState<Quality>(Quality.PASS);
+  // Chất lượng tự chọn theo hạng dầu (C5.2); chọn tay thì giữ lựa chọn của người dùng.
+  const [manualQuality, setManualQuality] = useState<Quality | null>(null);
   const [grade, setGrade] = useState<OilGrade | null>(null);
   const [suspectedAdulteration, setSuspectedAdulteration] = useState(false);
   const [gradeNote, setGradeNote] = useState('');
+  const { quality, isAuto: qualityAuto } = resolveQuality({ grade, suspectedAdulteration, manual: manualQuality });
   const [photos, setPhotos] = useState<PhotoAsset[]>([]);
   const [imageAnalysis, setImageAnalysis] = useState<OilImageAnalysis | null>(null);
   const [analyzingImages, setAnalyzingImages] = useState(false);
@@ -335,10 +338,12 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
         <OilGradeSelector value={grade} disabled={saving} onChange={(nextGrade) => { setGrade(nextGrade); setOverrideAcknowledged(false); }} />
         <label className="toggle-row"><input type="checkbox" checked={suspectedAdulteration} onChange={(event) => setSuspectedAdulteration(event.target.checked)} disabled={saving} /><span>Nghi ngờ pha lẫn</span></label>
         <p className="field-help">Bật nếu thấy có nước, dầu nhớt hoặc mùi lạ không phải dầu ăn.</p>
+        <p className="section-label">Chất lượng dầu{qualityAuto ? ' (tự chọn)' : ''}</p>
+        <div className="quality-options"><button className={quality === Quality.PASS ? 'quality-option selected' : 'quality-option'} onClick={() => setManualQuality(Quality.PASS)} disabled={saving}>Đạt</button><button className={quality === Quality.FLAG ? 'quality-option selected flag-selected' : 'quality-option'} onClick={() => setManualQuality(Quality.FLAG)} disabled={saving}>Cần kiểm tra</button></div>
+        {qualityAuto ? <p className="field-help">{quality === Quality.FLAG ? 'Tự chọn "Cần kiểm tra" vì hạng C hoặc nghi ngờ pha lẫn. Bấm để đổi nếu khác thực tế.' : 'Tự chọn theo hạng dầu. Bấm để đổi nếu khác thực tế.'}</p> : null}
         <label className="grade-note-label" htmlFor="grade-note">Ghi chú phân hạng (không bắt buộc)</label>
         <textarea className="grade-note-input" id="grade-note" value={gradeNote} onChange={(event) => setGradeNote(event.target.value)} disabled={saving} placeholder="Ghi chú thêm nếu cần" />
       </section>
-      <section className="quality-card"><p className="section-label">Chất lượng dầu</p><div className="quality-options"><button className={quality === Quality.PASS ? 'quality-option selected' : 'quality-option'} onClick={() => setQuality(Quality.PASS)} disabled={saving}>Đạt</button><button className={quality === Quality.FLAG ? 'quality-option selected flag-selected' : 'quality-option'} onClick={() => setQuality(Quality.FLAG)} disabled={saving}>Cần kiểm tra</button></div></section>
       <GradePhotoPicker photos={photos} busy={takingPhoto} disabled={saving} message={photoNotice} onTakePhoto={() => { void takePhoto(); }} onChooseAlbum={() => { void chooseAlbumPhoto(); }} onChooseFile={(file) => { void choosePhotoFile(file); }} onRemovePhoto={removePhoto} />
       {analysisError ? <section className="image-grade-analysis image-grade-analysis-error" role="alert"><span>{analysisError}</span><button type="button" className="secondary-button" onClick={() => { void analyzePhotos(photos); }} disabled={analyzingImages || saving}>Thử phân tích lại</button></section> : null}
       {analyzingImages ? <section className="image-grade-analysis image-grade-analysis-neutral" aria-live="polite"><strong>AI hỗ trợ phân hạng</strong><span>Đang phân tích ảnh…</span></section> : null}
