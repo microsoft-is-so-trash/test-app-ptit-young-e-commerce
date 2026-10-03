@@ -9,11 +9,11 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 
 | | |
 |---|---|
-| Giai đoạn | C xong — chờ chủ dự án duyệt |
+| Giai đoạn | I1 — đã rà soát đầu giai đoạn (B2), mọi task bị chặn |
 | Task đang làm | — |
-| Đang chờ chủ dự án | Duyệt giai đoạn C ("duyệt C") |
+| Đang chờ chủ dự án | Trả lời Q17–Q23 (Q24 không chặn) |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
-| Cập nhật lần cuối | 03/10/2026 — rà soát đầu giai đoạn M (B2) |
+| Cập nhật lần cuối | 03/10/2026 — duyệt C, duyệt Society Charter, B2 giai đoạn I1 |
 
 ## Quyết định
 
@@ -33,14 +33,25 @@ Ghi theo dạng: ngày — mã câu hỏi — nội dung đã chọn.
 - 03/10/2026 — Duyệt M — Chủ dự án duyệt giai đoạn M (sau khi xem kết quả kiểm thử), cho sang giai đoạn C; muốn tự thử trên localhost.
 - 03/10/2026 — Q10–Q16 — Theo đề xuất: (Q10) giữ nút "Hàng chờ N" luôn hiện, bỏ khối "Dữ liệu trên máy" ở Tài khoản. (Q11) Dải trạng thái màn Tuyến: lỗi tải/lỗi đồng bộ > mất mạng > hàng chờ > GPS > dữ liệu cũ > biên nhận đã lưu > ca đã sẵn sàng > tải lại thành công; hiện mục cao nhất, bấm mở danh sách đầy đủ giữ nút của từng mục; lỗi Bắt đầu ca vẫn hiện dưới nút; màn khác giữ thông báo mất mạng. (Q12) Đã thu ≥ 1 điểm thì màn Tuyến có nút chữ "Đi nộp trạm", thu xong điểm cuối thành nút chính; dòng "x / y điểm đã thu · z lít"; "Về tóm tắt ca" → "Về tuyến hôm nay"; mở lại app vào thẳng màn Tuyến. (Q13) Không đổi luồng kết ca, C4.4 thêm test chứng minh 1 lần bấm, giữ màn và dòng giả. (Q14) Ô kg và lít để trống; chỉ gửi ô người dùng nhập; ô còn lại ghi "tự tính". (Q15) Trạm gần nhất còn đủ chỗ lên đầu, ghi "Gần nhất còn đủ chỗ", nút của nó là nút chính; không tự chuyển màn. (Q16) Bỏ avatar chỉ ở Collector; Merchant giữ.
 
+- 03/10/2026 — Society Charter — Chủ dự án duyệt mục 2 của kế hoạch: (S-1) một luồng ghi, tác tử phụ chỉ đọc, dùng ở B2 (I2), B6, B8; (S-2) trần **12 lần** gọi tác tử phụ mỗi giai đoạn (chủ dự án ghi "chặt hơn" nhưng con số 12 lớn hơn đề xuất 9; áp dụng con số 12, mỗi vai không quá 3); (S-3) tạo agent `.claude/agents/ui-v4-verifier.md`; (S-4) sửa `.claude/rules/ui-v4-workflow.md` (B2, B3, B6, B8).
+- 03/10/2026 — Duyệt C — Chủ dự án duyệt giai đoạn C, cho sang giai đoạn I1.
+
 ## Câu hỏi đang mở
 
 | Mã | Chặn task | Câu hỏi | Đề xuất |
 |---|---|---|---|
+| Q17 | I1.2 (và cổng B4 của mọi task sửa `apps/api`) | Chạy test API ở đâu? Container không có Postgres/PostGIS, repo không có `.env.test`; `pnpm --filter @eco-oil/api test` chạy cả `*.e2e-spec.ts` (`apps/api/jest.config.js` testRegex), các test này cần DB và xoá dữ liệu. CI GitHub (có PostGIS) đang đỏ ở bước test `apps/api` từ trước v4 (cả `ui_version_3`); log chỉ xem được khi đăng nhập GitHub | (a) Trong container chỉ chạy typecheck, lint và unit spec của api (bỏ `e2e-spec`); test e2e nhánh dự phòng chạy trên CI. Trước đó CI phải xanh: chủ dự án dán log lỗi CI, hoặc cho thêm task I1.0 sửa test api đang đỏ (S6). (b) Chủ dự án đặt DB test riêng trong `.env.test` trên máy (không gửi qua chat) |
+| Q18 | I1.1 | Gợi ý địa chỉ (Places API New) gọi qua backend hay thẳng từ trình duyệt admin? | Qua backend: endpoint chỉ ADMIN, dùng `GOOGLE_MAPS_SERVER_KEY`, đúng E1 (key giao diện chỉ bật Maps JavaScript) |
+| Q19 | I1.1 | Bản đồ kéo ghim trong form trạm: Google Maps JavaScript (cần key giao diện, tải bằng thẻ script, có thể thêm devDependency `@types/google.maps` = S5) hay Leaflet có sẵn trong admin (nền OSM, không thêm thư viện)? ⚠️ Chưa xác minh: điều khoản Google Maps Platform có thể cấm hiện nội dung Places trên bản đồ không phải Google và hạn chế lưu lâu dài toạ độ lấy từ Places | (a) Google Maps JavaScript; toạ độ lưu là vị trí ghim admin tự xác nhận. Chủ dự án kiểm lại điều khoản hiện hành; nếu không có hạn chế thì (b) Leaflet rẻ hơn |
+| Q20 | I1.3 | Lúc "Bắt đầu ca" tính và lưu gì? Lúc đó chưa biết vị trí nộp trạm và số lít (`stationRecommendSchema` bắt `liters > 0`) | (a) Tải danh sách trạm đang nhận (toạ độ, sức chứa còn lại, thời điểm) và lưu trên máy. Lúc nộp trạm: có mạng thì gọi `/stations/recommend` (Routes, dự phòng `ST_Distance`); mất mạng thì tính đường chim bay trên máy từ GPS hiện tại, ghi "Sức chứa lúc …". Cần Dexie version 3 thêm bảng `stationCache` (S5) và tham số/endpoint lấy trạm khi chưa biết số lít. (b) Gọi Routes lúc Bắt đầu ca từ toạ độ điểm thu cuối tuyến, lưu bảng xếp hạng (sai khi thứ tự thu thay đổi) |
+| Q21 | I1.2 | `/stations/recommend` gọi Routes là endpoint trả phí, cần rate limit và cache (E6). Trả lời sớm T3, T4 cho I1: có `REDIS_URL` trên Render không; thêm `@nestjs/throttler` (thư viện mới, S5)? | `@nestjs/throttler` chỉ gắn vào endpoint gọi API trả phí; cache ma trận trong Redis nếu Render có `REDIS_URL`, nếu không thì bộ nhớ tiến trình (mất khi khởi động lại) |
+| Q22 | I1.1, I1.2 | Key và hạn mức Google Maps. Kế hoạch ghi key backend "giới hạn IP", nhưng Render gói Free không có IP cố định (E1) — mâu thuẫn (S2). Chủ dự án có đặt key vào `.env` trên máy để agent thử nhánh thật không? Ngân sách cảnh báo cho Maps? | Key backend giới hạn theo API (Routes + Places New) + hạn mức/ngày, không giới hạn IP; key giao diện (nếu Q19 = a) giới hạn referrer tên miền admin + `localhost`, chỉ Maps JavaScript. Chủ dự án tự tạo key, đặt vào `.env` máy và Render/Vercel; agent chỉ thêm tên biến vào `.env.example`. Không có key thì agent làm với nhà cung cấp giả lập, nhánh thật do chủ dự án thử. Cảnh báo ngân sách 5 USD/tháng (như T7) |
+| Q23 | I1.2 | Tham số gọi Routes và cách hiện kết quả (S3, S11) | Timeout 3 s mỗi lần gọi, thử lại tối đa 2 lần (E3); đưa tối đa 25 trạm gần nhất theo `ST_Distance` vào ma trận; làm tròn vị trí 3 chữ số thập phân (~100 m) để cache, giữ cache 10 phút; xếp theo quãng đường xe máy; khi dùng dự phòng thì ghi "đường chim bay" cạnh số km (thêm trường `distance_source` vào `StationRecommendation`) |
+| Q24 | Không chặn | Xử lý 3 phát hiện ngoài phạm vi cũ và CI đỏ khi nào? | Kẹt "Đang lưu…": chủ dự án thử trên máy thật. Giá ước tính 8.000đ/20.000đ: task nhỏ riêng sau I1. Rate limit toàn API: ngoài I1, I1 chỉ làm cho endpoint trả phí (Q21). CI đỏ: theo Q17 |
 | T1 | I2.1 | Nhà cung cấp Google cho TTS: Cloud TTS Chirp 3: HD, Gemini 3.8 Flash TTS, hay thử cả hai? | Chirp 3: HD (xem `docs/NGHIEN_CUU_TTS_GOOGLE.md` mục 2.3) |
 | T2 | I2.1 | Xác thực với Google: API key chỉ bật Cloud TTS, hay service account (thêm `google-auth-library`)? | API key + hạn mức/ngày + cảnh báo ngân sách |
-| T3 | I2.1 | Cache âm thanh phía server bằng Redis (cần `REDIS_URL` trên Render) hay chỉ cache trên máy? | Redis nếu Render đã có `REDIS_URL`; nếu không thì chỉ cache trên máy |
-| T4 | I2.1 | Rate limit: tự viết bằng Redis `INCR` hay thêm `@nestjs/throttler`? | `@nestjs/throttler` (thư viện chuẩn của NestJS) |
+| T3 | I2.1, I1.2 (qua Q21) | Cache âm thanh phía server bằng Redis (cần `REDIS_URL` trên Render) hay chỉ cache trên máy? | Redis nếu Render đã có `REDIS_URL`; nếu không thì chỉ cache trên máy |
+| T4 | I2.1, I1.2 (qua Q21) | Rate limit: tự viết bằng Redis `INCR` hay thêm `@nestjs/throttler`? | `@nestjs/throttler` (thư viện chuẩn của NestJS) |
 | T5 | I2.3, I2.4 | Giọng đọc Collector mặc định bật hay tắt? | Bật cho Collector, tắt cho Merchant; số tiền luôn mặc định tắt |
 | T6 | I2.2 | Giọng miền Bắc/Nam, nam/nữ? | Chọn sau khi nghe thử ở I2.2 |
 | T7 | I2.1 | Ngân sách tháng để đặt cảnh báo trên Google Cloud? | 5 USD |
@@ -85,9 +96,9 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 
 | Mã | Nhóm | Trạng thái | Commit | Ghi chú |
 |---|---|---|---|---|
-| I1.1 | B | chưa làm | | |
-| I1.2 | B | chưa làm | | |
-| I1.3 | B | chưa làm | | |
+| I1.1 | B | bị chặn (Q18, Q19, Q22) | | |
+| I1.2 | B | bị chặn (Q17, Q21, Q22, Q23) | | |
+| I1.3 | B | bị chặn (Q20) | | |
 
 ### Giai đoạn I2 — Đọc giọng nói (TTS)
 
@@ -113,6 +124,15 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 - 03/10/2026 — Trang chủ Merchant tính "tiền ước tính" bằng `VITE_ESTIMATED_PRICE_PER_LITER` (8.000đ) trong khi giá dầu từ API là 20.000đ (`HomePage.tsx:11`); vi phạm U11 nhưng không thuộc task nào của giai đoạn M.
 - 03/10/2026 — `apps/api` chưa có cơ chế rate limit cho bất kỳ endpoint nào (liên quan quy tắc
   bảo mật chung, không chỉ TTS).
+- 03/10/2026 — CI GitHub (`.github/workflows/ci.yml`) đỏ ở mọi commit của `ui_version_4` và
+  `ui_version_3`, cùng bước `pnpm typecheck && pnpm lint && pnpm test && pnpm build`; chú thích của
+  lần chạy nói lệnh `pnpm run test` của `apps/api` thoát mã 1. Đã đỏ từ trước v4 (68d5325, 17d3867).
+  Log chi tiết cần đăng nhập GitHub nên chưa biết test nào hỏng. Các báo cáo M, C không chạy test
+  api (chỉ typecheck) nên không phát hiện.
+- 03/10/2026 — Rủi ro: `pnpm --filter @eco-oil/api test` chạy cả test e2e, có 27 lệnh
+  `deleteMany`/`TRUNCATE`. `test/setup-env.ts` chỉ nạp `.env.test` nếu có; không có thì Prisma đọc
+  `DATABASE_URL` của `.env`. Hiện `.env` để giá trị mẫu (`HOST`) nên chưa nguy hiểm, nhưng nếu ai
+  đặt DB thật vào `.env` rồi chạy test thì dữ liệu sẽ bị xoá.
 
 ## Báo cáo giai đoạn
 
@@ -137,6 +157,10 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 ## Nhật ký
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
+
+- 03/10/2026 — B2 giai đoạn I1 — Tác tử chính tự rà (theo bảng 2.4, không gọi tác tử phụ; số lần gọi tác tử phụ của I1: 0/12). Đã đọc: `apps/admin/src/components/stations-view.tsx` (form trạm nhập tay vĩ độ/kinh độ ở dòng 612–631, kiểm hợp lệ ở 433–457; khớp kế hoạch), `operations-map-canvas.tsx` (admin đã có Leaflet, nền OSM có dự phòng), `apps/admin/src/lib/api.ts` (có chế độ demo offline cho trạm); `apps/api/src/modules/stations/` (`recommend` ở `stations.service.ts:137-179` dùng `ST_Distance`, lọc trạm đủ sức chứa; controller cho COLLECTOR và ADMIN), `stationRecommendSchema` (`packages/validation/src/index.ts:561`, bắt `liters > 0`), `StationRecommendation` (`packages/shared-types/src/index.ts:520`), `RedisService` (báo lỗi khi thiếu `REDIS_URL`), cách gọi HTTP ra ngoài có timeout (`real-zalo-auth.provider.ts`), `jest.config.js` và `test/setup-env.ts`; `apps/miniapp`: `offline-cache.ts`, `outbox-db.ts` (Dexie version 1–2, chưa có bảng trạm), `startShift` (`CollectorFlow.tsx:202`), `StationDeliveryFlow.tsx` (gọi `/stations/recommend` lúc mở màn nộp trạm, chưa có bản lưu khi mất mạng), `api.recommendStations` (demo trả `DEMO_STATIONS`). Kế hoạch ghi file `StationDeliveryFlow.tsx` không kèm thư mục; file thật ở `src/pages/`. Không chạy test api (chủ dự án huỷ lệnh; xem Q17). Tra CI qua API công khai của GitHub: đỏ từ trước v4. Dừng hỏi Q17–Q24.
+- 03/10/2026 — Society Charter — Chủ dự án duyệt (S-1…S-4). Đã sửa `.claude/rules/ui-v4-workflow.md` (B2 rà soát song song có điều kiện, B3 bằng chứng RED, B6 review theo bảng 2.4 + kiểm chỉ đọc + nhật ký MAST, B8 verifier) và tạo `.claude/agents/ui-v4-verifier.md`.
+- 03/10/2026 — Duyệt C — Ghi quyết định; bắt đầu giai đoạn I1.
 
 - 03/10/2026 — B8 giai đoạn C — Chạy code-reviewer trên 3249d20..HEAD: không CRITICAL/HIGH; sửa 5 điểm MEDIUM: (1) nút +/− của ô tự tính bị khoá để số tự tính không bị ghi thành số cân; (2) hạng AI chọn sẵn bị bỏ khi ảnh bị xoá/đổi nếu người thu gom chưa tự chọn; (3) "Đi nộp trạm" thành nút chính cả khi điểm cuối đã thu nhưng chưa đồng bộ; (4) hộp xác nhận: focus vào nút an toàn, Esc để đóng, role alertdialog; (5) thẻ điểm thu giữ tiêu đề h2, mở menu bằng nút thật "Gọi quán, chỉ đường…".
 - 03/10/2026 — C6 — xong. Mã kỹ thuật chuyển vào phần "Chi tiết" thu gọn (TechDetails, thẻ details): Mã giao dịch và provider/model AI ở màn nhập, UUID ở hàng chờ đồng bộ, Mã phiếu ở biên nhận nộp trạm, Mã phiếu/mã trạm/mã người thu gom/mã giao dịch ở biên nhận đã lưu. Dải trạng thái mục biên nhận không còn in mã phiếu. Đã thử trên demo: hàng chờ và màn nhập chỉ hiện "Chi tiết" (đóng). Cũng thấy dòng "Còn thiếu" không còn đòi xác nhận chênh lệch khi ô trống. Ảnh: design/snapshots/ui-v4/C6/.

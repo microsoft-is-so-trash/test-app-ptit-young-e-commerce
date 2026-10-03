@@ -46,6 +46,232 @@ mở và quyết định đã có nằm trong file tiến độ, không nằm tr
 
 ---
 
+## 2. Dùng nhiều tác tử (Society Charter)
+
+> **Trạng thái:** chủ dự án **duyệt ngày 03/10/2026** (S-1, S-3, S-4 theo đề xuất; S-2: trần 12 lần
+> gọi tác tử phụ mỗi giai đoạn). Áp dụng từ giai đoạn I1. Các bước tương ứng đã được đưa vào
+> `.claude/rules/ui-v4-workflow.md` (B2, B3, B6, B8).
+
+Cơ sở: tài liệu "Society of Agents" chủ dự án gửi trong chat ngày 03/10/2026 (cổng 6 câu, bảng
+Charter 11 trường), áp vào số liệu thật của dự án. Số liệu bên ngoài trong mục này (chi phí khoảng
+15 lần token, lỗi lan truyền khi thiếu kiểm chứng tập trung) lấy từ tài liệu đó, agent chưa kiểm lại.
+
+### 2.1. Kết luận
+
+- **Không dựng "society" để viết code.** Chỉ **một tác tử chính** (phiên chạy `/ui-v4`) được ghi:
+  code, test, file tiến độ, kế hoạch, commit, push. Lý do ở mục 2.2, dòng A.
+- Tác tử phụ chỉ được dùng **như công cụ chỉ đọc, ngữ cảnh sạch**, ở 3 chỗ, mỗi chỗ đã qua cổng:
+  1. Rà soát đầu giai đoạn (B2), chỉ khi khối lượng cần đọc vượt sức một tác tử (câu 4 của cổng
+     là "có"). Hiện chỉ I2 đạt (dòng B).
+  2. Review sau khi viết (B6): reviewer mã, và reviewer bảo mật khi task chạm key, endpoint gọi API
+     trả phí, xác thực hoặc rate limit (dòng C).
+  3. Kiểm nghiệm thu cuối giai đoạn (B8): một verifier độc lập chấm từng tiêu chí trước khi gửi
+     báo cáo (dòng D).
+- Không dùng tác tử phụ để viết test, chụp ảnh hay sửa lỗi build (dòng E, F).
+
+### 2.2. Cổng 6 câu áp vào dự án
+
+Câu hỏi: (1) chia được thành phần độc lập · (2) chạy song song được (chủ yếu đọc) · (3) cần người
+chấm khác người làm · (4) vượt ngữ cảnh một tác tử · (5) cần chuyên môn/công cụ khác nhau · (6) lợi
+ích lớn hơn chi phí. "Chưa rõ" tính là "không". Chỉ dùng khi có từ 4 "có" trở lên **và** câu 6 là "có".
+
+| | Cách dùng | 1 | 2 | 3 | 4 | 5 | 6 | Kết luận |
+|---|---|---|---|---|---|---|---|---|
+| A | Cả giai đoạn I1/I2 chia cho nhiều tác tử cùng viết (admin, api, miniapp song song) | Không | Không | Có | Chưa rõ | Có | Chưa rõ | **KHÔNG** |
+| B | Rà soát đầu giai đoạn (B2) bằng 2–3 tác tử đọc song song | Có | Có | Không | I1: không · I2: có | Không | Có | I1: **KHÔNG** · I2: **DÙNG** |
+| C | Review sau khi viết (B6) | Có | Có | Có | Không | Có | Có | **DÙNG** |
+| D | Verifier nghiệm thu cuối giai đoạn (B8) | Có | Có | Có | Không | Không | Có | **DÙNG** |
+| E | Tác tử riêng viết test trước (`tdd-guide`) | Không | Không | Có | Không | Không | Không | **KHÔNG** |
+| F | Tác tử riêng chụp ảnh/kiểm trực quan (B5) | Không | Không | Có | Không | Không | Không | **KHÔNG** |
+
+Giải thích các ô quyết định:
+
+- **A, câu 1–2:** I1.1, I1.2, I1.3 dùng chung hợp đồng `StationRecommendation`
+  (`packages/shared-types`) và `stationRecommendSchema` (`packages/validation`); I2.3–I2.5 cần
+  endpoint của I2.1. Ngoài ra mọi task cùng ghi `docs/TIEN_DO_UI_V4.md`, script `test` của
+  `apps/miniapp/package.json` và cùng một branch theo quy tắc "mỗi task một commit". Nhiều luồng
+  ghi sẽ xung đột.
+- **A, câu 6 và phép thử phủ quyết:** giai đoạn M và C (69 file, 30 commit) đã xong bằng một tác tử,
+  không có lỗi CRITICAL/HIGH, 228/228 test pass. Baseline một tác tử đã cao, nên muốn dùng society
+  thì phải có pilot chứng minh nó thắng. Chưa có pilot. Hạn mức sử dụng cũng là ràng buộc thật: phiên
+  ngày 03/10/2026 đã phải dừng giữa C5.2 vì hết hạn mức (xem nhật ký).
+- **B, câu 4:** I1 đã được tác tử chính rà gần xong trong khoảng 10 lệnh đọc (03/10/2026), không cần
+  chia. I2 chạm module backend mới, luồng "Bắt đầu ca" và Dexie của Collector, `NotificationBell` và
+  Cài đặt chung của Merchant, cộng 2 tài liệu nghiên cứu, nên đáng chia.
+- **C, câu 6:** đã có bằng chứng: 3 lần chạy `code-reviewer` tìm được 11 điểm MEDIUM, sửa 10.
+- **D, câu 3:** hiện tác tử chính tự chấm nghiệm thu chính việc mình làm. Theo bảng Charter, "chỉ
+  tác tử làm việc được tuyên bố xong" là tín hiệu đỏ.
+- **E:** test của dự án là hàm thuần nhỏ trong `src/lib/`, viết cùng luồng với code; tác tử viết
+  test riêng sẽ thành luồng ghi thứ hai. Thay bằng quy tắc bằng chứng RED (mục 2.3, trường 8), vì
+  đã có lần bỏ bước RED (ghi chú C3).
+- **F:** cần dev server và browser pane của phiên chính, là trạng thái dùng chung.
+
+### 2.3. Charter của dự án (11 trường)
+
+**1. Mục tiêu và tiêu chí hoàn thành.** Làm xong I1 → I2 → (I3 nếu được xác nhận) đúng kế hoạch.
+Mỗi giai đoạn xong khi:
+
+- Cổng kiểm tra B4 pass 100% cho mọi app bị sửa.
+- Không còn lỗi CRITICAL/HIGH nào chưa xử lý.
+- Mọi tiêu chí nghiệm thu được verifier chấm "đạt", hoặc "chưa đủ bằng chứng" kèm lý do (ví dụ
+  cần máy thật).
+- Số lần gọi tác tử phụ không vượt trần ở trường 9.
+
+**2. Vai trò.**
+
+| Vai | Loại agent · model | Đầu vào | Đầu ra | ĐƯỢC | KHÔNG được |
+|---|---|---|---|---|---|
+| Tác tử chính | Phiên `/ui-v4` | Kế hoạch, tiến độ, câu trả lời của chủ dự án | Code, test, commit, file tiến độ, câu hỏi, báo cáo | Mọi bước B0–B8; gọi tác tử phụ; phân xử | Sửa vùng cấm; tự kết luận nghiệm thu giai đoạn khi verifier chưa chạy; nhờ tác tử phụ ghi file |
+| Người rà soát | `Explore` · sonnet | Mã task + danh sách file của một app | Bảng: file:dòng còn khớp/không khớp mô tả, thay đổi dự kiến, điểm thuộc S1–S14 | Đọc file, `grep`, `git log/show/diff` | Sửa file; chạy lệnh ghi (`pnpm install`, `git` ghi); đề xuất việc ngoài kế hoạch |
+| Reviewer mã | `code-reviewer` · sonnet | Khoảng commit + mã task + quy tắc U1–U13/E1–E7 | Danh sách lỗi theo mức, file:dòng, kịch bản gây lỗi | Đọc, chạy test/lint chỉ đọc | Sửa code; chạy `git` ghi; mở rộng phạm vi |
+| Reviewer bảo mật | `security-reviewer` · sonnet | Như trên + checklist E1, E3, E6 | Như trên | Như trên | Như trên |
+| Verifier nghiệm thu | Agent mới `ui-v4-verifier` (Read, Grep, Glob, Bash) · sonnet | Tiêu chí nghiệm thu (trích từ kế hoạch), đường dẫn ảnh, danh sách lệnh kiểm tra | Mỗi tiêu chí: đạt / không đạt / chưa đủ bằng chứng, kèm bằng chứng | Chạy lại lệnh cổng kiểm tra, xem ảnh, đọc diff | Sửa file; đọc nhật ký lập luận của tác tử chính (chỉ chấm sản phẩm) |
+| Chủ dự án | Người | Câu hỏi, báo cáo giai đoạn | Quyết định, duyệt | Duyệt giai đoạn, trả lời S1–S14, phân xử cuối | |
+
+Tác tử phụ không được gọi tác tử khác. Cả 4 vai phụ đều có `Bash`, nên ranh giới "chỉ đọc" phải
+được kiểm bằng máy (trường 5), không chỉ dựa vào lời dặn trong prompt.
+
+**3. Mô hình phối hợp.** Hai mô hình, tách theo đọc/ghi:
+
+- Ghi: **pipeline tuần tự** B3 → B4 → B5 → B6 → B7, như hiện tại.
+- Đọc: **orchestrator–worker**, tác tử chính chia việc rồi tổng hợp.
+- Không dùng debate (bỏ phiếu đã đủ, mà ở đây test là trọng tài), blackboard hay đấu thầu.
+
+**4. Giao thức.** Công cụ `Agent` nhận một prompt chữ và trả về chữ, nên giao thức là mẫu prompt
+và mẫu kết quả cố định:
+
+```text
+conv_id:    <giai đoạn>-<mã task>-<vai>-<lần>   ví dụ I1-I1.2-sec-1
+act:        request
+task_ref:   <mã task> · mục <x> của docs/KE_HOACH_CHUAN_HOA_UI_V4.md
+payload_ref: <khoảng commit hoặc danh sách file> (không dán nội dung file)
+rules:      <các quy tắc U/E liên quan>
+forbidden:  không sửa file, không chạy lệnh ghi, không gọi tác tử khác
+return:     act (done | reject) · findings[] {mức, file:dòng, mô tả, kịch bản lỗi}
+            · evidence[] (file:dòng hoặc lệnh + kết quả) · confidence · việc chưa làm được
+```
+
+Kết quả không có `evidence` thì tác tử chính coi như không có.
+
+**5. Trạng thái.** Tác tử phụ chỉ đọc mọi kho:
+
+| Kho | Ai ghi | Ai đọc |
+|---|---|---|
+| Branch `ui_version_4` (code, test, ảnh) | Tác tử chính | Tất cả |
+| `docs/TIEN_DO_UI_V4.md` | Tác tử chính | Tất cả |
+| `docs/KE_HOACH_CHUAN_HOA_UI_V4.md` | Tác tử chính, sau khi chủ dự án trả lời | Tất cả |
+| Báo cáo gốc của tác tử phụ | Không lưu vào repo; tác tử chính tóm tắt vào cột "Ghi chú" | |
+
+Kiểm bằng máy: chụp `git status --porcelain` và `git diff --stat` trước và sau mỗi lần gọi tác tử
+phụ. Khác nhau → dừng hỏi (S8), không tự xoá thay đổi. Không dùng worktree, vì không có luồng ghi
+song song.
+
+**6. Phân xử khi bất đồng.** Thứ tự: test hoặc lệnh tái lập được > bằng chứng file:dòng > kế hoạch
+và quy tắc U/E > ý kiến reviewer.
+
+- Lỗi CRITICAL/HIGH: tác tử chính sửa, hoặc chứng minh là báo nhầm bằng test hay file:dòng rồi
+  ghi lại. Không chứng minh được mà muốn bỏ qua → S7.
+- Lỗi ngoài phạm vi → ghi vào "Phát hiện ngoài phạm vi", không sửa.
+- Verifier chấm "không đạt" mà tác tử chính không đồng ý → không tranh luận qua lại. Ghi cả hai lập
+  luận vào báo cáo giai đoạn, chủ dự án quyết.
+
+**7. Điều kiện dừng.**
+
+- Task xong khi: B4 pass, có ảnh B5 (nếu đổi giao diện), và review (nếu bắt buộc theo mục 2.4)
+  không còn CRITICAL/HIGH.
+- Sửa sau review: tối đa 2 vòng, tính chung với giới hạn của B4.
+- Verifier: chạy lại tối đa 1 lần sau khi sửa; vẫn "không đạt" thì đưa vào báo cáo cho chủ dự án.
+- Tác tử phụ lỗi hoặc trả kết quả rỗng: gọi lại tối đa 1 lần. Lần hai vẫn lỗi thì tác tử chính tự
+  làm phần rà soát; với review và verifier thì ghi "không chạy được" vào báo cáo.
+
+**8. Kiểm chứng độc lập.** Bốn tầng, tầng trên không thay tầng dưới:
+
+1. Tất định: typecheck, lint, test, build (thêm api/admin khi bị sửa).
+2. Reviewer ngữ cảnh sạch: chỉ nhận diff và quy tắc, không nhận lập luận của tác tử chính.
+3. Verifier: rubric là tiêu chí nghiệm thu của kế hoạch.
+4. Chủ dự án.
+
+Quy tắc bằng chứng RED: task nhóm B ghi vào cột "Ghi chú" tên test và dòng FAIL trước khi sửa.
+Không có dòng này thì task chưa xong.
+
+**9. Giới hạn.**
+
+- Tối đa 3 tác tử phụ chạy cùng lúc.
+- Mỗi giai đoạn tối đa **12 lần gọi tác tử phụ** (S-2). Mỗi vai không quá 3 lần: rà soát,
+  `code-reviewer`, `security-reviewer`, verifier. Sắp hết hạn mức thì bỏ verifier trước, giữ
+  `security-reviewer`.
+- Tác tử phụ dùng sonnet (theo frontmatter có sẵn); không dùng opus cho tác tử phụ.
+- Tác tử phụ chạy nền; tác tử chính không gửi tin nhắn hỏi thăm định kỳ trong lúc chờ.
+- Trần token/tiền theo con số chủ dự án đặt (câu hỏi S-2).
+
+**10. Điểm dừng cho con người.** Giữ nguyên: duyệt giai đoạn, câu hỏi S1–S14, vùng cấm. Thêm:
+
+- Duyệt Charter này.
+- Mọi thao tác trên Google Cloud (tạo key, hạn mức, cảnh báo ngân sách) do chủ dự án tự làm.
+- I2.2 (nghe thử, chọn giọng) do chủ dự án quyết; agent chỉ chuẩn bị bản nghe thử.
+
+**11. Xử lý lỗi và log.**
+
+- Mỗi lần gọi tác tử phụ ghi 1 dòng vào nhật ký của file tiến độ: `conv_id — vai — đầu vào — kết quả
+  (số lỗi theo mức) — đã xử lý thế nào`.
+- Lỗi gắn nhãn theo 3 nhóm MAST:
+  - **FM1 thiết kế:** brief sai hoặc thiếu, vai không rõ.
+  - **FM2 lệch pha:** tác tử phụ làm ngoài brief, ghi file, bỏ qua `forbidden`.
+  - **FM3 kiểm chứng:** bỏ sót lỗi mà sau đó mới phát hiện, hoặc kết luận không có bằng chứng.
+- Checkpoint vẫn là file tiến độ và commit sau mỗi task, nên bị ngắt thì làm tiếp từ task dở.
+
+### 2.4. Áp dụng cho từng giai đoạn còn lại
+
+| Giai đoạn | B2 rà soát | B6 review | B8 nghiệm thu |
+|---|---|---|---|
+| I1 | Tác tử chính tự rà (xong 03/10/2026, câu hỏi Q17–Q24 trong file tiến độ) | `security-reviewer` cho I1.2 (key Routes, endpoint gọi API trả phí, rate limit, timeout/thử lại theo E3) và cho I1.1 nếu gọi Places qua backend; `code-reviewer` 1 lần cuối giai đoạn trên diff api + admin + miniapp | Verifier chấm: "tắt mạng hoặc dùng key sai thì vẫn gợi ý trạm", "có test e2e backend cho nhánh dự phòng", và tiêu chí của I1.1, I1.3 |
+| I2 | 3 tác tử `Explore` song song: (1) `apps/api` (chỗ đặt module `tts`, JWT guard, Redis, config); (2) Collector (Bắt đầu ca, `outbox-db`/Dexie, các điểm C-T2…C-T6); (3) Merchant + Cài đặt chung (`NotificationBell`, các section) và tài liệu TTS mục 4. Tác tử chính gom thành một lần hỏi | `security-reviewer` bắt buộc cho I2.1 (key, mẫu câu thay vì văn bản tự do, rate limit, cache); `code-reviewer` cuối giai đoạn | Verifier chấm từng tiêu chí; mục cần máy thật (tự phát âm thanh trên iOS, `speechSynthesis` trong Zalo) ghi "chưa đủ bằng chứng" |
+| I3 | Quyết sau I2 | | |
+
+### 2.5. Pilot và đo hiệu quả
+
+I1 là pilot. Ghi lại:
+
+- Số lần gọi từng vai.
+- Số lỗi có giá trị (được sửa thật) trên tổng số lỗi báo ra.
+- Lỗi nào verifier bắt được mà tác tử chính đã bỏ sót.
+
+Cuối I1, đưa các số này vào báo cáo giai đoạn để chủ dự án quyết có giữ, giảm hay bỏ vai nào cho
+I2. Chưa có pilot thì không mở rộng sang nhiều luồng ghi.
+
+### 2.6. Những quy tắc ECC bị thay thế trong kế hoạch này
+
+Thứ tự ưu tiên đã có: kế hoạch đứng trên quy tắc ECC. Khi Charter được duyệt, các điểm sau của
+`.claude/rules/ecc/common/agents.md` và `.claude/AGENTS.md` **không áp dụng** cho kế hoạch UI v4:
+
+- "ALWAYS use parallel Task execution": chỉ chạy song song các nhánh đọc ở mục 2.4.
+- Tự gọi `planner`, `architect`, `tdd-guide`: kế hoạch đã có, và test do tác tử chính viết.
+- "Multi-Perspective Analysis" 5 vai: chỉ dùng các vai ở trường 2.
+
+### 2.7. Việc làm khi được duyệt (đã làm 03/10/2026)
+
+1. Ghi quyết định vào file tiến độ.
+2. Sửa `.claude/rules/ui-v4-workflow.md`:
+   - B2: thêm nhánh rà soát song song có điều kiện.
+   - B3: thêm quy tắc bằng chứng RED.
+   - B6: thay "chạy `code-reviewer` một lần nếu môi trường có" bằng bảng 2.4 cùng phép kiểm
+     `git status` trước/sau.
+   - B8: chạy verifier trước khi gửi báo cáo.
+   - Thêm nhãn MAST vào mẫu nhật ký.
+3. Tạo `.claude/agents/ui-v4-verifier.md` (tools: Read, Grep, Glob, Bash; model: sonnet), có
+   prompt chấm theo tiêu chí nghiệm thu và mẫu kết quả ở trường 4.
+
+### 2.8. Câu hỏi đã được trả lời (03/10/2026)
+
+| Mã | Câu hỏi | Trả lời |
+|---|---|---|
+| S-1 | Một luồng ghi, tác tử phụ chỉ đọc, dùng ở B2 (I2), B6, B8? | Đồng ý |
+| S-2 | Trần gọi tác tử phụ mỗi giai đoạn | 12 lần (đề xuất ban đầu là 9) |
+| S-3 | Tạo agent `.claude/agents/ui-v4-verifier.md` | Đồng ý |
+| S-4 | Sửa `.claude/rules/ui-v4-workflow.md` theo mục 2.7 | Đồng ý |
+
+---
+
 ## Giai đoạn M: Merchant
 
 ### M1. Sửa lỗi phường bị viết cứng khi gửi lại hồ sơ (nhóm B, fix)

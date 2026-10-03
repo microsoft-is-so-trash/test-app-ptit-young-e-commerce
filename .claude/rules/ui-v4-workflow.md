@@ -28,6 +28,8 @@ Riêng cho kế hoạch này, các quy tắc ECC sau được thay thế:
 - Không tự gửi báo cáo tiến độ giữa chừng (xem mục 5).
 - Không tự mở rộng phạm vi: thấy vấn đề ngoài kế hoạch thì ghi vào mục "Phát hiện ngoài phạm vi"
   của file tiến độ, không sửa.
+- Dùng tác tử phụ đúng theo Society Charter (mục 2 của kế hoạch): chỉ một luồng ghi; không áp dụng
+  "ALWAYS parallel", không tự gọi planner/architect/tdd-guide, không chạy phân tích 5 vai.
 
 ## 2. Vòng lặp thực thi
 
@@ -68,7 +70,10 @@ Mục tiêu: gom mọi điểm chưa rõ của cả giai đoạn vào **một** 
 
 1. Đọc toàn bộ task của giai đoạn trong kế hoạch.
 2. Với mỗi task: mở các file được nêu, xác nhận dòng/hàm/component được nhắc tới còn tồn tại và
-   khớp mô tả; liệt kê những gì sẽ thay đổi.
+   khớp mô tả; liệt kê những gì sẽ thay đổi. Nếu bảng 2.4 của kế hoạch cho phép rà soát song song
+   (hiện chỉ I2): gọi tối đa 3 agent `Explore` (model sonnet), mỗi agent một nhánh, theo mẫu brief ở
+   trường 4 của Society Charter (mục 2.3 của kế hoạch). Kiểm `git status` trước và sau như ở B6.
+   Tác tử chính kiểm lại mọi file:dòng mà agent báo trước khi dùng để đặt câu hỏi.
 3. Đánh dấu mọi điểm thuộc danh sách S1–S14. Ghi tất cả vào mục "Câu hỏi đang mở" của file tiến độ.
 4. Có câu hỏi → gửi một tin nhắn gom tất cả câu hỏi (mục 4) rồi dừng. Không có → bắt đầu B3.
 
@@ -80,6 +85,8 @@ Mục tiêu: gom mọi điểm chưa rõ của cả giai đoạn vào **một** 
 3. Nhóm B: viết test trước, chạy và thấy **FAIL** (RED). Logic mới tách thành hàm thuần trong
    `src/lib/`, test bằng `node:test`, thêm file test vào script `test` của
    `apps/miniapp/package.json`. Sau đó sửa code cho tới khi test **PASS** (GREEN).
+   **Bằng chứng RED:** ghi vào cột "Ghi chú" tên test và dòng FAIL thấy được trước khi sửa code.
+   Không có dòng này thì task chưa xong.
 4. Tuân theo U1–U13, E1–E7 cho mọi phần tử mới hoặc phần tử thật đang sửa. Phần giả và dataset
    demo: giữ nguyên chữ và hành vi, đặt lại vào vị trí mới khi tái cấu trúc.
 5. Chỉ sửa đúng phạm vi task. Không "tiện tay" sửa chỗ khác.
@@ -126,8 +133,22 @@ git diff --stat HEAD
 - [ ] Không vi phạm U1–U13 / E1–E7; không thêm phần giả mới; phần giả cũ vẫn đúng chữ.
 - [ ] Không có `console.log` gỡ lỗi, không có key/secret, không có `window.confirm` mới.
 - [ ] Không sửa vùng cấm (mục 6).
-- Task nhóm B: chạy agent `code-reviewer` một lần trên diff nếu môi trường có. Vấn đề CRITICAL/HIGH
-  phải sửa (vẫn tính trong giới hạn 2 vòng của B4); vấn đề muốn bỏ qua → dừng hỏi (S7).
+- Review bằng tác tử phụ theo bảng 2.4 và Society Charter (mục 2 của kế hoạch):
+  - `security-reviewer`: bắt buộc với task chạm key, endpoint gọi API trả phí, xác thực hoặc rate
+    limit (I1.2, I2.1, và I1.1 nếu gọi Places qua backend).
+  - `code-reviewer`: một lần cuối giai đoạn trên toàn bộ diff của giai đoạn (trước B8), hoặc sau
+    task lớn nếu bảng 2.4 ghi.
+  - Hai reviewer chạy song song, ở chế độ nền. Brief theo mẫu trường 4; chỉ gửi khoảng commit và
+    quy tắc, không gửi lập luận của tác tử chính.
+  - Trần: tối đa 12 lần gọi tác tử phụ mỗi giai đoạn, mỗi vai không quá 3 lần (trường 9).
+- **Kiểm chỉ đọc:** lưu `git status --porcelain` và `git diff --stat` ngay trước khi gọi, so lại
+  sau khi tác tử phụ trả kết quả. Khác nhau → dừng hỏi (S8), không tự xoá thay đổi.
+- Phân xử: test/lệnh tái lập được > file:dòng > kế hoạch và U/E > ý kiến reviewer. Vấn đề
+  CRITICAL/HIGH phải sửa (vẫn tính trong giới hạn 2 vòng của B4), hoặc chứng minh là báo nhầm bằng
+  test hay file:dòng. Muốn bỏ qua mà không chứng minh được → dừng hỏi (S7).
+- Mỗi lần gọi ghi 1 dòng nhật ký: `conv_id — vai — đầu vào — kết quả (số lỗi theo mức) — xử lý`.
+  Lỗi của chính tác tử phụ gắn nhãn MAST: FM1 (thiết kế/brief), FM2 (lệch pha: làm ngoài brief,
+  ghi file), FM3 (kiểm chứng: bỏ sót, kết luận không có bằng chứng).
 
 ### B7. Commit và ghi tiến độ
 
@@ -143,8 +164,16 @@ git diff --stat HEAD
 Khi mọi task của giai đoạn đã `xong` (hoặc `bị chặn` với câu hỏi đã gửi):
 
 1. Chụp màn hình trước/sau toàn bộ các màn của giai đoạn.
-2. Ghi mục "Báo cáo giai đoạn" vào file tiến độ.
-3. Gửi báo cáo giai đoạn (mục 5) và **dừng**, chờ chủ dự án duyệt.
+2. Gọi agent `ui-v4-verifier` (kiểm chỉ đọc như ở B6). Brief gồm: tiêu chí nghiệm thu của từng
+   task trích nguyên văn từ kế hoạch, khoảng commit của giai đoạn, đường dẫn ảnh, danh sách lệnh
+   cổng kiểm tra. Không gửi ghi chú hay lập luận của tác tử chính.
+   - Tiêu chí "không đạt": sửa (tính trong giới hạn 2 vòng) rồi chạy verifier lại tối đa 1 lần.
+     Vẫn không đạt, hoặc tác tử chính không đồng ý → ghi cả hai lập luận vào báo cáo, chủ dự án
+     quyết. Không tranh luận nhiều vòng.
+   - "Chưa đủ bằng chứng" (ví dụ cần máy thật): ghi nguyên vào báo cáo.
+3. Ghi mục "Báo cáo giai đoạn" vào file tiến độ, kèm kết quả verifier và số lần gọi từng vai tác
+   tử phụ (số liệu pilot, mục 2.5 của kế hoạch).
+4. Gửi báo cáo giai đoạn (mục 5) và **dừng**, chờ chủ dự án duyệt.
 
 ## 3. Điều kiện bắt buộc dừng và hỏi
 
