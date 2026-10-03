@@ -9,9 +9,9 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 
 | | |
 |---|---|
-| Giai đoạn | M (đang làm) |
+| Giai đoạn | M xong — chờ chủ dự án duyệt |
 | Task đang làm | — |
-| Đang chờ chủ dự án | — |
+| Đang chờ chủ dự án | Duyệt giai đoạn M ("duyệt M") |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — rà soát đầu giai đoạn M (B2) |
 
@@ -113,12 +113,20 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 ## Báo cáo giai đoạn
 
-(Chưa có.)
+### Giai đoạn M — 03/10/2026
+
+- Đã làm: M1, M2, M3, M4, M5.1, M5.2, M5.3, M5.4, M6 (mỗi task một commit trên `ui_version_4`).
+- Cổng kiểm tra cuối: typecheck, lint, build pass; 186/186 test pass (trước giai đoạn: 150).
+- Review: code-reviewer chạy 2 lần (M4; M5.1–M6). Không có CRITICAL/HIGH. Đã sửa 5 điểm MEDIUM.
+- Ảnh trước: `design/snapshots/ui-v4/M-before/`; ảnh sau theo từng task: `design/snapshots/ui-v4/M2` … `M6`.
+- Chưa kiểm được trên màn hình (dataset demo không có tình huống): thẻ "Đơn đang mở", nhắc "Can sắp đầy", dòng lý do nút khoá. Đã kiểm bằng test.
+- Giới hạn của dữ liệu demo: thông báo "Đã thu gom thành công" hiện lại chưa đọc sau khi tải lại vì dataset demo tính lại thời điểm theo giờ hiện tại.
 
 ## Nhật ký
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
 
+- 03/10/2026 — B8 giai đoạn M — Review M5.1–M6: sửa gợi ý "Chọn phường để gửi hồ sơ." ở màn đăng ký chỉ hiện khi thật sự có ô chọn phường. Ghi báo cáo giai đoạn, dừng chờ duyệt.
 - 03/10/2026 — M6 — xong. Nút đăng xuất trong Cài đặt chung: chữ thường "Đăng xuất", bỏ btn-lg (không còn nút lớn); giữ class btn-danger để font giữ nguyên 14px/700 theo ràng buộc giữ font. Không thêm hộp xác nhận (Q7). Ảnh: design/snapshots/ui-v4/M6/ (ảnh bị lệch khung do công cụ chụp, nội dung đúng).
 - 03/10/2026 — M5.4 — xong. Nút "Sẵn sàng thu gom" hiện dòng lý do khi bị khoá (đơn đang chờ / can đang chở đi / chưa được cấp can) qua lib/merchant-blockers.ts; nút gửi hồ sơ (MerchantApprovalView) liệt kê trường còn thiếu; nút "Gửi hồ sơ đăng ký" ở màn đăng nhập ghi "Chọn phường để gửi hồ sơ.". OrderSheet, sửa thông tin quán, yêu cầu can đã có dòng lỗi sẵn. Test merchant-blockers (6). Dataset demo không giữ đơn mới nên không chụp được trạng thái khoá; kiểm bằng test.
 - 03/10/2026 — M5.3 — xong. Trạng thái đã đọc lưu qua zaloClient storage, khoá eco_oil.notifications_read.<userId>, tối đa 100 khoá (lib/notification-read.ts). Mỗi thông báo có readKey: id bản ghi (thanh toán, giá dầu) hoặc id + thời điểm sự kiện (đơn chờ, lần thu gom, can đầy) để sự kiện mới cùng loại lại hiện chưa đọc. Test notification-read (6). Đã thử tải lại: 3/4 thông báo giữ trạng thái đã đọc; "Đã thu gom thành công" trong dataset demo bị tính lại thời điểm theo giờ hiện tại mỗi lần tải nên hiện chưa đọc lại (dữ liệu thật không bị). Ảnh: design/snapshots/ui-v4/M5.3/.
