@@ -10,7 +10,7 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 | | |
 |---|---|
 | Giai đoạn | C (đang làm) — M đã duyệt |
-| Task đang làm | — |
+| Task đang làm | C5.2, C5.4 (dừng giữa chừng do hết hạn mức sử dụng) |
 | Đang chờ chủ dự án | — |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — rà soát đầu giai đoạn M (B2) |
@@ -75,9 +75,9 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 | C4.3 | B | xong | (commit này) | Bỏ màn Tóm tắt ca (xoá CollectorSummaryScreen). Màn Tuyến: dòng "x / y điểm đã thu · z lít"; đã thu ≥ 1 điểm có nút chữ "Đi nộp trạm", thu hết điểm thì thành nút chính (lib/route-delivery.ts, Q12). "Về tóm tắt ca" → "Về tuyến hôm nay"; mở lại app khi ca dở vào thẳng màn Tuyến. Đã thử trên demo: sau 1 giao dịch dòng tiến độ hiện "1 / 4 điểm đã thu · 20 lít | Đi nộp trạm". Test thêm 3 trong collector-flow.test.ts. Phát hiện màn nhập kẹt "Đang lưu…" khi khung ẩn, có từ trước (xem Phát hiện ngoài phạm vi). |
 | C4.4 | B | xong | (commit này) | Theo Q13 không đổi luồng: bấm "Kết ca" ở biên nhận đã kết ca luôn. Tách logic thành closeShiftAfterReceipt (lưu biên nhận → kết ca, không qua màn trung gian) và thêm 3 test trong station-delivery.test.ts chứng minh 1 lần bấm, báo lỗi khi kết ca bị từ chối, không kết ca khi chưa lưu được biên nhận. Màn "Ca làm đã khép lại" và dòng giả "Số phiếu nộp trạm: 1" giữ nguyên. |
 | C5.1 | B | xong | (commit này) | Ô kg và lít để trống lúc đầu (Q14, không còn điền số quán khai). Ô nhập sau cùng là ô gốc, ô kia tự tính theo DEFAULT_DENSITY_KG_PER_LITER và ghi "(tự tính)" (lib/mass-entry.ts, không dùng useEffect). Chỉ gửi ô gốc: kg → actual_kg, lít → actual_liters. Đã thử: nhập 18,2 kg → 20.0 lít tự tính; nhập 12 lít → 10.9 kg tự tính, nhãn kg đổi thành "Khối lượng (tự tính)". Test mass-entry (5). Ảnh: design/snapshots/ui-v4/C5/. |
-| C5.2 | B | chưa làm | | |
+| C5.2 | B | đang làm | | Đã có hàm resolveQuality + test (grade-automation.test.ts); CHƯA nối vào CollectorEntryScreen và chưa gộp khối Chất lượng vào khối Phân hạng |
 | C5.3 | B | chưa làm | | |
-| C5.4 | B | chưa làm | | |
+| C5.4 | B | đang làm | | Đã có hàm aiPreselectGrade + test; CHƯA nối vào analyzePhotos và nhãn "AI chọn sẵn" |
 | C5.5 | B | chưa làm | | |
 | C6 | A | chưa làm | | |
 
@@ -129,6 +129,7 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
 
+- 03/10/2026 — C5.2/C5.4 — Dừng do hết hạn mức sử dụng. Đã có lib/grade-automation.ts và test; việc tiếp theo: nối vào CollectorEntryScreen, rồi C5.3, C5.5, C6, review, báo cáo giai đoạn C.
 - 03/10/2026 — C5.1 — xong. Ô kg và lít để trống lúc đầu (Q14, không còn điền số quán khai). Ô nhập sau cùng là ô gốc, ô kia tự tính theo DEFAULT_DENSITY_KG_PER_LITER và ghi "(tự tính)" (lib/mass-entry.ts, không dùng useEffect). Chỉ gửi ô gốc: kg → actual_kg, lít → actual_liters. Đã thử: nhập 18,2 kg → 20.0 lít tự tính; nhập 12 lít → 10.9 kg tự tính, nhãn kg đổi thành "Khối lượng (tự tính)". Test mass-entry (5). Ảnh: design/snapshots/ui-v4/C5/.
 - 03/10/2026 — C4.4 — xong. Theo Q13 không đổi luồng: bấm "Kết ca" ở biên nhận đã kết ca luôn. Tách logic thành closeShiftAfterReceipt (lưu biên nhận → kết ca, không qua màn trung gian) và thêm 3 test trong station-delivery.test.ts chứng minh 1 lần bấm, báo lỗi khi kết ca bị từ chối, không kết ca khi chưa lưu được biên nhận. Màn "Ca làm đã khép lại" và dòng giả "Số phiếu nộp trạm: 1" giữ nguyên.
 - 03/10/2026 — C4.3 — xong. Bỏ màn Tóm tắt ca (xoá CollectorSummaryScreen). Màn Tuyến: dòng "x / y điểm đã thu · z lít"; đã thu ≥ 1 điểm có nút chữ "Đi nộp trạm", thu hết điểm thì thành nút chính (lib/route-delivery.ts, Q12). "Về tóm tắt ca" → "Về tuyến hôm nay"; mở lại app khi ca dở vào thẳng màn Tuyến. Đã thử trên demo: sau 1 giao dịch dòng tiến độ hiện "1 / 4 điểm đã thu · 20 lít | Đi nộp trạm". Test thêm 3 trong collector-flow.test.ts. Phát hiện màn nhập kẹt "Đang lưu…" khi khung ẩn, có từ trước (xem Phát hiện ngoài phạm vi).
