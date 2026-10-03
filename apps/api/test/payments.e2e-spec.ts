@@ -7,6 +7,7 @@ import { AppModule } from '../src/app.module';
 import { paymentPeriodFor } from '../src/modules/payments/payment-period';
 import { PaymentsService } from '../src/modules/payments/payments.service';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { DEMO_COLLECTOR, DEMO_MERCHANTS, demoAdminUserId, demoWardId, ensureOpenOilPrice, loginAdmin } from './helpers/demo-seed';
 
 jest.setTimeout(120000);
 
@@ -18,6 +19,8 @@ describe('Weekly merchant payments (e2e)', () => {
   let merchantAToken: string;
   let originalPrice: OilPrice;
   let newPriceId: string | undefined;
+  let createdOpenPriceId: string | null = null;
+  let adminUserId: string;
 
   const suffix = randomUUID().slice(0, 8);
   const merchantAUserId = randomUUID();
@@ -44,7 +47,10 @@ describe('Weekly merchant payments (e2e)', () => {
     await app.init();
     prisma = app.get(PrismaService);
     paymentsService = app.get(PaymentsService);
-    adminToken = await login('zalo_admin_01', '0990000001');
+    adminToken = await loginAdmin(app);
+    adminUserId = await demoAdminUserId(prisma);
+    const wardId = await demoWardId(prisma, 'HB-HK-DEMO');
+    createdOpenPriceId = await ensureOpenOilPrice(prisma);
 
     const openPrice = await prisma.oilPrice.findFirst({ where: { effectiveTo: null }, orderBy: { effectiveFrom: 'desc' } });
     if (!openPrice) throw new Error('Payment e2e requires the seeded open oil price');
@@ -59,15 +65,15 @@ describe('Weekly merchant payments (e2e)', () => {
     });
     await prisma.merchant.createMany({
       data: [
-        { id: merchantAId, userId: merchantAUserId, wardId: '10000000-0000-4000-8000-000000000001', businessName: 'Quán thanh toán A', approvalStatus: 'APPROVED' },
-        { id: merchantBId, userId: merchantBUserId, wardId: '10000000-0000-4000-8000-000000000001', businessName: 'Quán thanh toán B', approvalStatus: 'APPROVED' },
+        { id: merchantAId, userId: merchantAUserId, wardId, businessName: 'Quán thanh toán A', approvalStatus: 'APPROVED' },
+        { id: merchantBId, userId: merchantBUserId, wardId, businessName: 'Quán thanh toán B', approvalStatus: 'APPROVED' },
       ],
     });
     await prisma.collectionTransaction.createMany({
       data: [
-        { id: transactionAId, clientUuid: randomUUID(), containerId: '60000000-0000-4000-8000-000000000001', merchantId: merchantAId, collectorId: '50000000-0000-4000-8000-000000000001', actualLiters: 10, grade: 'A', quality: 'PASS', collectedAt: boundaryCollectedAt },
-        { id: transactionBId, clientUuid: randomUUID(), containerId: '60000000-0000-4000-8000-000000000001', merchantId: merchantBId, collectorId: '50000000-0000-4000-8000-000000000001', actualLiters: 5.5, grade: 'C', quality: 'PASS', collectedAt: new Date('2030-01-08T03:00:00.000Z') },
-        { id: flaggedTransactionId, clientUuid: randomUUID(), containerId: '60000000-0000-4000-8000-000000000001', merchantId: merchantAId, collectorId: '50000000-0000-4000-8000-000000000001', actualLiters: 9, grade: 'A', quality: 'FLAG', collectedAt: new Date('2030-01-09T03:00:00.000Z') },
+        { id: transactionAId, clientUuid: randomUUID(), containerId: DEMO_MERCHANTS[0].containerId, merchantId: merchantAId, collectorId: DEMO_COLLECTOR.id, actualLiters: 10, grade: 'A', quality: 'PASS', collectedAt: boundaryCollectedAt },
+        { id: transactionBId, clientUuid: randomUUID(), containerId: DEMO_MERCHANTS[0].containerId, merchantId: merchantBId, collectorId: DEMO_COLLECTOR.id, actualLiters: 5.5, grade: 'C', quality: 'PASS', collectedAt: new Date('2030-01-08T03:00:00.000Z') },
+        { id: flaggedTransactionId, clientUuid: randomUUID(), containerId: DEMO_MERCHANTS[0].containerId, merchantId: merchantAId, collectorId: DEMO_COLLECTOR.id, actualLiters: 9, grade: 'A', quality: 'FLAG', collectedAt: new Date('2030-01-09T03:00:00.000Z') },
       ],
     });
     merchantAToken = await login(`zalo_payment_a_${suffix}`, `0961${suffix}`);
@@ -77,9 +83,10 @@ describe('Weekly merchant payments (e2e)', () => {
     if (!prisma) return;
     await prisma.payment.deleteMany({ where: { transactionId: { in: transactionIds } } }).catch(() => undefined);
     await prisma.collectionTransaction.deleteMany({ where: { id: { in: transactionIds } } }).catch(() => undefined);
-    await prisma.auditLog.deleteMany({ where: { action: { in: ['RUN_PAYMENT_PERIOD', 'CREATE_OIL_PRICE', 'MARK_PAYMENT_PAID'] }, actorUserId: '40000000-0000-4000-8000-000000000999' } }).catch(() => undefined);
+    await prisma.auditLog.deleteMany({ where: { action: { in: ['RUN_PAYMENT_PERIOD', 'CREATE_OIL_PRICE', 'MARK_PAYMENT_PAID'] }, actorUserId: adminUserId } }).catch(() => undefined);
     if (newPriceId) await prisma.oilPrice.delete({ where: { id: newPriceId } }).catch(() => undefined);
     if (originalPrice) await prisma.oilPrice.update({ where: { id: originalPrice.id }, data: { unitPrice: originalPrice.unitPrice, effectiveTo: null } }).catch(() => undefined);
+    if (createdOpenPriceId) await prisma.oilPrice.delete({ where: { id: createdOpenPriceId } }).catch(() => undefined);
     await prisma.merchant.deleteMany({ where: { id: { in: [merchantAId, merchantBId] } } }).catch(() => undefined);
     await prisma.refreshToken.deleteMany({ where: { userId: { in: [merchantAUserId, merchantBUserId] } } }).catch(() => undefined);
     await prisma.user.deleteMany({ where: { id: { in: [merchantAUserId, merchantBUserId] } } }).catch(() => undefined);
@@ -127,7 +134,7 @@ describe('Weekly merchant payments (e2e)', () => {
       newPriceId = undefined;
     }
     await prisma.oilPrice.update({ where: { id: originalPrice.id }, data: { effectiveTo: null, unit: 'PER_KG', unitPrice: 1000 } });
-    const result = await paymentsService.run(period, '40000000-0000-4000-8000-000000000999');
+    const result = await paymentsService.run(period, adminUserId);
     expect(result.created).toBe(1);
     const payment = await prisma.payment.findUniqueOrThrow({ where: { transactionId: transactionBId } });
     expect(payment.unit).toBe('PER_KG');

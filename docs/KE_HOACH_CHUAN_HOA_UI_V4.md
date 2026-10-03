@@ -421,9 +421,9 @@ Thứ tự ưu tiên đã có: kế hoạch đứng trên quy tắc ECC. Khi Cha
 |---|---|---|
 | Task | Việc | File | Trạng thái (03/10/2026) |
 |---|---|---|---|
-| I1.0 | Sửa test api đang đỏ trên CI (thêm theo Q17), để cổng kiểm tra của I1.2 chạy được | `turbo.json`, `apps/api/jest.config.js`, `apps/api/test/`, có thể `.github/workflows/ci.yml` (Q25) | Đã sửa 2 vòng; chờ Q25 |
-| I1.1 | Admin nhập vị trí trạm: gõ địa chỉ → gợi ý Places API (New) **qua backend** (Q18) → chọn → kéo ghim trên **Google Maps JavaScript** (Q19) xác nhận. Giữ ô nhập tay lat/lng làm dự phòng | `apps/admin/src/components/stations-view.tsx`, `apps/api` | Chờ Q27 (chi phí) |
-| I1.2 | Backend: gợi ý trạm theo đường đi bằng Routes API (Compute Route Matrix); lỗi/timeout thì dùng `ST_Distance` hiện có. Bản gốc dùng `TWO_WHEELER`, nhưng chế độ này là SKU Enterprise có tính phí → chế độ đi đường chờ Q26 | `apps/api/src/modules/stations/` | Chờ Q25, Q26 |
+| I1.0 | Sửa test api đang đỏ trên CI (thêm theo Q17), để cổng kiểm tra của I1.2 chạy được. Test e2e chuyển sang dữ liệu `seed-demo` (Q25) | `turbo.json`, `apps/api/jest.config.js`, `apps/api/test/` | Đang làm |
+| I1.1 | Admin nhập vị trí trạm: gõ địa chỉ → gợi ý Places API (New) **qua backend** (Q18) → chọn → kéo ghim trên **Google Maps JavaScript** (Q19) xác nhận. Giữ ô nhập tay lat/lng làm dự phòng | `apps/admin/src/components/stations-view.tsx`, `apps/api` | Chưa làm; có lớp chặn chi phí (Q27) |
+| I1.2 | Backend: gợi ý trạm theo đường đi bằng Routes API (Compute Route Matrix); lỗi/timeout thì dùng `ST_Distance` hiện có. Không dùng `TWO_WHEELER` (SKU Enterprise có phí); dùng Essentials `DRIVE` + `TRAFFIC_UNAWARE`, tối đa 5 trạm/lần, bộ đếm Redis tự dừng ở 8.000 phần tử/tháng, ghi "đường ô tô" (Q26) | `apps/api/src/modules/stations/` | Chưa làm |
 | I1.3 | Collector: lúc "Bắt đầu ca" lưu danh sách trạm đang nhận trên máy (Dexie version 3, bảng `stationCache`); mất mạng thì dùng bản đã lưu, khoảng cách đường chim bay tính trên máy (Q20) | `apps/miniapp/src/lib/offline-cache.ts`, `station-cache.ts`, `outbox-db.ts`, `StationDeliveryFlow.tsx`, `packages/validation` | Xong (4405ef8) |
 
 - Key: `GOOGLE_MAPS_SERVER_KEY` (backend, chỉ bật Routes + Places New, không giới hạn IP vì Render
@@ -435,8 +435,8 @@ Thứ tự ưu tiên đã có: kế hoạch đứng trên quy tắc ECC. Khi Cha
   không xoá/đổi khoá cũ, không dùng `FLUSHDB`/`FLUSHALL`.
 - Tham số Routes (Q23): timeout 3 s, thử lại tối đa 2 lần, làm tròn vị trí 3 chữ số thập phân để
   cache, giữ cache 10 phút, khi dùng dự phòng ghi "đường chim bay" (trường `distance_source`). Số
-  trạm mỗi lần (25) và chế độ đi đường có thể đổi theo Q26.
-- Chi phí bằng 0 (mục 0): I1.1 và I1.2 chỉ làm sau khi chủ dự án trả lời Q26, Q27.
+  trạm mỗi lần là 5 theo Q26 (thay 25 của Q23).
+- Chi phí bằng 0 (mục 0): I1.1 và I1.2 phải có lớp chặn theo Q26, Q27 (bộ đếm tháng trong Redis tự dừng ở 8.000, hạn mức trên Google Cloud, cảnh báo ngân sách).
 - **Nghiệm thu:** tắt mạng hoặc dùng key sai thì app vẫn gợi ý trạm (đường chim bay); có test e2e
   backend cho nhánh dự phòng.
 
@@ -487,6 +487,7 @@ Bản đầy đủ: mục "Quyết định" và "Câu hỏi đang mở" của `d
 | 03/10/2026 | **Duyệt M** (sau khi xem kết quả kiểm thử) |
 | 03/10/2026 | **Duyệt Society Charter** (S-1…S-4, mục 2) |
 | 03/10/2026 | **Duyệt C**, sang I1 |
+| 03/10/2026 | **Offline-first**: app lưu dữ liệu trên máy, tải lên máy chủ khi có mạng; mất mạng thì mọi chức năng vẫn hoạt động bình thường |
 | 03/10/2026 | **Chi phí Google bằng 0** cho Google Maps API và Google AI API; có dấu hiệu phát sinh phí thì dừng hỏi (S15) kèm phương án thay thế |
 
 ### 3.2. Câu hỏi đã trả lời
@@ -521,14 +522,14 @@ Bản đầy đủ: mục "Quyết định" và "Câu hỏi đang mở" của `d
 | Q22 | I1 | Key và hạn mức? | Giới hạn theo API + hạn mức/ngày, không giới hạn IP; chủ dự án tự tạo key; không có key thì dùng giả lập |
 | Q23 | I1 | Tham số Routes? | Timeout 3 s, thử lại 2 lần, 25 trạm, làm tròn 3 chữ số, cache 10 phút, ghi "đường chim bay" khi dự phòng (có thể đổi theo Q26) |
 | Q24 | I1 | 3 phát hiện ngoài phạm vi? | Kẹt "Đang lưu…": chủ dự án thử máy thật; giá ước tính: task nhỏ sau I1; rate limit toàn API: ngoài I1; CI đỏ: I1.0 |
+| Q25 | I1 | Test e2e api hỏng vì lệch dữ liệu seed | (a) nhưng dùng **seed-demo**: CI giữ `pnpm db:seed`, sửa test e2e cho khớp seed-demo, dữ liệu thêm do test tự tạo |
+| Q26 | I1 | Chế độ xe máy là SKU Enterprise có phí | (a) Routes Essentials `DRIVE` + `TRAFFIC_UNAWARE`, 5 trạm/lần, bộ đếm Redis tự dừng ở 8.000, ghi "đường ô tô" |
+| Q27 | I1 | Places + Maps JavaScript có thể vượt mức miễn phí | (a) Làm kèm các lớp chặn |
 
 ### 3.3. Câu hỏi đang mở
 
 | Mã | Chặn | Câu hỏi | Đề xuất |
 |---|---|---|---|
-| Q25 | I1.0, I1.2 | Test e2e api hỏng vì CI seed bằng dataset demo `scripts/seed-demo.ts`, trong khi test cần fixture `apps/api/test/fixtures/hcm-legacy-seed.ts` | (a) CI seed bằng fixture thay cho `pnpm db:seed`, không đụng seed demo |
-| Q26 | I1.2 | Chế độ xe máy `TWO_WHEELER` là SKU Enterprise: 1.000 phần tử miễn phí/tháng rồi 15 USD/1.000; ước tính ~180 USD/tháng | (a) Routes Essentials (`DRIVE`, `TRAFFIC_UNAWARE`, 10.000 miễn phí/tháng), 5 trạm/lần, bộ đếm Redis tự dừng ở 8.000; (b) chỉ giữ `ST_Distance` |
-| Q27 | I1.1 | Places + Maps JavaScript nằm trong mức miễn phí (10.000/tháng mỗi loại) nhưng có thể vượt nếu lỗi lặp | (a) Làm kèm các lớp chặn; (b) chỉ kéo ghim trên Leaflet, không tìm địa chỉ |
 | T1 | I2.1 | Nhà cung cấp TTS của Google | Cloud TTS Chirp 3: HD |
 | T2 | I2.1 | API key hay service account | API key + hạn mức/ngày + cảnh báo ngân sách |
 | T5 | I2.3, I2.4 | Giọng đọc mặc định bật hay tắt | Bật cho Collector, tắt cho Merchant; số tiền luôn tắt |
@@ -543,4 +544,5 @@ Bản đầy đủ: mục "Quyết định" và "Câu hỏi đang mở" của `d
 | 03/10/2026 | `2a72b8b` | Thêm "Cách chạy" (`/ui-v4`, file tiến độ); chốt CO2 = 2.5 (Q1); viết lại I2 theo nghiên cứu TTS (Cloud TTS Chirp 3: HD, `template_id`, cache theo hash, `blob:` URL, Dexie cho âm thanh); câu hỏi chuyển sang file tiến độ |
 | 03/10/2026 | `c0c4d1c` | Thêm mục 2 Society Charter (cổng 6 câu, Charter 11 trường, áp dụng từng giai đoạn, pilot I1) và câu trả lời S-1…S-4 |
 | 03/10/2026 | `6de287c` | Thêm ràng buộc chi phí Google bằng 0 (mục 0, S15); thêm task I1.0 (Q17); key backend không giới hạn IP (Q22) |
-| 03/10/2026 | (commit này) | Ghi chép đầy đủ: mục 1 thêm quy tắc dùng tác tử phụ, chi phí bằng 0, giữ kiểu xuống dòng; sửa cách chụp ảnh (không có Playwright); mục 2 thêm bảng quy tắc bắt buộc R1–R8 và sửa dòng trần token; I1 ghi quyết định Q18–Q23, trạng thái từng task, I1.2 chờ Q26 về chi phí; I2 ghi T3, T4 đã trả lời qua Q21; thêm mục 3 (sổ câu hỏi) và mục 4 (nhật ký này) |
+| 03/10/2026 | `3d2bde4` | Ghi chép đầy đủ: mục 1 thêm quy tắc dùng tác tử phụ, chi phí bằng 0, giữ kiểu xuống dòng; sửa cách chụp ảnh (không có Playwright); mục 2 thêm bảng quy tắc bắt buộc R1–R8 và sửa dòng trần token; I1 ghi quyết định Q18–Q23, trạng thái từng task, I1.2 chờ Q26 về chi phí; I2 ghi T3, T4 đã trả lời qua Q21; thêm mục 3 (sổ câu hỏi) và mục 4 (nhật ký này) |
+| 03/10/2026 | (commit này) | Ghi câu trả lời Q25 (test e2e dùng seed-demo), Q26 (Routes Essentials), Q27 (I1.1 kèm lớp chặn); thêm nguyên tắc offline-first vào mục 3.1; cập nhật bảng I1 |

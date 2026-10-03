@@ -5,8 +5,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
-
-const containerId = '60000000-0000-4000-8000-000000000007';
+import { addTestContainer, DEMO_COLLECTOR, DEMO_MERCHANTS, loginAdmin } from './helpers/demo-seed';
 
 describe('Admin container return to merchant (e2e)', () => {
   let app: INestApplication;
@@ -15,8 +14,7 @@ describe('Admin container return to merchant (e2e)', () => {
   let collectorToken: string;
   let approvedMerchantId: string;
   let secondMerchantId: string;
-  let originalState: string;
-  let originalMerchantId: string | null;
+  let containerId: string;
   let originalMerchantApproval: string;
 
   async function login(zaloId: string, phone: string): Promise<string> {
@@ -35,16 +33,13 @@ describe('Admin container return to merchant (e2e)', () => {
     await app.init();
     prisma = app.get(PrismaService);
 
-    const container = await prisma.container.findUnique({ where: { id: containerId } });
-    if (!container) throw new Error(`Seed container ${containerId} was not found`);
-    originalState = container.state;
-    originalMerchantId = container.merchantId;
+    containerId = (await addTestContainer(prisma, DEMO_MERCHANTS[0], 'RETURN')).id;
 
     const approvedMerchant = await prisma.merchant.findFirst({
-      where: { user: { zaloId: 'zalo_merchant_01' } },
+      where: { user: { zaloId: DEMO_MERCHANTS[0].zaloId } },
     });
     const secondMerchant = await prisma.merchant.findFirst({
-      where: { user: { zaloId: 'zalo_merchant_02' } },
+      where: { user: { zaloId: DEMO_MERCHANTS[1].zaloId } },
     });
     if (!approvedMerchant || !secondMerchant) throw new Error('Seed merchants for container return tests were not found');
     approvedMerchantId = approvedMerchant.id;
@@ -52,8 +47,8 @@ describe('Admin container return to merchant (e2e)', () => {
     originalMerchantApproval = secondMerchant.approvalStatus;
 
     await prisma.merchant.update({ where: { id: approvedMerchantId }, data: { approvalStatus: 'APPROVED' } });
-    adminToken = await login('zalo_admin_01', '0990000001');
-    collectorToken = await login('zalo_collector_01', '0910000001');
+    adminToken = await loginAdmin(app);
+    collectorToken = await login(DEMO_COLLECTOR.zaloId, DEMO_COLLECTOR.phone);
   });
 
   beforeEach(async () => {
@@ -66,10 +61,7 @@ describe('Admin container return to merchant (e2e)', () => {
   });
 
   afterAll(async () => {
-    await prisma.container.update({
-      where: { id: containerId },
-      data: { state: originalState as 'AT_MERCHANT' | 'IN_TRANSIT' | 'AT_STATION', merchantId: originalMerchantId },
-    });
+    await prisma.container.delete({ where: { id: containerId } }).catch(() => undefined);
     await prisma.merchant.update({
       where: { id: secondMerchantId },
       data: { approvalStatus: originalMerchantApproval as 'PENDING' | 'APPROVED' | 'REJECTED' },

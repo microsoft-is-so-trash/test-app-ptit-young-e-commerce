@@ -8,19 +8,24 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { configureBodyParser } from '../src/http/body-parser';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { addTestContainer, assignDemoCollectorWards, DEMO_COLLECTOR, DEMO_MERCHANTS, DEMO_STATION } from './helpers/demo-seed';
 
-const collectorUserId = '40000000-0000-4000-8000-000000000201';
-const collectorId = '50000000-0000-4000-8000-000000000001';
-const stationId = '30000000-0000-4000-8000-000000000001';
-const containers = [
-  { id: '60000000-0000-4000-8000-000000000001', merchant: 'zalo_merchant_01', phone: '0900000001', code: 'ECO-UCO-Q3-P7-001', lat: 10.78255, lng: 106.68475 },
-  { id: '60000000-0000-4000-8000-000000000002', merchant: 'zalo_merchant_01', phone: '0900000001', code: 'ECO-UCO-Q3-P7-002', lat: 10.78255, lng: 106.68475 },
-  { id: '60000000-0000-4000-8000-000000000003', merchant: 'zalo_merchant_02', phone: '0900000002', code: 'ECO-UCO-Q3-P7-003', lat: 10.78195, lng: 106.68535 },
-  { id: '60000000-0000-4000-8000-000000000004', merchant: 'zalo_merchant_02', phone: '0900000002', code: 'ECO-UCO-Q3-P7-004', lat: 10.78195, lng: 106.68535 },
-  { id: '60000000-0000-4000-8000-000000000005', merchant: 'zalo_merchant_03', phone: '0900000003', code: 'ECO-UCO-Q3-P7-005', lat: 10.78305, lng: 106.68615 },
-  { id: '60000000-0000-4000-8000-000000000006', merchant: 'zalo_merchant_03', phone: '0900000003', code: 'ECO-UCO-Q3-P7-006', lat: 10.78305, lng: 106.68615 },
-  { id: '60000000-0000-4000-8000-000000000007', merchant: 'zalo_merchant_04', phone: '0900000004', code: 'ECO-UCO-Q3-P7-007', lat: 10.78095, lng: 106.68425 },
-];
+const collectorUserId = DEMO_COLLECTOR.userId;
+const collectorId = DEMO_COLLECTOR.id;
+const stationId = DEMO_STATION.id;
+
+interface ContainerFixture {
+  id: string;
+  merchant: string;
+  phone: string;
+  code: string;
+  lat: number;
+  lng: number;
+}
+
+// Mỗi can chỉ dùng một lần trong file; seed-demo mỗi quán có 1 can nên test tự tạo thêm can.
+const containerOwners = [0, 0, 1, 1, 2, 2, 3] as const;
+const containers: ContainerFixture[] = [];
 
 describe('Sync batch and station delivery reconciliation (e2e)', () => {
   let app: INestApplication;
@@ -32,7 +37,7 @@ describe('Sync batch and station delivery reconciliation (e2e)', () => {
     return response.body.access_token as string;
   }
 
-  async function orderFor(container: (typeof containers)[number]) {
+  async function orderFor(container: ContainerFixture) {
     const token = await login(container.merchant, container.phone);
     const response = await request(app.getHttpServer())
       .post('/api/v1/orders/ready')
@@ -42,7 +47,7 @@ describe('Sync batch and station delivery reconciliation (e2e)', () => {
     return response.body.id as string;
   }
 
-  function collection(orderId: string, container: (typeof containers)[number], clientUuid = randomUUID(), actualLiters = 10) {
+  function collection(orderId: string, container: ContainerFixture, clientUuid = randomUUID(), actualLiters = 10) {
     return {
       client_uuid: clientUuid,
       order_id: orderId,
@@ -66,7 +71,13 @@ describe('Sync batch and station delivery reconciliation (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     await app.init();
     prisma = app.get(PrismaService);
-    collectorToken = await login('zalo_collector_01', '0910000001');
+    collectorToken = await login(DEMO_COLLECTOR.zaloId, DEMO_COLLECTOR.phone);
+    await assignDemoCollectorWards(prisma, ['CV-BD-DEMO', 'NT-HBT-DEMO']);
+    for (const ownerIndex of containerOwners) {
+      const owner = DEMO_MERCHANTS[ownerIndex];
+      const created = await addTestContainer(prisma, owner, 'SYNC');
+      containers.push({ id: created.id, merchant: owner.zaloId, phone: owner.phone, code: created.code, lat: owner.lat, lng: owner.lng });
+    }
 
     await prisma.collectionOrder.updateMany({
       where: { status: { in: ['READY', 'ASSIGNED'] } },
@@ -151,7 +162,7 @@ describe('Sync batch and station delivery reconciliation (e2e)', () => {
   });
 
   it('compares station variance on kilograms: exactly 2 percent is OK and above 2 percent is FLAGGED', async () => {
-    const merchant = await prisma.merchant.findFirstOrThrow({ where: { user: { zaloId: 'zalo_merchant_01' } } });
+    const merchant = await prisma.merchant.findFirstOrThrow({ where: { user: { zaloId: DEMO_MERCHANTS[0].zaloId } } });
     const collector = await prisma.collector.findUniqueOrThrow({ where: { id: collectorId } });
     const container = await prisma.container.findUniqueOrThrow({ where: { id: containers[0].id } });
     const exactTransactionId = '71000000-0000-4000-8000-000000000001';
@@ -205,7 +216,7 @@ describe('Sync batch and station delivery reconciliation (e2e)', () => {
   });
 
   it('rejects a collection transaction that has not been synchronized before station delivery', async () => {
-    const merchant = await prisma.merchant.findFirstOrThrow({ where: { user: { zaloId: 'zalo_merchant_01' } } });
+    const merchant = await prisma.merchant.findFirstOrThrow({ where: { user: { zaloId: DEMO_MERCHANTS[0].zaloId } } });
     const unsyncedId = randomUUID();
     await prisma.collectionTransaction.create({
       data: {

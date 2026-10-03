@@ -7,12 +7,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { DEMO_COLLECTOR, DEMO_MERCHANTS, demoWardId, loginAdmin } from './helpers/demo-seed';
 
-const wardId = '10000000-0000-4000-8000-000000000001';
+let wardId: string;
 const testStationUserId = randomUUID();
 const testStationZaloId = `zalo_station_test_${testStationUserId.slice(0, 8)}`;
 const testStationPhone = `092${Date.now().toString().slice(-7)}`;
-const seededContainerQr = 'ECO-UCO-Q3-P7-001';
+const seededContainerQr = DEMO_MERCHANTS[0].containerCode;
 
 describe('Core CRUD and PostGIS (e2e)', () => {
   let app: INestApplication;
@@ -33,8 +34,9 @@ describe('Core CRUD and PostGIS (e2e)', () => {
     await app.init();
 
     const prisma = app.get(PrismaService);
+    wardId = await demoWardId(prisma, 'HB-HK-DEMO');
     await prisma.container.update({
-      where: { id: '60000000-0000-4000-8000-000000000001' },
+      where: { id: DEMO_MERCHANTS[0].containerId },
       data: { state: 'AT_MERCHANT', lastSeenAt: null },
     });
     await prisma.user.upsert({
@@ -49,7 +51,7 @@ describe('Core CRUD and PostGIS (e2e)', () => {
   });
 
   it('allows ADMIN to create a station and blocks MERCHANT', async () => {
-    const adminToken = await login('zalo_admin_01', '0990000001');
+    const adminToken = await loginAdmin(app);
     const created = await request(app.getHttpServer())
       .post('/api/v1/stations')
       .set('Authorization', `Bearer ${adminToken}`)
@@ -57,14 +59,14 @@ describe('Core CRUD and PostGIS (e2e)', () => {
         user_id: testStationUserId,
         name: 'Trạm Test CRUD',
         address: '1 Đường Test, Phường 7, Quận 3',
-        lat: 10.7821,
-        lng: 106.6852,
+        lat: 21.0321,
+        lng: 105.8521,
         ward_id: wardId,
       })
       .expect(201);
-    expect(created.body).toMatchObject({ name: 'Trạm Test CRUD', lat: 10.7821, lng: 106.6852, status: 'ACTIVE' });
+    expect(created.body).toMatchObject({ name: 'Trạm Test CRUD', lat: 21.0321, lng: 105.8521, status: 'ACTIVE' });
 
-    const merchantToken = await login('zalo_merchant_01', '0900000001');
+    const merchantToken = await login(DEMO_MERCHANTS[0].zaloId, DEMO_MERCHANTS[0].phone);
     const forbidden = await request(app.getHttpServer())
       .post('/api/v1/stations')
       .set('Authorization', `Bearer ${merchantToken}`)
@@ -72,8 +74,8 @@ describe('Core CRUD and PostGIS (e2e)', () => {
         user_id: testStationUserId,
         name: 'Should Fail',
         address: '1 Đường Test',
-        lat: 10.7821,
-        lng: 106.6852,
+        lat: 21.0321,
+        lng: 105.8521,
         ward_id: wardId,
       })
       .expect(403);
@@ -81,7 +83,7 @@ describe('Core CRUD and PostGIS (e2e)', () => {
   });
 
   it('decodes seeded container QR data for a collector and returns 404 for an unknown code', async () => {
-    const collectorToken = await login('zalo_collector_01', '0910000001');
+    const collectorToken = await login(DEMO_COLLECTOR.zaloId, DEMO_COLLECTOR.phone);
     const found = await request(app.getHttpServer())
       .get(`/api/v1/containers/by-qr/${seededContainerQr}`)
       .set('Authorization', `Bearer ${collectorToken}`)
@@ -96,15 +98,15 @@ describe('Core CRUD and PostGIS (e2e)', () => {
   });
 
   it('returns decoded numeric coordinates from merchant list', async () => {
-    const adminToken = await login('zalo_admin_01', '0990000001');
+    const adminToken = await loginAdmin(app);
     const response = await request(app.getHttpServer())
       .get('/api/v1/merchants?page=1&limit=20')
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(200);
-    const merchant = response.body.data.find((item: { name: string }) => item.name === 'Quán Cơm Nhà Mình');
+    const merchant = response.body.data.find((item: { name: string }) => item.name === DEMO_MERCHANTS[0].name);
     expect(response.body.meta).toMatchObject({ page: 1, limit: 20, total: 5 });
-    expect(merchant.lat).toBeCloseTo(10.78255, 5);
-    expect(merchant.lng).toBeCloseTo(106.68475, 5);
+    expect(merchant.lat).toBeCloseTo(DEMO_MERCHANTS[0].lat, 5);
+    expect(merchant.lng).toBeCloseTo(DEMO_MERCHANTS[0].lng, 5);
     expect(typeof merchant.lat).toBe('number');
     expect(typeof merchant.lng).toBe('number');
   });

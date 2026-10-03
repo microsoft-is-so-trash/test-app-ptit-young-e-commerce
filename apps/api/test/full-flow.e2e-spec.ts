@@ -7,12 +7,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { assignDemoCollectorWards, DEMO_COLLECTOR, DEMO_MERCHANTS, DEMO_ORIGIN, loginAdmin } from './helpers/demo-seed';
 
 const fixtures = [
-  { zaloId: 'zalo_merchant_01', phone: '0900000001', containerId: '60000000-0000-4000-8000-000000000001', code: 'ECO-UCO-Q3-P7-001', lat: 10.78255, lng: 106.68475, expected: 10 },
-  { zaloId: 'zalo_merchant_02', phone: '0900000002', containerId: '60000000-0000-4000-8000-000000000003', code: 'ECO-UCO-Q3-P7-003', lat: 10.78195, lng: 106.68535, expected: 12 },
-  { zaloId: 'zalo_merchant_03', phone: '0900000003', containerId: '60000000-0000-4000-8000-000000000005', code: 'ECO-UCO-Q3-P7-005', lat: 10.78305, lng: 106.68615, expected: 8 },
+  { ...DEMO_MERCHANTS[0], expected: 10 },
+  { ...DEMO_MERCHANTS[1], expected: 12 },
+  { ...DEMO_MERCHANTS[2], expected: 8 },
 ] as const;
+const origin = `lat=${DEMO_ORIGIN.lat}&lng=${DEMO_ORIGIN.lng}`;
 
 describe('Full merchant-to-station working shift (e2e)', () => {
   let app: INestApplication;
@@ -47,7 +49,8 @@ describe('Full merchant-to-station working shift (e2e)', () => {
     await prisma.collectionOrder.deleteMany();
     await prisma.station.updateMany({ data: { currentVolumeLiters: 0 } });
 
-    collectorToken = await login('zalo_collector_01', '0910000001');
+    collectorToken = await login(DEMO_COLLECTOR.zaloId, DEMO_COLLECTOR.phone);
+    await assignDemoCollectorWards(prisma, ['CV-BD-DEMO', 'NT-HBT-DEMO']);
 
     await prisma.collectionOrder.updateMany({
       where: { status: { in: [OrderStatus.READY, OrderStatus.ASSIGNED] } },
@@ -75,7 +78,7 @@ describe('Full merchant-to-station working shift (e2e)', () => {
     }
 
     const route = await request(app.getHttpServer())
-      .get('/api/v1/routes/current?lat=10.7818&lng=106.6851')
+      .get(`/api/v1/routes/current?${origin}`)
       .set('Authorization', `Bearer ${collectorToken}`)
       .expect(200);
     expect(route.body.stops).toHaveLength(3);
@@ -87,7 +90,7 @@ describe('Full merchant-to-station working shift (e2e)', () => {
     const startedRoute = await request(app.getHttpServer())
       .post('/api/v1/routes/start')
       .set('Authorization', `Bearer ${collectorToken}`)
-      .send({ client_uuid: randomUUID(), lat: 10.7818, lng: 106.6851 })
+      .send({ client_uuid: randomUUID(), lat: DEMO_ORIGIN.lat, lng: DEMO_ORIGIN.lng })
       .expect(201);
     expect(startedRoute.body.persisted).toBe(true);
     expect(startedRoute.body.stops.map((stop: { order_id: string }) => stop.order_id).sort()).toEqual([...orderIds].sort());
@@ -134,13 +137,13 @@ describe('Full merchant-to-station working shift (e2e)', () => {
       .expect((response) => expect(response.body.route_status).toBe('COMPLETED'));
 
     const stationChoice = await request(app.getHttpServer())
-      .get(`/api/v1/stations/recommend?lat=10.7818&lng=106.6851&liters=${totalLiters}`)
+      .get(`/api/v1/stations/recommend?${origin}&liters=${totalLiters}`)
       .set('Authorization', `Bearer ${collectorToken}`)
       .expect(200);
     expect(stationChoice.body.length).toBeGreaterThan(0);
     // I1.3: lúc Bắt đầu ca miniapp hỏi với 0 lít để lưu mọi trạm đang nhận.
     const shiftStartStations = await request(app.getHttpServer())
-      .get('/api/v1/stations/recommend?lat=10.7818&lng=106.6851&liters=0')
+      .get(`/api/v1/stations/recommend?${origin}&liters=0`)
       .set('Authorization', `Bearer ${collectorToken}`)
       .expect(200);
     expect(shiftStartStations.body.length).toBeGreaterThanOrEqual(stationChoice.body.length);
@@ -160,7 +163,7 @@ describe('Full merchant-to-station working shift (e2e)', () => {
       .expect('X-Idempotent-Replay', 'true');
     expect(replay.body.id).toBe(delivery.body.id);
 
-    const adminToken = await login('zalo_admin_01', '0990000001');
+    const adminToken = await loginAdmin(app);
     const today = new Date().toISOString().slice(0, 10);
     const reconciliation = await request(app.getHttpServer())
       .get(`/api/v1/admin/reconciliation?date=${today}`)

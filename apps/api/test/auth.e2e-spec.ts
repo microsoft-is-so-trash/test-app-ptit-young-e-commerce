@@ -33,11 +33,11 @@ describe('Auth and RBAC (e2e)', () => {
   it('logs in with mock Zalo and returns the current user', async () => {
     const login = await request(app.getHttpServer())
       .post('/api/v1/auth/zalo')
-      .send({ zalo_id: 'zalo_merchant_01', phone: '0900000001' })
+      .send({ zalo_id: 'zalo_demo_merchant_01', phone: '0901000001' })
       .expect(201);
 
     expect(login.body.user).toMatchObject({
-      zalo_id: 'zalo_merchant_01',
+      zalo_id: 'zalo_demo_merchant_01',
       role: 'MERCHANT',
       merchantId: expect.any(String),
     });
@@ -50,7 +50,7 @@ describe('Auth and RBAC (e2e)', () => {
       .expect(200);
 
     expect(me.body).toMatchObject({
-      zalo_id: 'zalo_merchant_01',
+      zalo_id: 'zalo_demo_merchant_01',
       role: 'MERCHANT',
       merchantId: expect.any(String),
     });
@@ -59,7 +59,7 @@ describe('Auth and RBAC (e2e)', () => {
   it('returns 403 in the standard error format for a disallowed role', async () => {
     const login = await request(app.getHttpServer())
       .post('/api/v1/auth/zalo')
-      .send({ zalo_id: 'zalo_merchant_01', phone: '0900000001' })
+      .send({ zalo_id: 'zalo_demo_merchant_01', phone: '0901000001' })
       .expect(201);
 
     const response = await request(app.getHttpServer())
@@ -79,7 +79,7 @@ describe('Auth and RBAC (e2e)', () => {
       .get('/api/v1/auth/dev-accounts')
       .expect(200);
 
-    const collector = response.body.find((account: { zalo_id: string }) => account.zalo_id === 'zalo_collector_01');
+    const collector = response.body.find((account: { zalo_id: string }) => account.zalo_id === 'zalo_demo_collector_01');
     expect(collector).toMatchObject({ role: 'COLLECTOR' });
     expect(collector.wards.length).toBeGreaterThan(0);
     expect(response.body.every((account: { zalo_id: string }) => !account.zalo_id.includes(':'))).toBe(true);
@@ -88,7 +88,7 @@ describe('Auth and RBAC (e2e)', () => {
   it('rejects a mock access token passed as a Zalo id', async () => {
     const response = await request(app.getHttpServer())
       .post('/api/v1/auth/zalo')
-      .send({ zalo_id: 'mock-access-token:zalo_merchant_01', phone: '0900000001' })
+      .send({ zalo_id: 'mock-access-token:zalo_demo_merchant_01', phone: '0901000001' })
       .expect(401);
     expect(response.body).toMatchObject({ code: 'INVALID_ZALO_ID' });
   });
@@ -101,7 +101,7 @@ describe('Auth and RBAC (e2e)', () => {
 
     const login = await request(app.getHttpServer())
       .post('/api/v1/auth/zalo')
-      .send({ zalo_id: 'zalo_merchant_01', phone: '0900000001' })
+      .send({ zalo_id: 'zalo_demo_merchant_01', phone: '0901000001' })
       .expect(201);
 
     const fetchMock = jest.spyOn(globalThis, 'fetch').mockResolvedValue({
@@ -126,7 +126,7 @@ describe('Auth and RBAC (e2e)', () => {
   it('rotates refresh tokens and rejects reuse of the old token', async () => {
     const login = await request(app.getHttpServer())
       .post('/api/v1/auth/zalo')
-      .send({ zalo_id: 'zalo_merchant_01', phone: '0900000001' })
+      .send({ zalo_id: 'zalo_demo_merchant_01', phone: '0901000001' })
       .expect(201);
 
     const rotated = await request(app.getHttpServer())

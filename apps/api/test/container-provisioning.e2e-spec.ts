@@ -4,11 +4,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { DEMO_MERCHANTS, demoWardId, loginAdmin } from './helpers/demo-seed';
 
 describe('Container provisioning and merchant empty state (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  const wardId = '10000000-0000-4000-8000-000000000001';
+  let wardId: string;
   const zaloId = `zalo_container_${randomUUID().slice(0, 8)}`;
   const phone = `098${Date.now().toString().slice(-7)}`;
   let merchantId: string;
@@ -27,12 +28,13 @@ describe('Container provisioning and merchant empty state (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     await app.init();
     prisma = app.get(PrismaService);
-    const registered = await request(app.getHttpServer()).post('/api/v1/merchants/register').send({ zalo_id: zaloId, name: 'Quán test cấp can', address: '1 Nguyễn Huệ', phone, business_type: 'QUAN_AN', lat: 10.7769, lng: 106.7009, ward_id: wardId }).expect(201);
+    wardId = await demoWardId(prisma, 'HB-HK-DEMO');
+    const registered = await request(app.getHttpServer()).post('/api/v1/merchants/register').send({ zalo_id: zaloId, name: 'Quán test cấp can', address: '1 Nguyễn Huệ', phone, business_type: 'QUAN_AN', lat: 21.0333, lng: 105.85, ward_id: wardId }).expect(201);
     merchantId = registered.body.merchant.id as string;
     userId = registered.body.merchant.user_id as string;
-    await prisma.$executeRaw`UPDATE "merchants" SET "location" = ST_SetSRID(ST_MakePoint(106.685, 10.782), 4326)::geography WHERE "id" = ${merchantId}::uuid`;
-    const admin = await login('zalo_admin_01', '0990000001');
-    await request(app.getHttpServer()).post(`/api/v1/admin/merchants/${merchantId}/approve`).set('Authorization', `Bearer ${admin.body.access_token}`).expect(201);
+    await prisma.$executeRaw`UPDATE "merchants" SET "location" = ST_SetSRID(ST_MakePoint(105.85, 21.0333), 4326)::geography WHERE "id" = ${merchantId}::uuid`;
+    const adminToken = await loginAdmin(app);
+    await request(app.getHttpServer()).post(`/api/v1/admin/merchants/${merchantId}/approve`).set('Authorization', `Bearer ${adminToken}`).expect(201);
   });
 
   afterAll(async () => {
@@ -54,12 +56,12 @@ describe('Container provisioning and merchant empty state (e2e)', () => {
   });
 
   it('admin tạo và gán can, merchant tạo đơn thành công', async () => {
-    const admin = await login('zalo_admin_01', '0990000001');
-    const created = await request(app.getHttpServer()).post('/api/v1/admin/containers').set('Authorization', `Bearer ${admin.body.access_token}`).send({ ward_code: 'Q3-P7', capacity_liters: 30 }).expect(201);
+    const adminToken = await loginAdmin(app);
+    const created = await request(app.getHttpServer()).post('/api/v1/admin/containers').set('Authorization', `Bearer ${adminToken}`).send({ ward_code: 'HB-HK-DEMO', capacity_liters: 30 }).expect(201);
     containerId = created.body.id as string;
-    expect(created.body.qr_code).toMatch(/^ECO-UCO-Q3-P7-\d{3}$/);
+    expect(created.body.qr_code).toMatch(/^ECO-UCO-HB-HK-DEMO-\d{3}$/);
     expect(created.body.merchant).toBeNull();
-    await request(app.getHttpServer()).post(`/api/v1/admin/containers/${containerId}/assign`).set('Authorization', `Bearer ${admin.body.access_token}`).send({ merchant_id: merchantId }).expect(201);
+    await request(app.getHttpServer()).post(`/api/v1/admin/containers/${containerId}/assign`).set('Authorization', `Bearer ${adminToken}`).send({ merchant_id: merchantId }).expect(201);
     const merchant = await login(zaloId, phone);
     const order = await request(app.getHttpServer()).post('/api/v1/orders/ready').set('Authorization', `Bearer ${merchant.body.access_token}`).send({ container_id: containerId, expected_liters: 10 }).expect(201);
     orderId = order.body.id as string;
@@ -67,10 +69,10 @@ describe('Container provisioning and merchant empty state (e2e)', () => {
   });
 
   it('không cho gán can đang thuộc quán khác', async () => {
-    const other = await prisma.merchant.findFirst({ where: { user: { zaloId: 'zalo_merchant_02' } } });
+    const other = await prisma.merchant.findFirst({ where: { user: { zaloId: DEMO_MERCHANTS[1].zaloId } } });
     expect(other).not.toBeNull();
-    const admin = await login('zalo_admin_01', '0990000001');
-    const response = await request(app.getHttpServer()).post(`/api/v1/admin/containers/${containerId}/assign`).set('Authorization', `Bearer ${admin.body.access_token}`).send({ merchant_id: other?.id }).expect(409);
+    const adminToken = await loginAdmin(app);
+    const response = await request(app.getHttpServer()).post(`/api/v1/admin/containers/${containerId}/assign`).set('Authorization', `Bearer ${adminToken}`).send({ merchant_id: other?.id }).expect(409);
     expect(response.body.code).toBe('CONTAINER_ALREADY_ASSIGNED');
   });
 });

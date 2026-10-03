@@ -5,6 +5,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { DEMO_COLLECTOR, DEMO_MERCHANTS, loginAdmin } from './helpers/demo-seed';
 
 const containerId = '60000000-0000-4000-8000-0000000000ab';
 
@@ -44,7 +45,7 @@ describe('Admin cancel container transit (e2e)', () => {
     await app.init();
     prisma = app.get(PrismaService);
 
-    const merchant = await prisma.merchant.findFirst({ where: { user: { zaloId: 'zalo_merchant_01' } } });
+    const merchant = await prisma.merchant.findFirst({ where: { user: { zaloId: DEMO_MERCHANTS[0].zaloId } } });
     if (!merchant) throw new Error('Seed merchant for cancel-transit tests was not found');
     merchantId = merchant.id;
     await prisma.merchant.update({ where: { id: merchantId }, data: { approvalStatus: 'APPROVED' } });
@@ -54,9 +55,9 @@ describe('Admin cancel container transit (e2e)', () => {
       create: { id: containerId, merchantId, wardId: merchant.wardId, qrCode: 'ECO-UCO-TEST-CANCEL-AB', state: 'IN_TRANSIT', status: 'ACTIVE', capacityLiters: 30 },
     });
 
-    adminToken = await login('zalo_admin_01', '0990000001');
-    collectorToken = await login('zalo_collector_01', '0910000001');
-    merchantToken = await login('zalo_merchant_01', '0900000001');
+    adminToken = await loginAdmin(app);
+    collectorToken = await login(DEMO_COLLECTOR.zaloId, DEMO_COLLECTOR.phone);
+    merchantToken = await login(DEMO_MERCHANTS[0].zaloId, DEMO_MERCHANTS[0].phone);
   });
 
   beforeEach(async () => {
@@ -129,7 +130,7 @@ describe('Admin cancel container transit (e2e)', () => {
         clientUuid,
         containerId,
         merchantId,
-        collectorId: '50000000-0000-4000-8000-000000000001',
+        collectorId: DEMO_COLLECTOR.id,
         actualLiters: 12.5,
         quality: 'FLAG',
         photos: [],

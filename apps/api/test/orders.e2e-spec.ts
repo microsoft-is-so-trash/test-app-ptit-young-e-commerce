@@ -5,18 +5,20 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { assignDemoCollectorWards, DEMO_COLLECTOR, DEMO_MERCHANTS, DEMO_ORIGIN } from './helpers/demo-seed';
 
-const containerOneId = '60000000-0000-4000-8000-000000000001';
-const containerTwoId = '60000000-0000-4000-8000-000000000003';
-const containerThreeId = '60000000-0000-4000-8000-000000000005';
-const merchantOneId = '20000000-0000-4000-8000-000000000001';
-const merchantTwoId = '20000000-0000-4000-8000-000000000002';
-const merchantThreeId = '20000000-0000-4000-8000-000000000003';
+const [merchantOne, merchantTwo, merchantThree] = DEMO_MERCHANTS;
+const containerOneId = merchantOne.containerId;
+const containerTwoId = merchantTwo.containerId;
+const containerThreeId = merchantThree.containerId;
+const merchantOneId = merchantOne.id;
+const merchantTwoId = merchantTwo.id;
+const merchantThreeId = merchantThree.id;
 const multiWardId = '10000000-0000-4000-8000-000000000099';
 const multiWardUserId = '40000000-0000-4000-8000-000000000099';
 const multiWardMerchantId = '20000000-0000-4000-8000-000000000099';
 const multiWardContainerId = '60000000-0000-4000-8000-000000000099';
-const collectorOneId = '50000000-0000-4000-8000-000000000001';
+const collectorOneId = DEMO_COLLECTOR.id;
 
 describe('Orders and collector routes (e2e)', () => {
   let app: INestApplication;
@@ -36,6 +38,7 @@ describe('Orders and collector routes (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     await app.init();
     const prisma = app.get(PrismaService);
+    await assignDemoCollectorWards(prisma, ['CV-BD-DEMO', 'NT-HBT-DEMO']);
     await prisma.container.updateMany({
       where: { id: { in: [containerOneId, containerTwoId, containerThreeId] } },
       data: { state: 'AT_MERCHANT', lastSeenAt: null },
@@ -60,7 +63,7 @@ describe('Orders and collector routes (e2e)', () => {
       where: { containerId: containerOneId, status: { in: ['READY', 'ASSIGNED'] } },
       data: { status: 'CANCELLED', cancelledAt: new Date() },
     });
-    const merchantToken = await login('zalo_merchant_01', '0900000001');
+    const merchantToken = await login(merchantOne.zaloId, merchantOne.phone);
     const tooMuch = await request(app.getHttpServer())
       .post('/api/v1/orders/ready')
       .set('Authorization', `Bearer ${merchantToken}`)
@@ -79,7 +82,7 @@ describe('Orders and collector routes (e2e)', () => {
   });
 
   it('creates a READY order and blocks a duplicate for the same container', async () => {
-    const merchantToken = await login('zalo_merchant_01', '0900000001');
+    const merchantToken = await login(merchantOne.zaloId, merchantOne.phone);
     const created = await request(app.getHttpServer())
       .post('/api/v1/orders/ready')
       .set('Authorization', `Bearer ${merchantToken}`)
@@ -102,9 +105,9 @@ describe('Orders and collector routes (e2e)', () => {
   });
 
   it('sorts route stops by priority, applies capacity and enforces roles/ownership', async () => {
-    const merchantOneToken = await login('zalo_merchant_01', '0900000001');
-    const merchantTwoToken = await login('zalo_merchant_02', '0900000002');
-    const merchantThreeToken = await login('zalo_merchant_03', '0900000003');
+    const merchantOneToken = await login(merchantOne.zaloId, merchantOne.phone);
+    const merchantTwoToken = await login(merchantTwo.zaloId, merchantTwo.phone);
+    const merchantThreeToken = await login(merchantThree.zaloId, merchantThree.phone);
 
     const orderTwo = await request(app.getHttpServer())
       .post('/api/v1/orders/ready')
@@ -117,9 +120,9 @@ describe('Orders and collector routes (e2e)', () => {
       .send({ container_id: containerThreeId, expected_liters: 30 })
       .expect(201);
 
-    const collectorToken = await login('zalo_collector_01', '0910000001');
+    const collectorToken = await login(DEMO_COLLECTOR.zaloId, DEMO_COLLECTOR.phone);
     const route = await request(app.getHttpServer())
-      .get('/api/v1/routes/current?lat=10.7818&lng=106.6851')
+      .get(`/api/v1/routes/current?lat=${DEMO_ORIGIN.lat}&lng=${DEMO_ORIGIN.lng}`)
       .set('Authorization', `Bearer ${collectorToken}`)
       .expect(200);
     expect(route.body.total_expected_liters).toBeLessThanOrEqual(100);
@@ -187,7 +190,7 @@ describe('Orders and collector routes (e2e)', () => {
       ],
     });
 
-    const collectorToken = await login('zalo_collector_01', '0910000001');
+    const collectorToken = await login(DEMO_COLLECTOR.zaloId, DEMO_COLLECTOR.phone);
     const route = await request(app.getHttpServer())
       .get('/api/v1/routes/current?lat=21.0333&lng=105.8500')
       .set('Authorization', `Bearer ${collectorToken}`)
@@ -195,7 +198,7 @@ describe('Orders and collector routes (e2e)', () => {
 
     expect(route.body.stops).toHaveLength(2);
     expect(route.body.stops.map((stop: { container_code: string }) => stop.container_code).sort()).toEqual([
-      'ECO-UCO-Q3-P7-001',
+      merchantOne.containerCode,
       'ECO-UCO-TEST-MULTI-099',
     ].sort());
 

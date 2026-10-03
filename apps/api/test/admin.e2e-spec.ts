@@ -6,12 +6,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { addTestContainer, DEMO_COLLECTOR, DEMO_MERCHANTS, DEMO_STATION, demoAdminUserId, loginAdmin } from './helpers/demo-seed';
 
-const merchantId = '20000000-0000-4000-8000-000000000004';
-const collectorUserId = '40000000-0000-4000-8000-000000000201';
-const containerId = '60000000-0000-4000-8000-000000000007';
-const stationId = '30000000-0000-4000-8000-000000000001';
-const adminUserId = '40000000-0000-4000-8000-000000000999';
+const merchant = DEMO_MERCHANTS[3];
+const merchantId = merchant.id;
+const collectorUserId = DEMO_COLLECTOR.userId;
+const stationId = DEMO_STATION.id;
 
 describe('Admin KPIs, reconciliation and access control (e2e)', () => {
   let app: INestApplication;
@@ -20,6 +20,9 @@ describe('Admin KPIs, reconciliation and access control (e2e)', () => {
   let collectorToken: string;
   let transactionId: string;
   let alertId: string;
+  let containerId: string;
+  let containerCode: string;
+  let adminUserId: string;
 
   async function login(zaloId: string, phone: string): Promise<string> {
     const response = await request(app.getHttpServer()).post('/api/v1/auth/zalo').send({ zalo_id: zaloId, phone }).expect(201);
@@ -33,8 +36,10 @@ describe('Admin KPIs, reconciliation and access control (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     await app.init();
     prisma = app.get(PrismaService);
-    adminToken = await login('zalo_admin_01', '0990000001');
-    collectorToken = await login('zalo_collector_01', '0910000001');
+    adminToken = await loginAdmin(app);
+    adminUserId = await demoAdminUserId(prisma);
+    collectorToken = await login(DEMO_COLLECTOR.zaloId, DEMO_COLLECTOR.phone);
+    ({ id: containerId, code: containerCode } = await addTestContainer(prisma, merchant, 'ADMIN'));
 
     await prisma.collectionOrder.updateMany({
       where: { containerId, status: { in: ['READY', 'ASSIGNED'] } },
@@ -44,7 +49,7 @@ describe('Admin KPIs, reconciliation and access control (e2e)', () => {
     await prisma.collector.update({ where: { userId: collectorUserId }, data: { status: 'ACTIVE' } });
     await prisma.station.update({ where: { id: stationId }, data: { capacityLiters: 1000, currentVolumeLiters: 0 } });
 
-    const merchantToken = await login('zalo_merchant_04', '0900000004');
+    const merchantToken = await login(merchant.zaloId, merchant.phone);
     const order = await request(app.getHttpServer())
       .post('/api/v1/orders/ready')
       .set('Authorization', `Bearer ${merchantToken}`)
@@ -56,13 +61,13 @@ describe('Admin KPIs, reconciliation and access control (e2e)', () => {
       .send({
         client_uuid: randomUUID(),
         order_id: order.body.id,
-        container_code: 'ECO-UCO-Q3-P7-007',
+        container_code: containerCode,
         actual_liters: 10,
         quality: 'PASS',
         grade: 'A',
         collector_selected_grade: 'A',
         collector_grade_confirmed: true,
-        geo: { lat: 10.78095, lng: 106.68425 },
+        geo: { lat: merchant.lat, lng: merchant.lng },
         photos: ['https://example.com/admin.jpg'],
         collected_at: '2026-08-11T10:00:00Z',
       })

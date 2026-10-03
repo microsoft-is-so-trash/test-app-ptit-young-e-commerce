@@ -4,13 +4,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { demoWardId, loginAdmin } from './helpers/demo-seed';
 
 describe('Merchant onboarding and collector provisioning (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
   const zaloId = `zalo_onboarding_${randomUUID().slice(0, 8)}`;
   const phone = `098${Date.now().toString().slice(-7)}`;
-  const wardId = '10000000-0000-4000-8000-000000000001';
+  let wardId: string;
   let merchantId: string;
   let userId: string;
   let containerId: string;
@@ -26,6 +27,7 @@ describe('Merchant onboarding and collector provisioning (e2e)', () => {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
     await app.init();
     prisma = app.get(PrismaService);
+    wardId = await demoWardId(prisma, 'HB-HK-DEMO');
   });
 
   afterAll(async () => {
@@ -43,7 +45,7 @@ describe('Merchant onboarding and collector provisioning (e2e)', () => {
   it('đăng ký tạo merchant PENDING', async () => {
     const response = await request(app.getHttpServer()).post('/api/v1/merchants/register').send({
       zalo_id: zaloId, name: 'Quán thử onboarding', address: '1 Nguyễn Huệ, TP.HCM', phone,
-      business_type: 'Quán ăn', lat: 10.7818, lng: 106.6851, ward_id: wardId,
+      business_type: 'Quán ăn', lat: 21.0333, lng: 105.85, ward_id: wardId,
     }).expect(201);
     merchantId = response.body.merchant.id as string;
     userId = response.body.merchant.user_id as string;
@@ -60,9 +62,9 @@ describe('Merchant onboarding and collector provisioning (e2e)', () => {
   it('sau khi admin approve thì merchant tạo đơn thành công', async () => {
     const container = await prisma.container.create({ data: { merchantId, qrCode: `ONBOARD-${randomUUID().slice(0, 8)}`, capacityLiters: 30, state: 'AT_MERCHANT', status: 'ACTIVE' } });
     containerId = container.id;
-    await prisma.$executeRaw`UPDATE "merchants" SET "location" = ST_SetSRID(ST_MakePoint(106.6851, 10.7818), 4326)::geography WHERE "id" = ${merchantId}::uuid`;
-    const admin = await login('zalo_admin_01', '0990000001');
-    await request(app.getHttpServer()).post(`/api/v1/admin/merchants/${merchantId}/approve`).set('Authorization', `Bearer ${admin.body.access_token}`).expect(201);
+    await prisma.$executeRaw`UPDATE "merchants" SET "location" = ST_SetSRID(ST_MakePoint(105.85, 21.0333), 4326)::geography WHERE "id" = ${merchantId}::uuid`;
+    const adminToken = await loginAdmin(app);
+    await request(app.getHttpServer()).post(`/api/v1/admin/merchants/${merchantId}/approve`).set('Authorization', `Bearer ${adminToken}`).expect(201);
     const merchant = await login(zaloId, phone);
     const order = await request(app.getHttpServer()).post('/api/v1/orders/ready').set('Authorization', `Bearer ${merchant.body.access_token}`).send({ container_id: containerId, expected_liters: 12 }).expect(201);
     expect(order.body.status).toBe('READY');
@@ -71,7 +73,7 @@ describe('Merchant onboarding and collector provisioning (e2e)', () => {
   it('đăng ký trùng zalo_id trả MERCHANT_ALREADY_REGISTERED', async () => {
     const response = await request(app.getHttpServer()).post('/api/v1/merchants/register').send({
       zalo_id: zaloId, name: 'Trùng hồ sơ', address: '2 Lê Lợi, TP.HCM', phone: '0970000000',
-      business_type: 'Quán ăn', lat: 10.7818, lng: 106.6851, ward_id: wardId,
+      business_type: 'Quán ăn', lat: 21.0333, lng: 105.85, ward_id: wardId,
     }).expect(409);
     expect(response.body.code).toBe('MERCHANT_ALREADY_REGISTERED');
   });

@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { PrismaService } from '../src/prisma/prisma.service';
+import { demoWardId, loginAdmin } from './helpers/demo-seed';
 
 jest.setTimeout(30000);
 
@@ -21,8 +22,7 @@ describe('Ward management and per-ward QR sequences (e2e)', () => {
     app.setGlobalPrefix('api/v1', { exclude: ['health'] });
     await app.init();
     prisma = app.get(PrismaService);
-    const login = await request(app.getHttpServer()).post('/api/v1/auth/zalo').send({ zalo_id: 'zalo_admin_01', phone: '0990000001' }).expect(201);
-    adminToken = login.body.access_token as string;
+    adminToken = await loginAdmin(app);
   });
 
   afterAll(async () => {
@@ -46,7 +46,8 @@ describe('Ward management and per-ward QR sequences (e2e)', () => {
   });
 
   it('không cho tắt phường còn quán đang hoạt động', async () => {
-    const response = await request(app.getHttpServer()).patch('/api/v1/admin/wards/10000000-0000-4000-8000-000000000001').set('Authorization', `Bearer ${adminToken}`).send({ status: 'INACTIVE' }).expect(409);
+    const activeWardId = await demoWardId(prisma, 'HB-HK-DEMO');
+    const response = await request(app.getHttpServer()).patch(`/api/v1/admin/wards/${activeWardId}`).set('Authorization', `Bearer ${adminToken}`).send({ status: 'INACTIVE' }).expect(409);
     expect(response.body.code).toBe('WARD_HAS_ACTIVE_MERCHANTS');
   });
 });
