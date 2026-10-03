@@ -22,10 +22,12 @@ import { compressImageBlob, isValidGeoPoint, zaloClient } from '../../lib/zalo-c
 import type { PhotoAsset } from '../../lib/zalo-client';
 import { OilGradeSelector } from '../../components/OilGradeSelector';
 import { GradePhotoPicker } from '../../components/GradePhotoPicker';
+import { EMPTY_MASS_ENTRY, editMassField, massEntryView } from '../../lib/mass-entry';
+import type { MassEntryState, MassField } from '../../lib/mass-entry';
 
 export function CollectorEntryScreen({ stop, container, containerCode, onBack, onSuccess }: { stop: RouteStop; container: ContainerLookupResponse; containerCode: string; onBack: () => void; onSuccess: (liters: number, kilograms: number | null, clientUuid: string) => void }) {
-  const [liters, setLiters] = useState(stop.expected_liters > 0 ? stop.expected_liters.toFixed(1) : '');
-  const [kilograms, setKilograms] = useState('');
+  // Kg và lít để trống lúc đầu (Q14); ô nhập sau cùng là ô gốc, ô kia tự tính.
+  const [massEntry, setMassEntry] = useState<MassEntryState>(EMPTY_MASS_ENTRY);
   const [quality, setQuality] = useState<Quality>(Quality.PASS);
   const [grade, setGrade] = useState<OilGrade | null>(null);
   const [suspectedAdulteration, setSuspectedAdulteration] = useState(false);
@@ -54,12 +56,9 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
     zaloClient.cancelMediaPicker?.();
   }, []);
   const capacity = Number(container.capacity_liters ?? 0);
-  const enteredLiters = parseLocalizedDecimal(liters);
-  const actualKg = parseLocalizedDecimal(kilograms);
-  const hasLiters = enteredLiters !== null && Number.isFinite(enteredLiters) && enteredLiters > 0;
-  const hasKilograms = actualKg !== null && Number.isFinite(actualKg) && actualKg > 0;
-  const litersDerivedFromKilograms = !hasLiters && hasKilograms;
-  const actualLiters = litersDerivedFromKilograms ? (actualKg as number) / DEFAULT_DENSITY_KG_PER_LITER : enteredLiters ?? 0;
+  const mass = massEntryView(massEntry);
+  const { enteredLiters, actualKg, hasLiters, hasKilograms, actualLiters } = mass;
+  const litersDerivedFromKilograms = mass.litersAuto;
   const maxLiters = capacity * 1.1;
   const invalidLiters =
     actualLiters > maxLiters ||
@@ -95,14 +94,9 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
     imageGradeDecisionBlocked,
   });
 
-  function adjustLiters(amount: number): void {
-    const next = Math.max(0, (parseLocalizedDecimal(liters) || 0) + amount);
-    setLiters(next.toFixed(1));
-  }
-
-  function adjustKilograms(amount: number): void {
-    const next = Math.max(0, (parseLocalizedDecimal(kilograms) || 0) + amount);
-    setKilograms(next.toFixed(1));
+  function adjustMass(field: MassField, amount: number): void {
+    const current = parseLocalizedDecimal(field === 'kg' ? mass.kgText : mass.litersText) || 0;
+    setMassEntry((state) => editMassField(state, field, Math.max(0, current + amount).toFixed(1)));
   }
 
   async function analyzePhotos(nextPhotos: PhotoAsset[]): Promise<void> {
@@ -326,12 +320,12 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
        <header className="collector-screen-heading"><p className="eyebrow">GHI NHẬN THU GOM</p><h1>{container.merchant.name}</h1><p>{containerCode}</p></header>
       <section className="entry-target-card"><span>Số lít quán khai</span><strong>{formatLiters(stop.expected_liters)}</strong>{pickupVolumeForecast ? <div className="entry-volume-forecast"><strong>{pickupVolumeForecast.predictedLiters === null ? 'AI chưa đủ dữ liệu để dự báo sản lượng.' : `AI dự báo: khoảng ${formatPickupVolumeLiters(pickupVolumeForecast.predictedLiters)}`}</strong><small>{pickupVolumeForecast.confidenceLabel}</small>{pickupVolumeForecast.declaredOnly ? <small>AI chưa có đủ lịch sử riêng cho quán này.</small> : null}</div> : null}</section>
       <section className="liter-entry-card">
-        <label htmlFor="actual-kilograms">Khối lượng (kg đã cân)</label>
-        <div className="large-number-input"><button onClick={() => adjustKilograms(-0.5)} disabled={saving}>−</button><input id="actual-kilograms" aria-describedby="actual-kilograms-help" type="text" inputMode="decimal" value={kilograms} onChange={(event) => setKilograms(event.target.value)} placeholder="0,0" /><span>kg</span><button onClick={() => adjustKilograms(0.5)} disabled={saving}>+</button></div>
-        <p id="actual-kilograms-help" className={invalidKg ? 'error-text' : 'field-help'}>{actualKg === null ? 'Không có số cân? Hệ thống sẽ ước lượng kg từ số lít bên dưới.' : 'SCALE — số kg này là số cân thực tế.'}</p>
-        <label htmlFor="actual-liters">Số lít thực tế</label>
-        <div className="large-number-input"><button onClick={() => adjustLiters(-0.5)} disabled={saving}>−</button><input id="actual-liters" aria-describedby="actual-liters-help" type="text" inputMode="decimal" value={liters} onChange={(event) => setLiters(event.target.value)} placeholder="0,0" /><span>lít</span><button onClick={() => adjustLiters(0.5)} disabled={saving}>+</button></div>
-        <p id="actual-liters-help" className={invalidLiters && (liters || litersDerivedFromKilograms) ? 'error-text' : 'field-help'}>{litersDerivedFromKilograms ? `Số lít ước tính từ khối lượng: ${actualLiters.toFixed(2)} lít · dung tích tối đa ${maxLiters.toFixed(1)} lít` : `Dung tích ${formatLiters(capacity)} · tối đa ${maxLiters.toFixed(1)} lít`}</p>
+        <label htmlFor="actual-kilograms">{mass.kgAuto ? 'Khối lượng (tự tính)' : 'Khối lượng (kg đã cân)'}</label>
+        <div className="large-number-input"><button onClick={() => adjustMass('kg', -0.5)} disabled={saving}>−</button><input id="actual-kilograms" aria-describedby="actual-kilograms-help" type="text" inputMode="decimal" value={mass.kgText} onChange={(event) => setMassEntry((state) => editMassField(state, 'kg', event.target.value))} placeholder="0,0" /><span>kg</span><button onClick={() => adjustMass('kg', 0.5)} disabled={saving}>+</button></div>
+        <p id="actual-kilograms-help" className={invalidKg ? 'error-text' : 'field-help'}>{mass.kgAuto ? 'Tự tính từ số lít, không phải số cân. Có số cân thì nhập vào ô này.' : actualKg === null ? 'Không có số cân? Nhập số lít bên dưới, kg sẽ tự tính.' : 'SCALE — số kg này là số cân thực tế.'}</p>
+        <label htmlFor="actual-liters">Số lít thực tế{mass.litersAuto ? ' (tự tính)' : ''}</label>
+        <div className="large-number-input"><button onClick={() => adjustMass('liters', -0.5)} disabled={saving}>−</button><input id="actual-liters" aria-describedby="actual-liters-help" type="text" inputMode="decimal" value={mass.litersText} onChange={(event) => setMassEntry((state) => editMassField(state, 'liters', event.target.value))} placeholder="0,0" /><span>lít</span><button onClick={() => adjustMass('liters', 0.5)} disabled={saving}>+</button></div>
+        <p id="actual-liters-help" className={invalidLiters && (massEntry.sourceText || litersDerivedFromKilograms) ? 'error-text' : 'field-help'}>{litersDerivedFromKilograms ? `Số lít ước tính từ khối lượng: ${actualLiters.toFixed(2)} lít · dung tích tối đa ${maxLiters.toFixed(1)} lít` : `Dung tích ${formatLiters(capacity)} · tối đa ${maxLiters.toFixed(1)} lít`}</p>
         {pickupVolumeDeviation?.level === 'NORMAL' ? <p className="pickup-volume-deviation pickup-volume-deviation-normal">Sản lượng nằm gần mức AI dự báo.</p> : null}
         {pickupVolumeDeviation?.level === 'REVIEW' ? <p className="pickup-volume-deviation pickup-volume-deviation-review">Số lít đang chênh {formatDeviationPercent(pickupVolumeDeviation.deviation_pct)} so với AI dự báo. Hãy kiểm tra lại số nhập và mức dầu trong can.</p> : null}
         {pickupVolumeDeviation?.level === 'HIGH' ? <div className="pickup-volume-deviation pickup-volume-deviation-high"><strong>Chênh lệch rất cao so với AI dự báo.</strong><span>AI dự báo {formatPickupVolumeLiters(pickupVolumeDeviation.predicted_liters)}</span><span>Thực tế nhập {formatPickupVolumeLiters(pickupVolumeDeviation.actual_liters)}</span><span>Chênh lệch {formatSignedDeviationLiters(pickupVolumeDeviation.deviation_liters)} ({formatDeviationPercent(pickupVolumeDeviation.deviation_pct)})</span><label className="pickup-volume-ack"><input type="checkbox" checked={highDeviationAcknowledgement === highDeviationKey} onChange={(event) => setHighDeviationAcknowledgement(event.target.checked ? highDeviationKey : null)} disabled={saving} /><span>Tôi đã kiểm tra lại số lít và xác nhận tiếp tục.</span></label></div> : null}
