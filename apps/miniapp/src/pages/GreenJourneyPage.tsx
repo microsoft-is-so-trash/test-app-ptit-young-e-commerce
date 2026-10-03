@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { CO2_KG_PER_LITER } from '@eco-oil/shared-types';
 import { api, ApiError } from '../lib/api';
 import { formatLiters } from '../lib/formatters';
 import { StatusView } from '../components/StatusView';
@@ -8,7 +9,6 @@ import { MonthlyTrendChart } from '../components/MonthlyTrendChart';
 import { buildMonthlyTrend } from '../lib/monthly-trend';
 import { generateCo2ReportPdf } from '../lib/co2-report-pdf';
 
-const CO2_KG_PER_LITER = 2.5;
 const MONTHLY_GOAL_LITERS = 500;
 const BEP_XANH_LITERS_THRESHOLD = 500;
 const LONG_TERM_PARTNER_MONTHS_THRESHOLD = 6;

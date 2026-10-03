@@ -3,6 +3,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { DEFAULT_DENSITY_KG_PER_LITER } from '@eco-oil/shared-types';
 import { api } from '../lib/api';
 import { formatDate, formatLiters } from '../lib/formatters';
+import { summarizeMerchantHistory } from '../lib/merchant-history';
 import { StatusView } from '../components/StatusView';
 import { useAuthStore } from '../stores/auth-store';
 import { Icon } from '../components/Icon';
@@ -43,9 +44,7 @@ export function HistoryPage() {
   }
 
   // KPI calculations
-  const totalLiters = transactions.reduce((sum, t) => sum + t.actual_liters, 0);
-  const totalCount = transactions.length;
-  const totalCO2 = totalLiters * 2.65; // approx kg CO2e per liter UCO
+  const { totalLiters, totalCount, totalCo2Kg } = summarizeMerchantHistory(transactions);
 
   return (
     <div className="page-content">
@@ -67,7 +66,7 @@ export function HistoryPage() {
             <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)', fontWeight: 600 }}>Lượt thu gom</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <span className="text-headline-sm" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{totalCO2.toFixed(1)}</span>
+            <span className="text-headline-sm" style={{ color: 'var(--secondary)', fontWeight: 700 }}>{totalCo2Kg.toFixed(1)}</span>
             <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)', fontWeight: 600 }}>kg CO₂e giảm</span>
           </div>
         </div>

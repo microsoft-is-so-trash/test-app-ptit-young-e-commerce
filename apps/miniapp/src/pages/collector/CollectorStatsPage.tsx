@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { CO2_KG_PER_LITER } from '@eco-oil/shared-types';
 import { ApiError, api } from '../../lib/api';
 import { formatLiters } from '../../lib/formatters';
 import { summarizeCollectorStats } from '../../lib/collector-stats';
@@ -8,7 +9,6 @@ import { StatusView } from '../../components/StatusView';
 import { Icon } from '../../components/Icon';
 import { useAuthStore } from '../../stores/auth-store';
 
-const CO2_KG_PER_LITER = 2.5;
 const TREND_MONTHS_BACK = 6;
 
 export function CollectorStatsPage() {

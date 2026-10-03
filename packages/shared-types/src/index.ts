@@ -96,6 +96,9 @@ export enum PriceUnit {
 
 export const DEFAULT_DENSITY_KG_PER_LITER = 0.91;
 
+/** Hệ số quy đổi ước tính: kg CO2 giảm được trên mỗi lít dầu ăn đã qua sử dụng được tái chế. */
+export const CO2_KG_PER_LITER = 2.5;
+
 export enum AlertSeverity {
   LOW = 'LOW',
   MEDIUM = 'MEDIUM',

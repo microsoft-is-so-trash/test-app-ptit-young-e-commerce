@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import { CO2_KG_PER_LITER } from '@eco-oil/shared-types';
 import type { MonthlyTrendPoint } from './monthly-trend';
 import { formatLiters } from './formatters';
 
@@ -51,7 +52,7 @@ export function generateCo2ReportPdf({ merchantName, generatedAt, monthly }: Co2
 
   y += 28;
   doc.setFontSize(9);
-  doc.text('Số liệu ước tính theo hệ số quy đổi 2.5 kg CO2/lít dầu tái chế, chỉ mang tính tham khảo.', marginX, y);
+  doc.text(`Số liệu ước tính theo hệ số quy đổi ${CO2_KG_PER_LITER} kg CO2/lít dầu tái chế, chỉ mang tính tham khảo.`, marginX, y);
 
   return doc;
 }

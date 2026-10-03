@@ -53,7 +53,7 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 |---|---|---|---|---|
 | M1 | B | xong | (commit này) | Bỏ WARD_ID cứng; payload gửi lại hồ sơ tạo bằng lib/merchant-resubmit.ts, test merchant-resubmit.test.ts (3). Không đổi giao diện nên không chụp ảnh. Cổng kiểm tra pass (153 test). |
 | M2 | A | xong | (commit này) | Bỏ ô "Tiền ước tính tuần"/"Tiền chốt tuần" ở lưới thống kê Trang chủ (tiền tuần chỉ còn ở thẻ lớn); "Lần thu gom gần nhất" xếp cạnh "Lít tháng này". Phần chuyển danh sách can làm trong M4 (Q3). Ảnh: design/snapshots/ui-v4/M2/. Cổng kiểm tra pass. |
-| M3 | B | chưa làm | | Q1: dùng 2.5 |
+| M3 | B | xong | (commit này) | Thêm CO2_KG_PER_LITER = 2.5 vào @eco-oil/shared-types; HistoryPage (trước 2.65), GreenJourneyPage, CollectorStatsPage, co2-report-pdf dùng chung. Lịch sử: 1.073 lít → 2682.5 kg CO2e (trước 2843.4). Test co2-factor.test.ts (4, có kiểm tra không màn nào tự khai báo hệ số). Typecheck shared-types/api/admin pass. Ảnh: design/snapshots/ui-v4/M3/. |
 | M4 | B | chưa làm | | Gồm cả phần chuyển danh sách can từ M2 (Q3) |
 | M5.1 | B | chưa làm | | |
 | M5.2 | B | chưa làm | | Q4: can thiếu dung tích thì không nhắc |
@@ -119,6 +119,7 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
 
+- 03/10/2026 — M3 — xong. Thêm CO2_KG_PER_LITER = 2.5 vào @eco-oil/shared-types; HistoryPage (trước 2.65), GreenJourneyPage, CollectorStatsPage, co2-report-pdf dùng chung. Lịch sử: 1.073 lít → 2682.5 kg CO2e (trước 2843.4). Test co2-factor.test.ts (4, có kiểm tra không màn nào tự khai báo hệ số). Typecheck shared-types/api/admin pass. Ảnh: design/snapshots/ui-v4/M3/.
 - 03/10/2026 — M2 — xong. Bỏ ô "Tiền ước tính tuần"/"Tiền chốt tuần" ở lưới thống kê Trang chủ (tiền tuần chỉ còn ở thẻ lớn); "Lần thu gom gần nhất" xếp cạnh "Lít tháng này". Phần chuyển danh sách can làm trong M4 (Q3). Ảnh: design/snapshots/ui-v4/M2/. Cổng kiểm tra pass.
 - 03/10/2026 — M1 — xong. Bỏ WARD_ID cứng; payload gửi lại hồ sơ tạo bằng lib/merchant-resubmit.ts, test merchant-resubmit.test.ts (3). Không đổi giao diện nên không chụp ảnh. Cổng kiểm tra pass (153 test).
 - 03/10/2026 — B2 giai đoạn M — Đọc toàn bộ file của M1–M6, chụp ảnh trước (`design/snapshots/ui-v4/M-before/`), thêm cấu hình `eco-oil-miniapp-demo` vào `.claude/launch.json`. Dừng hỏi Q5–Q9.
