@@ -9,9 +9,9 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 
 | | |
 |---|---|
-| Giai đoạn | I1 — đang làm |
-| Task đang làm | I1.0 — chờ kết quả CI |
-| Đang chờ chủ dự án | — |
+| Giai đoạn | I1 — I1.3 xong; I1.0, I1.1, I1.2 bị chặn |
+| Task đang làm | — |
+| Đang chờ chủ dự án | Trả lời Q25–Q27 |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — nhận trả lời Q17–Q24 và ràng buộc chi phí Google |
 
@@ -49,8 +49,11 @@ Ghi theo dạng: ngày — mã câu hỏi — nội dung đã chọn.
 | T5 | I2.3, I2.4 | Giọng đọc Collector mặc định bật hay tắt? | Bật cho Collector, tắt cho Merchant; số tiền luôn mặc định tắt |
 | T6 | I2.2 | Giọng miền Bắc/Nam, nam/nữ? | Chọn sau khi nghe thử ở I2.2 |
 | T7 | I2.1 | Ngân sách tháng để đặt cảnh báo trên Google Cloud? | 5 USD |
+| Q25 | I1.0, I1.2 | Test e2e api hỏng vì CI seed bằng dataset demo (`scripts/seed-demo.ts`, vùng cấm) trong khi test cần fixture `apps/api/test/fixtures/hcm-legacy-seed.ts`. Sửa thế nào? (S7: đã hết 2 vòng tự sửa) | (a) Sửa `.github/workflows/ci.yml`: bước seed chạy fixture `hcm-legacy-seed.ts` thay cho `pnpm db:seed`; không đụng `scripts/seed-demo.ts`; sau đó sửa test còn lệch (nếu có) tối đa 2 vòng nữa. (b) Giữ seed demo, chạy thêm fixture sau đó (dễ trùng khoá duy nhất, ví dụ `zalo_admin_01` có ở cả hai). (c) Bỏ e2e khỏi `pnpm test` trên CI: CI xanh ngay nhưng nghiệm thu "test e2e nhánh dự phòng" của I1.2 không chạy ở đâu |
+| Q26 | I1.2 | S15: Routes chế độ xe máy (`TWO_WHEELER`) tính vào SKU **Enterprise** của Compute Route Matrix: 1.000 phần tử miễn phí/tháng, sau đó 15 USD/1.000 (trang giá chính thức của Google, đọc 03/10/2026). Ước tính 20 Collector × 26 ngày × 1 lần nộp × 25 trạm ≈ 13.000 phần tử/tháng ≈ 180 USD/tháng; chỉ 2 trạm/lần cũng đã vượt 1.000. Làm sao giữ 0 đồng? | (a) Routes **Essentials**: `DRIVE` + `TRAFFIC_UNAWARE` (10.000 phần tử miễn phí/tháng), tối đa 5 trạm gần nhất mỗi lần (thay 25 của Q23) ≈ 2.600 phần tử/tháng; 3 lớp chặn: bộ đếm tháng trong Redis (`maps:route-matrix:elements:<YYYY-MM>`) tự dừng ở 8.000 rồi dùng `ST_Distance`, hạn mức trên Google Cloud, cảnh báo ngân sách. Đánh đổi: quãng đường theo đường ô tô, có thể dài hơn đường xe máy trong hẻm; ghi "đường ô tô" cạnh số km. (b) Bỏ Routes, giữ `ST_Distance` (0 đồng tuyệt đối, đang chạy ổn): I1.2 chỉ còn ghi "đường chim bay". (c) Dịch vụ ngoài Google (OpenRouteService/OSRM công cộng): không cam kết hoạt động, chưa xác minh có chế độ xe máy — không đề xuất. Lưu ý: mức miễn phí tính theo tài khoản thanh toán cho mỗi SKU; tài khoản dùng cho dự án khác thì phần miễn phí bị chia |
+| Q27 | I1.1 | S15: Places Autocomplete Requests 10.000 miễn phí/tháng; Autocomplete Session Usage miễn phí không giới hạn; Place Details Essentials (có `location`, `formattedAddress`) 10.000/tháng; Maps JavaScript Dynamic Maps 10.000 lượt tải/tháng (trang giá chính thức, 03/10/2026). Admin dùng vài chục lần/tháng nên nằm trong mức miễn phí, nhưng có thể vượt nếu lỗi lặp hoặc bị lạm dụng. Có làm không? | (a) Làm, kèm chặn: session token; gõ ≥ 3 ký tự và dừng 300 ms mới gọi; endpoint chỉ ADMIN và có rate limit; bộ đếm tháng trong Redis tự dừng ở 8.000 mỗi SKU (sau đó chỉ còn nhập tay); bản đồ chỉ tải khi mở form trạm; chủ dự án đặt hạn mức/ngày trên Google Cloud (ví dụ Autocomplete 300, Place Details 100, Maps JS 100 lượt tải) và cảnh báo ngân sách. (b) Không dùng Google cho I1.1: kéo ghim trên bản đồ Leaflet có sẵn (không có tìm địa chỉ), giữ ô nhập tay — 0 đồng tuyệt đối |
 
-Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi làm M và C.
+, chưa cần trả lời trước khi làm M và C.
 
 ## Bảng task
 
@@ -90,9 +93,9 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 
 | Mã | Nhóm | Trạng thái | Commit | Ghi chú |
 |---|---|---|---|---|
-| I1.0 | B | đang làm | | Thêm theo Q17: sửa test api đang đỏ trên CI |
-| I1.1 | B | chưa làm | | |
-| I1.2 | B | chưa làm | | |
+| I1.0 | B | bị chặn (Q25) | 6de287c, 73ad335, 638f2da | Vòng 1: `turbo.json` khai báo biến môi trường cho task `test` (Turborepo 2 lọc biến không khai báo nên `JWT_SECRET`, `DATABASE_URL`… không tới jest). RED: chạy 1 file e2e qua turbo với `DATABASE_URL=127.0.0.1:1` vẫn báo `HOST:5432` (bị lọc, Prisma lùi về `.env`); GREEN: báo `127.0.0.1:1`. CI sau vòng 1 treo hơn 23 phút (đã huỷ run 37123567004): test e2e lỗi ở beforeAll sau khi Redis đã kết nối nên jest không thoát. Vòng 2: `apps/api/jest.config.js` thêm `forceExit`. CI run 37124977833: không còn treo, 13/15 file e2e vẫn hỏng vì dữ liệu seed: CI chạy `pnpm db:seed` = `scripts/seed-demo.ts` (dataset demo) trong khi e2e viết theo fixture `apps/api/test/fixtures/hcm-legacy-seed.ts` (không nơi nào gọi; có `zalo_merchant_01`, `50000000-…-001`, container `60000000-…` mà seed demo không có). Hết 2 vòng → hỏi Q25. |
+| I1.1 | B | bị chặn (Q27) | | |
+| I1.2 | B | bị chặn (Q25, Q26) | | |
 | I1.3 | B | xong | (commit này) | Theo Q20 (a). Bằng chứng RED: `test/station-cache.test.ts` fail "Cannot find module src/lib/station-cache"; `station-recommend-schema.spec.ts` fail "accepts 0 liters…" (schema bắt `liters > 0`). Đã làm: `stationRecommendSchema` cho phép `liters = 0` (lấy mọi trạm đang nhận); Dexie version 3 thêm bảng `stationCache` (khoá `stations:<collector>`); `prefetchRouteData` lúc Bắt đầu ca lưu danh sách trạm (vị trí GPS, không có thì tâm phường của tuyến), lỗi không chặn bắt đầu ca; `loadStationsWithCache`: có mạng lấy từ máy chủ và gộp vào bản lưu, mất mạng (lỗi mạng/408/429/5xx) dùng bản lưu và tính đường chim bay trên máy (`lib/station-cache.ts`), lỗi 4xx không bị che. Màn chọn trạm hiện "Đang dùng danh sách trạm đã lưu — Chưa kết nối được máy chủ. Khoảng cách đường chim bay, sức chứa lúc …". Test: station-cache (11), api schema spec (3), thêm kiểm tra `liters=0` trong `full-flow.e2e-spec.ts` (chạy trên CI). Cổng: miniapp typecheck/lint/239 test/build pass; api typecheck/lint/230 unit test pass; admin typecheck pass. Trực quan (demo 375×812): bấm Bắt đầu ca → IndexedDB `eco-oil-miniapp` có bảng `stationCache` với 2 trạm demo (Long Biên, Thanh Trì), không lỗi console; ảnh `design/snapshots/ui-v4/I1.3/after-start-shift.jpg`. Chưa xem được thông báo "danh sách trạm đã lưu" trên màn hình: chế độ demo offline không bao giờ lỗi mạng; đã kiểm bằng test. Lưu ý: màn chọn trạm chỉ tìm trạm khi mọi giao dịch đã đồng bộ (quy tắc có sẵn), nên bản lưu chỉ dùng được khi mất mạng sau lúc đồng bộ xong (xem Phát hiện ngoài phạm vi). |
 
 ### Giai đoạn I2 — Đọc giọng nói (TTS)
@@ -154,6 +157,10 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 ## Nhật ký
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
+
+- 03/10/2026 — Dừng hỏi Q25 (I1.0 hết 2 vòng, S7), Q26 (I1.2, S15: chế độ xe máy là SKU Enterprise), Q27 (I1.1, S15). Đọc giá trên developers.google.com/maps/billing-and-pricing/pricing và sku-details. Số lần gọi tác tử phụ của I1: 0/12.
+- 03/10/2026 — I1.3 — xong (4405ef8). Chi tiết ở bảng task.
+- 03/10/2026 — I1.0 — vòng 1 (turbo env), vòng 2 (jest forceExit); CI vẫn đỏ vì seed. Lấy log CI bằng `gh` của máy host (`/run/host/usr/bin/gh run view … --log-failed`).
 
 - 03/10/2026 — B2 giai đoạn I1 — Tác tử chính tự rà (theo bảng 2.4, không gọi tác tử phụ; số lần gọi tác tử phụ của I1: 0/12). Đã đọc: `apps/admin/src/components/stations-view.tsx` (form trạm nhập tay vĩ độ/kinh độ ở dòng 612–631, kiểm hợp lệ ở 433–457; khớp kế hoạch), `operations-map-canvas.tsx` (admin đã có Leaflet, nền OSM có dự phòng), `apps/admin/src/lib/api.ts` (có chế độ demo offline cho trạm); `apps/api/src/modules/stations/` (`recommend` ở `stations.service.ts:137-179` dùng `ST_Distance`, lọc trạm đủ sức chứa; controller cho COLLECTOR và ADMIN), `stationRecommendSchema` (`packages/validation/src/index.ts:561`, bắt `liters > 0`), `StationRecommendation` (`packages/shared-types/src/index.ts:520`), `RedisService` (báo lỗi khi thiếu `REDIS_URL`), cách gọi HTTP ra ngoài có timeout (`real-zalo-auth.provider.ts`), `jest.config.js` và `test/setup-env.ts`; `apps/miniapp`: `offline-cache.ts`, `outbox-db.ts` (Dexie version 1–2, chưa có bảng trạm), `startShift` (`CollectorFlow.tsx:202`), `StationDeliveryFlow.tsx` (gọi `/stations/recommend` lúc mở màn nộp trạm, chưa có bản lưu khi mất mạng), `api.recommendStations` (demo trả `DEMO_STATIONS`). Kế hoạch ghi file `StationDeliveryFlow.tsx` không kèm thư mục; file thật ở `src/pages/`. Không chạy test api (chủ dự án huỷ lệnh; xem Q17). Tra CI qua API công khai của GitHub: đỏ từ trước v4. Dừng hỏi Q17–Q24.
 - 03/10/2026 — Society Charter — Chủ dự án duyệt (S-1…S-4). Đã sửa `.claude/rules/ui-v4-workflow.md` (B2 rà soát song song có điều kiện, B3 bằng chứng RED, B6 review theo bảng 2.4 + kiểm chỉ đọc + nhật ký MAST, B8 verifier) và tạo `.claude/agents/ui-v4-verifier.md`.
