@@ -137,6 +137,9 @@ export function StationLocationPicker({ lat, lng, onPick }: { lat: string; lng: 
 
   useEffect(() => {
     if (DEMO_OFFLINE || !shouldSearchPlaces(query) || query === chosenTextRef.current) {
+      // Bỏ kết quả của lần tìm đang chờ (nếu có) để gợi ý cũ không hiện lại.
+      requestIdRef.current += 1;
+      setSearching(false);
       setSuggestions([]);
       return;
     }

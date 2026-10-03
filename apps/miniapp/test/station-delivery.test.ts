@@ -331,6 +331,27 @@ test('the nearest station with enough room is recommended and listed first; the 
   assert.deepEqual(result.ordered.map((item) => item.id), ['mid-ok', 'far-ok', 'near-full']);
 });
 
+test('with road distances, the server order wins: a straight line distance is never compared with a road distance', () => {
+  const result = orderStationsForDelivery([
+    { ...stationAt('road-a', 5000, 500), distance_source: 'road' as const },
+    { ...stationAt('road-b', 6000, 500), distance_source: 'road' as const },
+    { ...stationAt('straight-r', 4800, 500), distance_source: 'straight' as const },
+  ], 50);
+
+  assert.equal(result.recommendedId, 'road-a');
+  assert.deepEqual(result.ordered.map((item) => item.id), ['road-a', 'road-b', 'straight-r']);
+});
+
+test('with road distances, the first station in server order that has room is recommended', () => {
+  const result = orderStationsForDelivery([
+    { ...stationAt('road-full', 900, 10), distance_source: 'road' as const },
+    { ...stationAt('straight-ok', 800, 500), distance_source: 'straight' as const },
+  ], 50);
+
+  assert.equal(result.recommendedId, 'straight-ok');
+  assert.deepEqual(result.ordered.map((item) => item.id), ['straight-ok', 'road-full']);
+});
+
 test('no station is recommended when none has enough room', () => {
   const result = orderStationsForDelivery([stationAt('a', 100, 10), stationAt('b', 200, 20)], 50);
 

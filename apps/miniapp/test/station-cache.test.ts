@@ -78,6 +78,14 @@ test('online station search returns server results and refreshes the stored list
   assert.deepEqual((await getCachedStations('collector-d'))?.stations.map((item) => item.id), ['far']);
 });
 
+test('online station search keeps stored stations that the server did not return this time', async () => {
+  await cacheStations([near, far], here, 'collector-h');
+  await loadStationsWithCache(here, 20, 'collector-h', async () => [{ ...far, remaining_capacity_l: 400 }]);
+  const cached = await getCachedStations('collector-h');
+  assert.deepEqual(cached?.stations.map((item) => item.id).sort(), ['far', 'near']);
+  assert.equal(cached?.stations.find((item) => item.id === 'far')?.remaining_capacity_l, 400);
+});
+
 test('offline station search falls back to the stored list with straight line distances', async () => {
   await cacheStations([far, near, full], here, 'collector-e');
   const result = await loadStationsWithCache(here, 20, 'collector-e', async () => { throw new ApiError(0, { code: 'NETWORK', message: 'offline', details: null }); });

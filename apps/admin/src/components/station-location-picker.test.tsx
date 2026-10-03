@@ -75,6 +75,19 @@ test('does not search again after a suggestion is chosen', async () => {
   expect(screen.queryByRole('list', { name: 'Gợi ý địa chỉ' })).toBeNull();
 });
 
+test('drops a pending search result when the search box was cleared before it arrived', async () => {
+  let resolveSearch: (value: unknown) => void = () => undefined;
+  apiMock.placesAutocomplete.mockReturnValue(new Promise((resolve) => { resolveSearch = resolve; }));
+  const { input } = renderPicker();
+  fireEvent.change(input, { target: { value: '22 Hà' } });
+  await act(async () => { vi.advanceTimersByTime(300); });
+  expect(apiMock.placesAutocomplete).toHaveBeenCalledTimes(1);
+  fireEvent.change(input, { target: { value: '2' } });
+  await act(async () => { resolveSearch([{ place_id: 'place-1', text: '22 Hàng Bạc', main_text: '22 Hàng Bạc', secondary_text: null }]); });
+  expect(screen.queryByRole('list', { name: 'Gợi ý địa chỉ' })).toBeNull();
+  expect(screen.queryByText('Đang tìm…')).toBeNull();
+});
+
 test('shows the backend message so the admin knows to type coordinates by hand', async () => {
   apiMock.placesAutocomplete.mockRejectedValue(new Error('Chưa tìm được địa chỉ lúc này. Hãy nhập vĩ độ, kinh độ bằng tay.'));
   const { input } = renderPicker();

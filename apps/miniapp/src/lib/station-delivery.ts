@@ -123,11 +123,15 @@ export async function closeShiftAfterReceipt(persistReceipt: () => Promise<unkno
   if (!closed) throw new Error('Không thể kết ca. Vui lòng thử lại.');
 }
 
-/** Trạm gần nhất còn đủ chỗ cho số lít đang mang được chọn sẵn và đưa lên đầu (C5.5, Q15); không tự chuyển màn. */
-export function orderStationsForDelivery<T extends { id: string; distance_m: number; remaining_capacity_l: number }>(stations: ReadonlyArray<T>, liters: number): { ordered: T[]; recommendedId: string | null } {
-  const recommended = [...stations]
-    .filter((item) => item.remaining_capacity_l >= liters)
-    .sort((a, b) => a.distance_m - b.distance_m)[0];
+/**
+ * Trạm gần nhất còn đủ chỗ cho số lít đang mang được chọn sẵn và đưa lên đầu (C5.5, Q15); không tự
+ * chuyển màn. Khi máy chủ đã xếp theo quãng đường ô tô (I1.2) thì giữ thứ tự máy chủ, không so quãng
+ * đường ô tô với đường chim bay.
+ */
+export function orderStationsForDelivery<T extends { id: string; distance_m: number; remaining_capacity_l: number; distance_source?: 'road' | 'straight' }>(stations: ReadonlyArray<T>, liters: number): { ordered: T[]; recommendedId: string | null } {
+  const withRoom = stations.filter((item) => item.remaining_capacity_l >= liters);
+  const serverRanked = stations.some((item) => item.distance_source === 'road');
+  const recommended = serverRanked ? withRoom[0] : [...withRoom].sort((a, b) => a.distance_m - b.distance_m)[0];
   if (!recommended) return { ordered: [...stations], recommendedId: null };
   return { ordered: [recommended, ...stations.filter((item) => item.id !== recommended.id)], recommendedId: recommended.id };
 }

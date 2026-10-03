@@ -417,13 +417,11 @@ Thứ tự ưu tiên đã có: kế hoạch đứng trên quy tắc ECC. Khi Cha
 
 ## Giai đoạn I1: Google Maps cho trạm
 
-| Task | Việc | File |
-|---|---|---|
 | Task | Việc | File | Trạng thái (03/10/2026) |
 |---|---|---|---|
-| I1.0 | Sửa test api đang đỏ trên CI (thêm theo Q17), để cổng kiểm tra của I1.2 chạy được. Test e2e chuyển sang dữ liệu `seed-demo` (Q25) | `turbo.json`, `apps/api/jest.config.js`, `apps/api/test/` | Đang làm |
-| I1.1 | Admin nhập vị trí trạm: gõ địa chỉ → gợi ý Places API (New) **qua backend** (Q18) → chọn → kéo ghim trên **Google Maps JavaScript** (Q19) xác nhận. Giữ ô nhập tay lat/lng làm dự phòng | `apps/admin/src/components/stations-view.tsx`, `apps/api` | Chưa làm; có lớp chặn chi phí (Q27) |
-| I1.2 | Backend: gợi ý trạm theo đường đi bằng Routes API (Compute Route Matrix); lỗi/timeout thì dùng `ST_Distance` hiện có. Không dùng `TWO_WHEELER` (SKU Enterprise có phí); dùng Essentials `DRIVE` + `TRAFFIC_UNAWARE`, tối đa 5 trạm/lần, bộ đếm Redis tự dừng ở 8.000 phần tử/tháng, ghi "đường ô tô" (Q26) | `apps/api/src/modules/stations/` | Chưa làm |
+| I1.0 | Sửa test api đang đỏ trên CI (thêm theo Q17), để cổng kiểm tra của I1.2 chạy được. Test e2e chuyển sang dữ liệu `seed-demo` (Q25) | `turbo.json`, `apps/api/jest.config.js`, `apps/api/test/` | Xong |
+| I1.1 | Admin nhập vị trí trạm: gõ địa chỉ → gợi ý Places API (New) **qua backend** (Q18) → chọn → kéo ghim trên **Google Maps JavaScript** (Q19) xác nhận. Giữ ô nhập tay lat/lng làm dự phòng | `apps/admin/src/components/stations-view.tsx`, `apps/api` | Xong |
+| I1.2 | Backend: gợi ý trạm theo đường đi bằng Routes API (Compute Route Matrix); lỗi/timeout thì dùng `ST_Distance` hiện có. Không dùng `TWO_WHEELER` (SKU Enterprise có phí); dùng Essentials `DRIVE` + `TRAFFIC_UNAWARE`, tối đa 5 trạm/lần, bộ đếm Redis tự dừng ở 8.000 phần tử/tháng, ghi "đường ô tô" (Q26) | `apps/api/src/modules/stations/` | Xong |
 | I1.3 | Collector: lúc "Bắt đầu ca" lưu danh sách trạm đang nhận trên máy (Dexie version 3, bảng `stationCache`); mất mạng thì dùng bản đã lưu, khoảng cách đường chim bay tính trên máy (Q20) | `apps/miniapp/src/lib/offline-cache.ts`, `station-cache.ts`, `outbox-db.ts`, `StationDeliveryFlow.tsx`, `packages/validation` | Xong (4405ef8) |
 
 - Key: `GOOGLE_MAPS_SERVER_KEY` (backend, chỉ bật Routes + Places New, không giới hạn IP vì Render
@@ -554,4 +552,5 @@ Bản đầy đủ: mục "Quyết định" và "Câu hỏi đang mở" của `d
 | 03/10/2026 | `6de287c` | Thêm ràng buộc chi phí Google bằng 0 (mục 0, S15); thêm task I1.0 (Q17); key backend không giới hạn IP (Q22) |
 | 03/10/2026 | `3d2bde4` | Ghi chép đầy đủ: mục 1 thêm quy tắc dùng tác tử phụ, chi phí bằng 0, giữ kiểu xuống dòng; sửa cách chụp ảnh (không có Playwright); mục 2 thêm bảng quy tắc bắt buộc R1–R8 và sửa dòng trần token; I1 ghi quyết định Q18–Q23, trạng thái từng task, I1.2 chờ Q26 về chi phí; I2 ghi T3, T4 đã trả lời qua Q21; thêm mục 3 (sổ câu hỏi) và mục 4 (nhật ký này) |
 | 03/10/2026 | `3772889` | Ghi câu trả lời Q25 (test e2e dùng seed-demo), Q26 (Routes Essentials), Q27 (I1.1 kèm lớp chặn); thêm nguyên tắc offline-first vào mục 3.1; cập nhật bảng I1 |
-| 03/10/2026 | (commit này) | Ghi Q28 (số rate limit) và Q29 (task X1 nộp trạm offline-first) |
+| 03/10/2026 | `9e23e3e` | Ghi Q28 (số rate limit) và Q29 (task X1 nộp trạm offline-first) |
+| 03/10/2026 | (commit này) | Sửa bảng I1 bị lặp dòng tiêu đề; cập nhật trạng thái I1.0–I1.3 là xong |

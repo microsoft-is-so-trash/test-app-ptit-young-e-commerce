@@ -9,9 +9,9 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 
 | | |
 |---|---|
-| Giai đoạn | I1 — đang làm (I1.3 xong) |
-| Task đang làm | B8 giai đoạn I1 |
-| Đang chờ chủ dự án | — |
+| Giai đoạn | I1 xong — chờ chủ dự án duyệt |
+| Task đang làm | — |
+| Đang chờ chủ dự án | Duyệt giai đoạn I1 ("duyệt I1"); xác nhận đã đặt hạn mức/ngày và cảnh báo ngân sách trên Google Cloud khi tạo key |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — nhận trả lời Q17–Q24 và ràng buộc chi phí Google |
 
@@ -144,6 +144,18 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 ## Báo cáo giai đoạn
 
+### Giai đoạn I1 — 03/10/2026
+
+- Đã làm: I1.0 sửa CI api (6de287c, 73ad335, 638f2da, 3772889, 5f221ee), I1.1 tìm vị trí trạm cho admin (29aeda7, 314041e, 9e23e3e), I1.2 gợi ý trạm theo quãng đường (6087cf7, 314041e, 9e23e3e), I1.3 lưu trạm khi Bắt đầu ca (4405ef8); sửa sau review (314041e, commit này).
+- Cổng kiểm tra cuối: api typecheck/lint/257 unit; admin 82 test, build; miniapp 244 test, build; CI e2e api 349/349 (run 37135660023, trước các sửa review cuối — CI của commit báo cáo ghi ở nhật ký).
+- Verifier: I1.0, I1.1, I1.2, I1.3, rate limit Q28, nghiệm thu chung: đạt. Chi phí bằng 0: chưa đủ bằng chứng — bộ đếm Redis đạt, nhưng hạn mức/ngày và cảnh báo ngân sách trên Google Cloud cần chủ dự án tự đặt và xác nhận.
+- Pilot Society Charter (mục 2.5): 3/12 lần gọi (security-reviewer 1, code-reviewer 1, verifier 1). Lỗi có giá trị: security 2 MEDIUM (sửa cả 2: bộ đếm tháng có thể reset sớm hơn Google; chọn gợi ý gọi Autocomplete lần nữa), code 1 MEDIUM + 3 LOW (sửa cả 4). Tổng 6/10 lỗi báo ra được sửa; 4 LOW của security chỉ ghi nhận. Verifier không phát hiện lỗi mà tác tử chính bỏ sót, nhưng tách rõ phần không kiểm chứng được (cấu hình Google Cloud, giao diện với key thật).
+- Chưa xem được trên màn hình: ô tìm địa chỉ và bản đồ ghim (cần API + DB đang chạy và key Google; máy không có PostGIS), nhãn "đường ô tô"/"đường chim bay" (dataset demo không có `distance_source`), thông báo danh sách trạm đã lưu khi mất mạng (demo không mất mạng). Đã kiểm bằng test component/unit/e2e.
+- Câu chữ mới cần duyệt: admin "Tìm vị trí theo địa chỉ", "Gõ địa chỉ trạm, ví dụ 22 Hàng Bạc", "Kéo ghim trên bản đồ để chỉnh vị trí."; miniapp "Đang dùng danh sách trạm đã lưu — Chưa kết nối được máy chủ. Khoảng cách đường chim bay, sức chứa lúc …", "… · đường ô tô", "… · đường chim bay"; lỗi 429 "Gọi quá nhiều lần trong một phút. Vui lòng thử lại sau."
+- Việc của chủ dự án trước khi bật Google: tạo `GOOGLE_MAPS_SERVER_KEY` (chỉ Routes + Places New) và `NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY` (referrer admin + localhost, chỉ Maps JavaScript); đặt hạn mức/ngày và cảnh báo ngân sách; đặt key vào Render/Vercel. Không có key thì app chạy như cũ (đường chim bay, nhập tay).
+- Ghi nhận chưa sửa: Redis là chốt chặn chi phí duy nhất trong code (bộ đếm mất nếu Redis bị xoá khoá); `google.maps.Marker` đã deprecated; `/stations/recommend` với `liters=0` không giới hạn số trạm; throttler đếm trong bộ nhớ (đúng khi chạy 1 instance); `full-flow.e2e-spec.ts` vẫn xoá sạch bảng trong DB test.
+- Tiếp theo sau khi duyệt: task X1 (nộp trạm offline-first, Q29), rồi giai đoạn I2 (còn chờ T1, T2, T5, T6, T7).
+
 ### Giai đoạn C — 03/10/2026
 
 - Đã làm: C1, C2, C3, C4.1–C4.4, C5.1–C5.5, C6 (commit 3cf77df … ccdafc9) và sửa sau review (9ee7030).
@@ -165,6 +177,10 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 ## Nhật ký
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
+
+- 03/10/2026 — B8 giai đoạn I1 — Sửa theo code-reviewer: (MEDIUM) `orderStationsForDelivery` giữ thứ tự máy chủ khi đã có quãng đường ô tô, không so đường ô tô với đường chim bay — RED: "with road distances, the server order wins" fail; (LOW) bỏ kết quả tìm địa chỉ đang chờ khi ô tìm bị xoá và tắt "Đang tìm…" — RED: "drops a pending search result…" fail (2 lần: gợi ý cũ, rồi "Đang tìm…" kẹt); (LOW) thêm test gộp danh sách trạm khi có mạng (pass ngay, chỉ bổ sung độ phủ); (LOW) khối mới trong `sync-station-deliveries.e2e-spec.ts` về CRLF, không còn dòng chỉ đổi kiểu xuống dòng. Cổng: admin 82, miniapp 244 test, typecheck/lint/build pass.
+- 03/10/2026 — I1-phase-verify-1 — ui-v4-verifier (sonnet) — đầu vào tiêu chí I1 + c0c4d1c..dfba4e4 + CI 37135660023 — 6 đạt, 1 chưa đủ bằng chứng (hạn mức/cảnh báo ngân sách trên Google Cloud là cấu hình ngoài repo), 0 không đạt — ghi vào báo cáo; kiểm chỉ đọc đạt. Không chạy lại verifier (không có tiêu chí "không đạt").
+- 03/10/2026 — I1-phase-code-1 — code-reviewer (sonnet) — đầu vào c0c4d1c..dfba4e4 — 0 CRITICAL, 0 HIGH, 1 MEDIUM, 3 LOW — sửa cả 4; kiểm chỉ đọc đạt. Tác tử phụ đã gọi trong I1: 3/12 (security 1, code 1, verifier 1). Không có lỗi MAST.
 
 - 03/10/2026 — I1.1, I1.2 — Rate limit theo Q28: `@nestjs/throttler` 6.7.1 (S5 đã duyệt ở Q21; package.json giữ CRLF, chỉ thêm 1 dòng), `UserThrottlerGuard` đếm theo tài khoản (`sub` của JWT, không có thì IP), trả 429 `RATE_LIMITED`; chỉ gắn cho `/stations/recommend` (20/phút), `/admin/places/autocomplete` (30/phút), `/admin/places/details` (10/phút). RED: `user-throttler.guard.spec.ts` fail "Cannot find module"; lần hai fail vì `request.user` chỉ có `sub` (không có `id`) — sửa tracker. e2e: 21 lần gợi ý trạm / 11 lần chi tiết địa điểm → 429. Miniapp gặp 429 thì dùng danh sách trạm đã lưu (đã có trong `canUseOfflineCache`). Cổng: api typecheck/lint/257 unit/build pass.
 
