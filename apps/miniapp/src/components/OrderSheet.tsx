@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { Icon } from './Icon';
+import { orderLitersField } from '../lib/order-liters';
 
 interface OrderSheetProps {
   busy: boolean;
   maxLiters: number | null;
+  /** Số lít tự tính từ can đang ở quán; null nếu không có. */
+  estimatedLiters: number | null;
   onClose: () => void;
   onSubmit: (liters: number | undefined) => void;
 }
 
-export function OrderSheet({ busy, maxLiters, onClose, onSubmit }: OrderSheetProps) {
-  const [liters, setLiters] = useState('');
+export function OrderSheet({ busy, maxLiters, estimatedLiters, onClose, onSubmit }: OrderSheetProps) {
+  const [manualLiters, setManualLiters] = useState<string | null>(null);
+  const { text: liters, isAuto } = orderLitersField(manualLiters, estimatedLiters);
   const parsedLiters = liters.trim() ? Number(liters) : undefined;
   const valid = parsedLiters === undefined || (Number.isFinite(parsedLiters) && parsedLiters > 0 && (maxLiters === null || parsedLiters <= maxLiters));
   const exceedsCapacity = parsedLiters !== undefined && maxLiters !== null && parsedLiters > maxLiters;
@@ -48,7 +52,7 @@ export function OrderSheet({ busy, maxLiters, onClose, onSubmit }: OrderSheetPro
 
         {/* Input */}
         <div>
-          <label className="form-label" htmlFor="estimated-liters">Số lít ước lượng</label>
+          <label className="form-label" htmlFor="estimated-liters">Số lít ước lượng{isAuto ? ' (tự tính)' : ''}</label>
           <div className="input-with-suffix">
             <input
               id="estimated-liters"
@@ -59,11 +63,12 @@ export function OrderSheet({ busy, maxLiters, onClose, onSubmit }: OrderSheetPro
               step="0.1"
               max={maxLiters ?? undefined}
               value={liters}
-              onChange={(event) => setLiters(event.target.value)}
+              onChange={(event) => setManualLiters(event.target.value)}
               placeholder="Ví dụ: 18.5"
             />
             <span className="suffix">lít</span>
           </div>
+          {isAuto ? <p className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>Tự tính theo mức dầu ước tính của can; sửa được nếu khác thực tế.</p> : null}
           {parsedLiters !== undefined && parsedLiters <= 0 ? <p className="error-text">Vui lòng nhập số lít lớn hơn 0.</p> : null}
           {exceedsCapacity ? <p className="error-text">Số lít không được vượt quá dung tích can {maxLiters} lít.</p> : null}
         </div>

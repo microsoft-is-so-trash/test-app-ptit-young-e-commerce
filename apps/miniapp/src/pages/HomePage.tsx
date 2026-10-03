@@ -6,6 +6,7 @@ import { currentVietnamWeek, fillPercent, formatCurrency, formatDate, formatLite
 import { OrderSheet } from '../components/OrderSheet';
 import { MerchantOrderList } from '../components/MerchantOrderList';
 import { splitMerchantOrders } from '../lib/merchant-nav';
+import { estimateReadyLiters } from '../lib/order-liters';
 import { StatusView } from '../components/StatusView';
 import { useAuthStore } from '../stores/auth-store';
 import { Icon } from '../components/Icon';
@@ -278,6 +279,7 @@ export function HomePage() {
         <OrderSheet
           busy={createOrder.isPending}
           maxLiters={availableContainer?.capacity_l ?? null}
+          estimatedLiters={estimateReadyLiters(availableContainer)}
           onClose={() => setSheetOpen(false)}
           onSubmit={(liters) => void submitOrder(liters)}
         />
