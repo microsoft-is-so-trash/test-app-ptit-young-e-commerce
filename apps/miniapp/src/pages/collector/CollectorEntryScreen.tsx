@@ -22,6 +22,7 @@ import { compressImageBlob, zaloClient } from '../../lib/zalo-client';
 import type { PhotoAsset } from '../../lib/zalo-client';
 import { OilGradeSelector } from '../../components/OilGradeSelector';
 import { GradePhotoPicker } from '../../components/GradePhotoPicker';
+import { TechDetails } from '../../components/TechDetails';
 import { EMPTY_MASS_ENTRY, editMassField, litersForDeviationCheck, massEntryView } from '../../lib/mass-entry';
 import { aiPreselectGrade, isAiPreselected, resolveQuality } from '../../lib/grade-automation';
 import { entryGpsStatus, requestEntryGps } from '../../lib/entry-gps';
@@ -363,7 +364,8 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
         <section className={`image-grade-analysis image-grade-analysis-${imageAnalysis?.confidence.toLowerCase() ?? 'low'}`} aria-label="AI hỗ trợ phân hạng">
           <div className="image-grade-analysis-heading"><span className="image-grade-ai-label">AI hỗ trợ</span><strong>Phân tích hình ảnh thử nghiệm</strong></div>
           {imageGradeDisplay.suggestedGrade ? <p><strong>Gợi ý: {imageGradeDisplay.suggestedGrade}</strong> · {imageGradeDisplay.confidenceLabel}</p> : <p><strong>Chưa có gợi ý phân hạng</strong> · {imageGradeDisplay.confidenceLabel}</p>}
-          <small>{imageGradeDisplay.qualityLabel} · provider: {imageAnalysis?.provider ?? 'on-device-heuristic'} · model: {imageAnalysis?.model_version ?? 'unknown'}</small>
+          <small>{imageGradeDisplay.qualityLabel}</small>
+          <TechDetails><span>provider: {imageAnalysis?.provider ?? 'on-device-heuristic'}</span><span>model: {imageAnalysis?.model_version ?? 'unknown'}</span></TechDetails>
           <small>{imageGradeDisplay.summary}</small>
           {imageGradeDisplay.reasons.length > 0 ? <div className="image-grade-reasons">{imageGradeDisplay.reasons.map((reason, index) => <span key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
           {suggestedGrade && grade && suggestedGrade !== grade ? <p className="image-grade-disagreement" role="status"><strong>Khác gợi ý:</strong> bạn chọn hạng {grade}, AI gợi ý hạng {suggestedGrade}. Lý do AI: {imageGradeDisplay.reasons.join(', ') || 'tín hiệu hình ảnh hạn chế'}.</p> : null}
@@ -372,7 +374,7 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
         </section>
       ) : null}
       {error ? <div className="error-panel" role="alert">{error}</div> : null}
-      <section className="entry-meta-card"><small>Mã giao dịch: {clientUuid.slice(0, 8)}…</small><p className={locationFallback ? 'location-banner' : 'field-help'}>{gpsStatus.text}</p>{gpsStatus.showRetry ? <button type="button" className="text-button" onClick={() => { void retryGps(); }} disabled={locating || saving}>Lấy lại GPS</button> : null}</section>
+      <section className="entry-meta-card"><p className={locationFallback ? 'location-banner' : 'field-help'}>{gpsStatus.text}</p>{gpsStatus.showRetry ? <button type="button" className="text-button" onClick={() => { void retryGps(); }} disabled={locating || saving}>Lấy lại GPS</button> : null}<TechDetails><span>Mã giao dịch: {clientUuid}</span></TechDetails></section>
       {submitBlockReasons.length > 0 ? <div className="error-text submit-block-reason" role="alert"><strong>Còn thiếu:</strong><ul>{submitBlockReasons.map((reason) => <li key={reason}>{reason}</li>)}</ul></div> : null}
       <button className="submit-collection-button" onClick={() => { void submit(); }} disabled={saving || submitBlockReasons.length > 0}>{saving ? 'Đang lưu trên máy…' : 'Xác nhận thu gom'}</button>
     </div>

@@ -10,6 +10,7 @@ import { outboxErrorMessage } from '../../lib/outbox-errors';
 import { OutboxIssueNotice } from './CollectorRouteScreen';
 import { StatusView } from '../../components/StatusView';
 import { CollectorNotice } from '../../components/CollectorNotice';
+import { TechDetails } from '../../components/TechDetails';
 
 export function OutboxQueueScreen({ onBack }: { onBack: () => void }) {
   const rows = useOutboxRows();
@@ -45,9 +46,9 @@ function OutboxRow({ row, retrying, onRetry }: { row: OutboxRecord; retrying: bo
   return (
     <article className="outbox-row">
       <div className="outbox-row-top"><span className={`outbox-dot outbox-dot-${row.status}`} /><strong>{formatLiters(Number(payload.actual_liters ?? Number(payload.actual_kg ?? 0) / DEFAULT_DENSITY_KG_PER_LITER))} · {statusLabel(row.status)}</strong></div>
-      <p>UUID: {row.client_uuid}</p>
       <p>Tạo lúc {formatTime(row.created_at)} · Lần thử {row.attempts}</p>
       {row.last_error ? <div className="outbox-error">{outboxErrorMessage(row.last_error)}</div> : null}
+      <TechDetails><span>UUID: {row.client_uuid}</span></TechDetails>
       {row.status === 'failed' ? <button className="secondary-button" onClick={onRetry} disabled={retrying}>{retrying ? 'Đang thử lại…' : 'Thử lại thủ công'}</button> : null}
     </article>
   );

@@ -74,7 +74,7 @@ export function buildRouteStatusItems(input: RouteStatusInput): RouteStatusItem[
     items.push({ key: 'refresh-cache', tone: 'warning', icon: 'cloud_off', title: 'Đang dùng tuyến đã lưu', message: input.refreshNotice.message });
   }
   if (input.receiptId) {
-    items.push({ key: 'receipt', tone: 'success', icon: 'receipt_long', title: 'Đã lưu biên nhận trên máy', message: `Mã phiếu: ${input.receiptId}`, action: { id: 'open-receipt', label: 'Xem lại biên nhận', disabled: false } });
+    items.push({ key: 'receipt', tone: 'success', icon: 'receipt_long', title: 'Đã lưu biên nhận trên máy', message: 'Xem lại khi cần đối chiếu với trạm.', action: { id: 'open-receipt', label: 'Xem lại biên nhận', disabled: false } });
   }
   if (input.shiftStarted) {
     const started = input.shiftStartedAt ? `Bắt đầu lúc ${formatTime(input.shiftStartedAt)}.` : 'Tuyến và mã QR đã lưu trên máy.';

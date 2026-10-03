@@ -13,6 +13,7 @@ import { compressImageBlob } from '../lib/zalo-client';
 import { pickZaloPhoto } from '../lib/media-picker';
 import { StatusView } from '../components/StatusView';
 import { CollectorNotice } from '../components/CollectorNotice';
+import { TechDetails } from '../components/TechDetails';
 import type { CompletedStop } from '../lib/collector-metrics';
 import { canSubmitStationDelivery, closeShiftAfterReceipt, loadStationRecommendations, orderStationsForDelivery, resolveStationSearchLocation, retryStationDeliverySync } from '../lib/station-delivery';
 import { parseLocalizedDecimal } from '../lib/collection-entry-validation';
@@ -449,13 +450,13 @@ export function StationDeliveryReceipt({ station, clientUuid, collectorId, expec
       <section className="receipt-card">
         <div className={`receipt-status receipt-status-${response?.status ?? row?.status ?? 'pending'}`}>{receiptStatus}</div>
         <dl>
-          <div><dt>Mã phiếu</dt><dd>{response?.id ?? clientUuid}</dd></div>
           <div><dt>Trạm</dt><dd>{station.name}</dd></div>
           <div><dt>Tổng server đối soát</dt><dd>{formatLiters(response?.expected_liters ?? expectedLiters)}</dd></div>
           <div><dt>Thực tế đổ</dt><dd>{formatLiters(actual)}</dd></div>
           <div><dt>Chênh lệch</dt><dd>{response ? `${response.variance_l >= 0 ? '+' : ''}${response.variance_l.toFixed(1)} L (${(response.variance_pct * 100).toFixed(1)}%)` : 'Chờ server tính'}</dd></div>
           <div><dt>Giờ ghi nhận</dt><dd>{formatTime(response?.created_at ?? row?.created_at ?? null)}</dd></div>
         </dl>
+        <TechDetails><span>Mã phiếu: {response?.id ?? clientUuid}</span></TechDetails>
       </section>
       {receiptSaveState === 'saving' ? <p className="field-help" role="status">Đang lưu biên nhận…</p> : null}
       {receiptSaveState === 'saved' ? <p className="field-help" role="status">Đã lưu biên nhận trên máy.</p> : null}
