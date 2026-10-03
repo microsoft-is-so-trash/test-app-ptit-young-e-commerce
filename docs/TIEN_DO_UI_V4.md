@@ -10,7 +10,7 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 | | |
 |---|---|
 | Giai đoạn | I1 — đang làm |
-| Task đang làm | I1.0 — sửa test api đang đỏ trên CI |
+| Task đang làm | I1.0 — chờ kết quả CI |
 | Đang chờ chủ dự án | — |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — nhận trả lời Q17–Q24 và ràng buộc chi phí Google |
@@ -93,7 +93,7 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 | I1.0 | B | đang làm | | Thêm theo Q17: sửa test api đang đỏ trên CI |
 | I1.1 | B | chưa làm | | |
 | I1.2 | B | chưa làm | | |
-| I1.3 | B | chưa làm | | |
+| I1.3 | B | xong | (commit này) | Theo Q20 (a). Bằng chứng RED: `test/station-cache.test.ts` fail "Cannot find module src/lib/station-cache"; `station-recommend-schema.spec.ts` fail "accepts 0 liters…" (schema bắt `liters > 0`). Đã làm: `stationRecommendSchema` cho phép `liters = 0` (lấy mọi trạm đang nhận); Dexie version 3 thêm bảng `stationCache` (khoá `stations:<collector>`); `prefetchRouteData` lúc Bắt đầu ca lưu danh sách trạm (vị trí GPS, không có thì tâm phường của tuyến), lỗi không chặn bắt đầu ca; `loadStationsWithCache`: có mạng lấy từ máy chủ và gộp vào bản lưu, mất mạng (lỗi mạng/408/429/5xx) dùng bản lưu và tính đường chim bay trên máy (`lib/station-cache.ts`), lỗi 4xx không bị che. Màn chọn trạm hiện "Đang dùng danh sách trạm đã lưu — Chưa kết nối được máy chủ. Khoảng cách đường chim bay, sức chứa lúc …". Test: station-cache (11), api schema spec (3), thêm kiểm tra `liters=0` trong `full-flow.e2e-spec.ts` (chạy trên CI). Cổng: miniapp typecheck/lint/239 test/build pass; api typecheck/lint/230 unit test pass; admin typecheck pass. Trực quan (demo 375×812): bấm Bắt đầu ca → IndexedDB `eco-oil-miniapp` có bảng `stationCache` với 2 trạm demo (Long Biên, Thanh Trì), không lỗi console; ảnh `design/snapshots/ui-v4/I1.3/after-start-shift.jpg`. Chưa xem được thông báo "danh sách trạm đã lưu" trên màn hình: chế độ demo offline không bao giờ lỗi mạng; đã kiểm bằng test. Lưu ý: màn chọn trạm chỉ tìm trạm khi mọi giao dịch đã đồng bộ (quy tắc có sẵn), nên bản lưu chỉ dùng được khi mất mạng sau lúc đồng bộ xong (xem Phát hiện ngoài phạm vi). |
 
 ### Giai đoạn I2 — Đọc giọng nói (TTS)
 
@@ -128,6 +128,8 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
   `deleteMany`/`TRUNCATE`. `test/setup-env.ts` chỉ nạp `.env.test` nếu có; không có thì Prisma đọc
   `DATABASE_URL` của `.env`. Hiện `.env` để giá trị mẫu (`HOST`) nên chưa nguy hiểm, nhưng nếu ai
   đặt DB thật vào `.env` rồi chạy test thì dữ liệu sẽ bị xoá.
+
+- 03/10/2026 — Màn chọn trạm (`StationDeliveryFlow.tsx`) chỉ tìm trạm khi `waiting === 0` (mọi giao dịch đã đồng bộ). Khi mất mạng từ trước lúc đồng bộ xong, Collector không thấy danh sách trạm (kể cả bản lưu của I1.3) dù phiếu nộp trạm vẫn xếp hàng chờ được. Không đổi vì là quy tắc đối soát có sẵn; cần chủ dự án quyết nếu muốn hiện danh sách trạm đã lưu trong trường hợp này.
 
 ## Báo cáo giai đoạn
 

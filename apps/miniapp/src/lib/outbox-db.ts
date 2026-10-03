@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie';
-import type { CollectionCreateRequest, ContainerLookupResponse, CurrentRouteResponse, StationDeliveryCreateRequest } from '@eco-oil/shared-types';
+import type { CollectionCreateRequest, ContainerLookupResponse, CurrentRouteResponse, StationDeliveryCreateRequest, StationRecommendation } from '@eco-oil/shared-types';
 
 export type OutboxType = 'collection' | 'station_delivery';
 export type OutboxStatus = 'pending' | 'syncing' | 'synced' | 'failed';
@@ -32,6 +32,15 @@ export interface CachedRouteRecord {
 export interface CachedContainerRecord {
   qr_code: string;
   payload: ContainerLookupResponse;
+  updated_at: string;
+}
+
+/** Danh sách trạm lưu lúc Bắt đầu ca để gợi ý trạm khi mất mạng (I1.3). */
+export interface CachedStationsRecord {
+  key: string;
+  owner_id?: string;
+  stations: StationRecommendation[];
+  location: { lat: number; lng: number } | null;
   updated_at: string;
 }
 
@@ -93,6 +102,7 @@ export class EcoOilDatabase extends Dexie {
   routeCache!: Table<CachedRouteRecord, string>;
   containerCache!: Table<CachedContainerRecord, string>;
   stationReceipts!: Table<StationReceiptRecord, string>;
+  stationCache!: Table<CachedStationsRecord, string>;
 
   constructor() {
     super('eco-oil-miniapp');
@@ -106,6 +116,13 @@ export class EcoOilDatabase extends Dexie {
       routeCache: '&key,updated_at',
       containerCache: '&qr_code,updated_at',
       stationReceipts: '&key,owner_id,created_at',
+    });
+    this.version(3).stores({
+      outbox: '&client_uuid,status,next_attempt_at,created_at,synced_at',
+      routeCache: '&key,updated_at',
+      containerCache: '&qr_code,updated_at',
+      stationReceipts: '&key,owner_id,created_at',
+      stationCache: '&key,updated_at',
     });
   }
 }
@@ -386,6 +403,19 @@ export async function cacheContainer(payload: ContainerLookupResponse): Promise<
 
 export async function getCachedContainer(qrCode: string): Promise<CachedContainerRecord | undefined> {
   return ecoOilDb.containerCache.get(qrCode);
+}
+
+function stationCacheKey(ownerId?: string | null): string {
+  return ownerId ? `stations:${ownerId}` : 'stations';
+}
+
+export async function cacheStations(stations: StationRecommendation[], location: { lat: number; lng: number } | null, ownerId?: string | null): Promise<void> {
+  const owner = ownerId ?? activeOutboxOwnerId;
+  await ecoOilDb.stationCache.put({ key: stationCacheKey(owner), owner_id: owner ?? undefined, stations, location, updated_at: new Date().toISOString() });
+}
+
+export async function getCachedStations(ownerId?: string | null): Promise<CachedStationsRecord | undefined> {
+  return ecoOilDb.stationCache.get(stationCacheKey(ownerId ?? activeOutboxOwnerId));
 }
 
 function stationReceiptKey(ownerId: string, receiptId: string): string {

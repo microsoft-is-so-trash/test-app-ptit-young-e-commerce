@@ -138,6 +138,12 @@ describe('Full merchant-to-station working shift (e2e)', () => {
       .set('Authorization', `Bearer ${collectorToken}`)
       .expect(200);
     expect(stationChoice.body.length).toBeGreaterThan(0);
+    // I1.3: lúc Bắt đầu ca miniapp hỏi với 0 lít để lưu mọi trạm đang nhận.
+    const shiftStartStations = await request(app.getHttpServer())
+      .get('/api/v1/stations/recommend?lat=10.7818&lng=106.6851&liters=0')
+      .set('Authorization', `Bearer ${collectorToken}`)
+      .expect(200);
+    expect(shiftStartStations.body.length).toBeGreaterThanOrEqual(stationChoice.body.length);
     const stationId = stationChoice.body[0].id as string;
 
     const deliveryClientUuid = randomUUID();

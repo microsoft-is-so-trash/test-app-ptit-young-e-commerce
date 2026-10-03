@@ -561,7 +561,8 @@ export type StationDeliveryCreateInput = z.infer<typeof stationDeliveryCreateSch
 export const stationRecommendSchema = z.object({
   lat: z.coerce.number().finite().min(-90).max(90),
   lng: z.coerce.number().finite().min(-180).max(180),
-  liters: z.coerce.number().finite().positive().max(100000),
+  // 0 lít: lấy mọi trạm đang nhận để Collector lưu sẵn lúc Bắt đầu ca (I1.3).
+  liters: z.coerce.number().finite().min(0).max(100000),
 });
 export type StationRecommendInput = z.infer<typeof stationRecommendSchema>;
 

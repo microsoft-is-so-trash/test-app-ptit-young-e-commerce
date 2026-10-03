@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { DEFAULT_DENSITY_KG_PER_LITER, DeliveryStatus } from '@eco-oil/shared-types';
 import type { CollectionCreateRequest, GeoPoint, StationDeliveryCreateRequest, StationDeliveryResponse, StationRecommendation } from '@eco-oil/shared-types';
-import { api } from '../lib/api';
-import { formatCurrency, formatLiters } from '../lib/formatters';
+import { formatCurrency, formatDate, formatLiters } from '../lib/formatters';
+import { loadStationsWithCache } from '../lib/offline-cache';
 import { enqueueStationDelivery, retryOutbox, saveStationReceipt, type OutboxRecord, type StoredStationReceipt } from '../lib/outbox-db';
 import { syncOutbox } from '../lib/outbox-sync';
 import { useOutboxRows } from '../lib/outbox-hooks';
@@ -50,6 +50,7 @@ export function StationDeliveryFlow({ completed, pendingDelivery, collectorId, r
   const [recommendationStatus, setRecommendationStatus] = useState<'idle' | 'success' | 'empty' | 'error'>('idle');
   const [recommendationError, setRecommendationError] = useState<string | null>(null);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [stationsCachedAt, setStationsCachedAt] = useState<string | null>(null);
   const [selectedStation, setSelectedStation] = useState<StationRecommendation | null>(pendingDelivery?.station ?? null);
   const [deliveryClientUuid, setDeliveryClientUuid] = useState<string | null>(pendingDelivery?.clientUuid ?? null);
   const [retryingWaiting, setRetryingWaiting] = useState(false);
@@ -96,13 +97,17 @@ export function StationDeliveryFlow({ completed, pendingDelivery, collectorId, r
     }
     setRecommendationError(null);
     const result = await loadStationRecommendations(
-      () => api.recommendStations(location, expectedLiters),
+      async () => {
+        const loaded = await loadStationsWithCache(location, expectedLiters, collectorId);
+        setStationsCachedAt(loaded.fromCache ? loaded.cachedAt : null);
+        return loaded.stations;
+      },
       setLoadingRecommendations,
     );
     setRecommendations(result.stations);
     setRecommendationStatus(result.status);
     setRecommendationError(result.error);
-  }, [expectedLiters, location]);
+  }, [collectorId, expectedLiters, location]);
 
   useEffect(() => {
     if (screen === 'select' && waiting === 0 && expectedLiters > 0 && location) {
@@ -127,7 +132,7 @@ export function StationDeliveryFlow({ completed, pendingDelivery, collectorId, r
   if (screen === 'select') {
     const loading = waiting === 0 && (locating || loadingRecommendations);
     const error = locationError ?? recommendationError;
-    return <StationSelectScreen expectedLiters={expectedLiters} expectedKg={expectedKg} waiting={waiting} locationDenied={locationDenied} recommendations={recommendations} loading={loading} status={recommendationStatus} error={error} retryingWaiting={retryingWaiting} retryError={retryError} onBack={onBack} onRetryWaiting={() => { void retryWaiting(); }} onChoose={(station) => { setSelectedStation(station); setScreen('review'); }} onRetry={() => { void resolveLocation(); }} />;
+    return <StationSelectScreen expectedLiters={expectedLiters} expectedKg={expectedKg} waiting={waiting} locationDenied={locationDenied} recommendations={recommendations} cachedAt={stationsCachedAt} loading={loading} status={recommendationStatus} error={error} retryingWaiting={retryingWaiting} retryError={retryError} onBack={onBack} onRetryWaiting={() => { void retryWaiting(); }} onChoose={(station) => { setSelectedStation(station); setScreen('review'); }} onRetry={() => { void resolveLocation(); }} />;
   }
 
   if (screen === 'review' && selectedStation) {
@@ -141,12 +146,14 @@ export function StationDeliveryFlow({ completed, pendingDelivery, collectorId, r
   return <ShiftCloseout candidates={candidates} onFinish={onFinish} />;
 }
 
-export function StationSelectScreen({ expectedLiters, expectedKg, waiting, locationDenied, recommendations, loading, status, error, retryingWaiting, retryError, onBack, onRetryWaiting, onChoose, onRetry }: {
+export function StationSelectScreen({ expectedLiters, expectedKg, waiting, locationDenied, recommendations, cachedAt = null, loading, status, error, retryingWaiting, retryError, onBack, onRetryWaiting, onChoose, onRetry }: {
   expectedLiters: number;
   expectedKg: number;
   waiting: number;
   locationDenied: boolean;
   recommendations: StationRecommendation[];
+  /** Thời điểm lưu danh sách trạm khi đang dùng bản lưu lúc mất mạng (I1.3). */
+  cachedAt?: string | null;
   loading: boolean;
   status: 'idle' | 'success' | 'empty' | 'error';
   error: string | null;
@@ -180,6 +187,11 @@ export function StationSelectScreen({ expectedLiters, expectedKg, waiting, locat
       {loading ? <StatusView title="Đang tìm trạm còn chỗ…" /> : null}
       {!loading && status === 'error' ? <StatusView title="Chưa tìm được trạm" message={error ?? 'Kiểm tra kết nối rồi thử lại.'} action={{ label: 'Thử lại', onClick: onRetry }} /> : null}
       {!loading && status === 'empty' ? <StatusView title="Hiện chưa có trạm phù hợp để tiếp nhận" message="Thử lại sau hoặc liên hệ điều phối để được hướng dẫn." action={{ label: 'Thử lại', onClick: onRetry }} /> : null}
+      {!loading && waiting === 0 && status === 'success' && cachedAt ? (
+        <CollectorNotice tone="warning" icon="cloud_off" title="Đang dùng danh sách trạm đã lưu">
+          {`Chưa kết nối được máy chủ. Khoảng cách đường chim bay, sức chứa lúc ${formatDate(cachedAt)}.`}
+        </CollectorNotice>
+      ) : null}
       {!loading && waiting === 0 && status === 'success' ? <section className="station-list">{stationOrder.ordered.map((station) => <StationCard key={station.id} station={station} liters={expectedLiters} recommended={station.id === stationOrder.recommendedId} onChoose={() => onChoose(station)} />)}</section> : null}
     </div>
   );
