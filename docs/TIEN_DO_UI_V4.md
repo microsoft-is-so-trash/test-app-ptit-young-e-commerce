@@ -10,7 +10,7 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 | | |
 |---|---|
 | Giai đoạn | I1 — đang làm (I1.3 xong) |
-| Task đang làm | I1.0 — chuyển test e2e api sang dữ liệu seed-demo (Q25) |
+| Task đang làm | I1.2 |
 | Đang chờ chủ dự án | — |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — nhận trả lời Q17–Q24 và ràng buộc chi phí Google |
@@ -92,7 +92,7 @@ T1, T2, T5, T6, T7 chỉ chặn giai đoạn I2. T3, T4 đã có câu trả lờ
 
 | Mã | Nhóm | Trạng thái | Commit | Ghi chú |
 |---|---|---|---|---|
-| I1.0 | B | đang làm | 6de287c, 73ad335, 638f2da | Vòng 1: `turbo.json` khai báo biến môi trường cho task `test` (Turborepo 2 lọc biến không khai báo nên `JWT_SECRET`, `DATABASE_URL`… không tới jest). RED: chạy 1 file e2e qua turbo với `DATABASE_URL=127.0.0.1:1` vẫn báo `HOST:5432` (bị lọc, Prisma lùi về `.env`); GREEN: báo `127.0.0.1:1`. CI sau vòng 1 treo hơn 23 phút (đã huỷ run 37123567004): test e2e lỗi ở beforeAll sau khi Redis đã kết nối nên jest không thoát. Vòng 2: `apps/api/jest.config.js` thêm `forceExit`. CI run 37124977833: không còn treo, 13/15 file e2e vẫn hỏng vì dữ liệu seed: CI chạy `pnpm db:seed` = `scripts/seed-demo.ts` (dataset demo) trong khi e2e viết theo fixture `apps/api/test/fixtures/hcm-legacy-seed.ts` (không nơi nào gọi; có `zalo_merchant_01`, `50000000-…-001`, container `60000000-…` mà seed demo không có). Hết 2 vòng → hỏi Q25. |
+| I1.0 | B | xong | 6de287c, 73ad335, 638f2da, 3772889, 5f221ee | Vòng 1: `turbo.json` khai báo biến môi trường cho task `test` (Turborepo 2 lọc biến không khai báo). RED: chạy 1 file e2e qua turbo với `DATABASE_URL=127.0.0.1:1` vẫn báo `HOST:5432`; GREEN: báo `127.0.0.1:1`. Vòng 2: `jest.config.js` thêm `forceExit` (CI treo khi e2e lỗi ở beforeAll sau khi Redis đã kết nối). Theo Q25: test e2e chuyển sang dữ liệu seed-demo qua `test/helpers/demo-seed.ts` (định danh thực thể seed-demo, admin đăng nhập bằng `admin/login`, test tự tạo thêm can/giá dầu, gán thêm phường cho người thu gom demo, toạ độ Hà Nội theo từng quán). CI run 37133364271: 2/315 hỏng do test lỗi thời so với code v3 (tạo trạm cần `capacity_liters`; tuyến xếp theo `pickup_priority_score` có tính khoảng cách) → sửa (5f221ee). **CI run 37133576282 xanh**: api 315/315 (42 suite), miniapp 239/239, admin 6 file. Không sửa `scripts/seed-demo.ts`. |
 | I1.1 | B | chưa làm | | |
 | I1.2 | B | chưa làm | | |
 | I1.3 | B | xong | (commit này) | Theo Q20 (a). Bằng chứng RED: `test/station-cache.test.ts` fail "Cannot find module src/lib/station-cache"; `station-recommend-schema.spec.ts` fail "accepts 0 liters…" (schema bắt `liters > 0`). Đã làm: `stationRecommendSchema` cho phép `liters = 0` (lấy mọi trạm đang nhận); Dexie version 3 thêm bảng `stationCache` (khoá `stations:<collector>`); `prefetchRouteData` lúc Bắt đầu ca lưu danh sách trạm (vị trí GPS, không có thì tâm phường của tuyến), lỗi không chặn bắt đầu ca; `loadStationsWithCache`: có mạng lấy từ máy chủ và gộp vào bản lưu, mất mạng (lỗi mạng/408/429/5xx) dùng bản lưu và tính đường chim bay trên máy (`lib/station-cache.ts`), lỗi 4xx không bị che. Màn chọn trạm hiện "Đang dùng danh sách trạm đã lưu — Chưa kết nối được máy chủ. Khoảng cách đường chim bay, sức chứa lúc …". Test: station-cache (11), api schema spec (3), thêm kiểm tra `liters=0` trong `full-flow.e2e-spec.ts` (chạy trên CI). Cổng: miniapp typecheck/lint/239 test/build pass; api typecheck/lint/230 unit test pass; admin typecheck pass. Trực quan (demo 375×812): bấm Bắt đầu ca → IndexedDB `eco-oil-miniapp` có bảng `stationCache` với 2 trạm demo (Long Biên, Thanh Trì), không lỗi console; ảnh `design/snapshots/ui-v4/I1.3/after-start-shift.jpg`. Chưa xem được thông báo "danh sách trạm đã lưu" trên màn hình: chế độ demo offline không bao giờ lỗi mạng; đã kiểm bằng test. Lưu ý: màn chọn trạm chỉ tìm trạm khi mọi giao dịch đã đồng bộ (quy tắc có sẵn), nên bản lưu chỉ dùng được khi mất mạng sau lúc đồng bộ xong (xem Phát hiện ngoài phạm vi). |
@@ -156,6 +156,8 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 ## Nhật ký
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
+
+- 03/10/2026 — I1.0 — xong. CI xanh lần đầu kể từ `ui_version_3` (run 37133576282).
 
 - 03/10/2026 — Kế hoạch — Theo yêu cầu chủ dự án: rà toàn bộ thay đổi của `docs/KE_HOACH_CHUAN_HOA_UI_V4.md` và ghi vào kế hoạch: bảng quy tắc bắt buộc R1–R8 cho Society Charter (mục 2), quy tắc 8–10 ở mục 1, quyết định Q18–Q23 và trạng thái I1, sổ câu hỏi (mục 3) và nhật ký thay đổi kế hoạch (mục 4); sửa cách chụp ảnh (không có Playwright). Sửa dòng thừa trong mục "Câu hỏi đang mở" của file này.
 
