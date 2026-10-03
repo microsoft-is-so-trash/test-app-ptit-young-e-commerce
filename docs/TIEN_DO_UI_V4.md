@@ -11,9 +11,9 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 |---|---|
 | Giai đoạn | M (chưa bắt đầu) |
 | Task đang làm | — |
-| Đang chờ chủ dự án | Xác nhận Q2, Q4 và trả lời Q3 (chặn M1, M2 phần can, M5.2) |
+| Đang chờ chủ dự án | Xác nhận Q2 (chặn M1) |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
-| Cập nhật lần cuối | 03/10/2026 — ghi câu trả lời Q1, cài môi trường |
+| Cập nhật lần cuối | 03/10/2026 — ghi câu trả lời Q3, Q4 |
 
 ## Quyết định
 
@@ -25,14 +25,14 @@ Ghi theo dạng: ngày — mã câu hỏi — nội dung đã chọn.
   đoạn hoặc khi cần hỏi; dừng chờ duyệt giữa các giai đoạn.
 - 03/10/2026 — Workflow, file tiến độ và mọi thay đổi của kế hoạch nằm trên branch `ui_version_4`.
 - 03/10/2026 — Q1 — Hệ số CO2 là **2.5** kg CO2/lít (M3 đưa 2.65 ở `HistoryPage.tsx` về 2.5).
+- 03/10/2026 — Q3 — Theo đề xuất: M2 chỉ bỏ ô "Tiền ước tính tuần" ở Trang chủ; việc chuyển danh sách can (kể cả chữ giả "Can HDPE ISCC", "QR-ISCC") từ Tài khoản sang "Của tôi" làm trong M4.
+- 03/10/2026 — Q4 — Giữ M5.2 (nhắc báo thu gom khi can ước tính đầy từ 85%). Chỉ thêm điều kiện: can có `capacity_l = null` thì không nhắc.
 
 ## Câu hỏi đang mở
 
 | Mã | Chặn task | Câu hỏi | Đề xuất |
 |---|---|---|---|
 | Q2 | M1 | **Chờ xác nhận:** chủ dự án trả lời "bỏ khối dữ liệu", agent hiểu là chọn (a) — bỏ `ward_id` khỏi dữ liệu gửi đi. Câu hỏi gốc — Gửi lại hồ sơ: (a) không gửi `ward_id`, giữ phường hiện tại — backend đã cho phép bỏ trống (`merchants.service.ts:283-292`), không đổi API; hay (b) hiện ô chọn phường điền sẵn phường hiện tại, cho sửa | (a): nhỏ nhất, sửa đúng lỗi; (b) là thêm tính năng |
-| Q3 | M2, M4 | M2 yêu cầu chuyển danh sách can ở Tài khoản vào "Của tôi", nhưng "Của tôi" chỉ có sau M4. Làm phần này trong M4? | Có: M2 chỉ bỏ ô "Tiền ước tính tuần" ở Trang chủ; phần can làm trong M4 |
-| Q4 | M5.2 | **Chờ xác nhận:** chủ dự án trả lời "không nhắc báo thu gom", agent hiểu là: can thiếu dung tích thì không nhắc, M5.2 vẫn làm cho can có dung tích (không phải bỏ cả M5.2). Câu hỏi gốc — Can không có dung tích (`capacity_l = null`) thì không tính được % đầy. Khi đó không nhắc? | Không nhắc (không đoán dung tích) |
 | T1 | I2.1 | Nhà cung cấp Google cho TTS: Cloud TTS Chirp 3: HD, Gemini 3.8 Flash TTS, hay thử cả hai? | Chirp 3: HD (xem `docs/NGHIEN_CUU_TTS_GOOGLE.md` mục 2.3) |
 | T2 | I2.1 | Xác thực với Google: API key chỉ bật Cloud TTS, hay service account (thêm `google-auth-library`)? | API key + hạn mức/ngày + cảnh báo ngân sách |
 | T3 | I2.1 | Cache âm thanh phía server bằng Redis (cần `REDIS_URL` trên Render) hay chỉ cache trên máy? | Redis nếu Render đã có `REDIS_URL`; nếu không thì chỉ cache trên máy |
@@ -50,11 +50,11 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 | Mã | Nhóm | Trạng thái | Commit | Ghi chú |
 |---|---|---|---|---|
 | M1 | B | bị chặn (Q2) | | |
-| M2 | A | bị chặn một phần (Q3) | | Phần bỏ ô "Tiền ước tính tuần" làm được ngay |
+| M2 | A | chưa làm | | Q3: phần chuyển danh sách can làm trong M4 |
 | M3 | B | chưa làm | | Q1: dùng 2.5 |
-| M4 | B | chưa làm | | |
+| M4 | B | chưa làm | | Gồm cả phần chuyển danh sách can từ M2 (Q3) |
 | M5.1 | B | chưa làm | | |
-| M5.2 | B | bị chặn (Q4) | | |
+| M5.2 | B | chưa làm | | Q4: can thiếu dung tích thì không nhắc |
 | M5.3 | B | chưa làm | | |
 | M5.4 | B | chưa làm | | |
 | M6 | A/B | chưa làm | | |
