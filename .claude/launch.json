@@ -38,6 +38,20 @@
       "port": 3001
     },
     {
+      "name": "eco-oil-admin-demo",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "PATH=/home/ADMIN/.local/share/pnpm/bin:/home/ADMIN/.local/bin:/usr/local/bin:/usr/bin:/bin",
+        "NEXT_PUBLIC_DEMO_OFFLINE=1",
+        "NEXT_PUBLIC_LOGIN_GATE_URL=http://localhost:5173",
+        "pnpm",
+        "--filter",
+        "@eco-oil/admin",
+        "dev"
+      ],
+      "port": 3001
+    },
+    {
       "name": "eco-oil-miniapp-zmp-preview",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [
