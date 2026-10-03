@@ -11,3 +11,8 @@ export function aiPreselectGrade(current: OilGrade | null, analysis: { suggested
   if (current !== null || !analysis || analysis.confidence !== 'HIGH' || !analysis.suggested_grade) return null;
   return Object.values(OilGrade).includes(analysis.suggested_grade as OilGrade) ? (analysis.suggested_grade as OilGrade) : null;
 }
+
+/** Hạng đang chọn là do AI chọn sẵn (người thu gom chưa tự chọn/đổi) thì ghi "AI chọn sẵn". */
+export function isAiPreselected({ grade, gradeTouched, analysis }: { grade: OilGrade | null; gradeTouched: boolean; analysis: { suggested_grade: string | null; confidence: string } | null }): boolean {
+  return !gradeTouched && grade !== null && analysis?.confidence === 'HIGH' && analysis.suggested_grade === grade;
+}

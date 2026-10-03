@@ -23,7 +23,7 @@ import type { PhotoAsset } from '../../lib/zalo-client';
 import { OilGradeSelector } from '../../components/OilGradeSelector';
 import { GradePhotoPicker } from '../../components/GradePhotoPicker';
 import { EMPTY_MASS_ENTRY, editMassField, litersForDeviationCheck, massEntryView } from '../../lib/mass-entry';
-import { resolveQuality } from '../../lib/grade-automation';
+import { aiPreselectGrade, isAiPreselected, resolveQuality } from '../../lib/grade-automation';
 import { entryGpsStatus, requestEntryGps } from '../../lib/entry-gps';
 import type { MassEntryState, MassField } from '../../lib/mass-entry';
 
@@ -33,6 +33,8 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
   // Chất lượng tự chọn theo hạng dầu (C5.2); chọn tay thì giữ lựa chọn của người dùng.
   const [manualQuality, setManualQuality] = useState<Quality | null>(null);
   const [grade, setGrade] = useState<OilGrade | null>(null);
+  // Người thu gom đã tự chọn/đổi hạng thì AI không chọn sẵn nữa (C5.4).
+  const [gradeTouched, setGradeTouched] = useState(false);
   const [suspectedAdulteration, setSuspectedAdulteration] = useState(false);
   const [gradeNote, setGradeNote] = useState('');
   const { quality, isAuto: qualityAuto } = resolveQuality({ grade, suspectedAdulteration, manual: manualQuality });
@@ -135,7 +137,10 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
     setImageAnalysis(null);
     try {
       const result = await analyzeOilImages(nextPhotos.map((item) => item.url));
-      if (mountedRef.current && run === analysisRunRef.current) setImageAnalysis(result);
+      if (mountedRef.current && run === analysisRunRef.current) {
+        setImageAnalysis(result);
+        setGrade((current) => aiPreselectGrade(current, result) ?? current);
+      }
     } catch {
       if (mountedRef.current && run === analysisRunRef.current) {
         setAnalysisError('Không phân tích được ảnh. Bạn có thể thử lại hoặc chọn/chụp ảnh khác.');
@@ -341,7 +346,8 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
       </section>
       <section className="quality-card">
         <p className="section-label">Phân hạng dầu</p>
-        <OilGradeSelector value={grade} disabled={saving} onChange={(nextGrade) => { setGrade(nextGrade); setOverrideAcknowledged(false); }} />
+        <OilGradeSelector value={grade} disabled={saving} onChange={(nextGrade) => { setGrade(nextGrade); setGradeTouched(true); setOverrideAcknowledged(false); }} />
+        {isAiPreselected({ grade, gradeTouched, analysis: imageAnalysis }) ? <p className="field-help">AI chọn sẵn hạng {grade} (tin cậy cao). Bấm hạng khác nếu thấy không đúng.</p> : null}
         <label className="toggle-row"><input type="checkbox" checked={suspectedAdulteration} onChange={(event) => setSuspectedAdulteration(event.target.checked)} disabled={saving} /><span>Nghi ngờ pha lẫn</span></label>
         <p className="field-help">Bật nếu thấy có nước, dầu nhớt hoặc mùi lạ không phải dầu ăn.</p>
         <p className="section-label">Chất lượng dầu{qualityAuto ? ' (tự chọn)' : ''}</p>
@@ -361,7 +367,7 @@ export function CollectorEntryScreen({ stop, container, containerCode, onBack, o
           <small>{imageGradeDisplay.summary}</small>
           {imageGradeDisplay.reasons.length > 0 ? <div className="image-grade-reasons">{imageGradeDisplay.reasons.map((reason, index) => <span key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
           {suggestedGrade && grade && suggestedGrade !== grade ? <p className="image-grade-disagreement" role="status"><strong>Khác gợi ý:</strong> bạn chọn hạng {grade}, AI gợi ý hạng {suggestedGrade}. Lý do AI: {imageGradeDisplay.reasons.join(', ') || 'tín hiệu hình ảnh hạn chế'}.</p> : null}
-          {imageGradeDisplay.canUseSuggestion && imageAnalysis?.suggested_grade ? <button type="button" className="secondary-button image-grade-use-button" onClick={() => { setGrade(imageAnalysis.suggested_grade as OilGrade); setOverrideAcknowledged(false); }} disabled={saving}>Dùng gợi ý này</button> : null}
+          {imageGradeDisplay.canUseSuggestion && imageAnalysis?.suggested_grade ? <button type="button" className="secondary-button image-grade-use-button" onClick={() => { setGrade(imageAnalysis.suggested_grade as OilGrade); setGradeTouched(true); setOverrideAcknowledged(false); }} disabled={saving}>Dùng gợi ý này</button> : null}
           {needsImageGradeOverrideAcknowledgement ? <label className="image-grade-override"><input type="checkbox" checked={overrideAcknowledged} onChange={(event) => setOverrideAcknowledged(event.target.checked)} disabled={saving} /><span>Tôi đã kiểm tra và xác nhận giữ phân hạng đã chọn.</span></label> : null}
         </section>
       ) : null}

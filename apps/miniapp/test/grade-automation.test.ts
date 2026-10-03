@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { OilGrade, Quality } from '@eco-oil/shared-types';
-import { aiPreselectGrade, resolveQuality } from '../src/lib/grade-automation';
+import { aiPreselectGrade, isAiPreselected, resolveQuality } from '../src/lib/grade-automation';
 
 test('quality is automatically "Cần kiểm tra" for grade C', () => {
   assert.deepEqual(resolveQuality({ grade: OilGrade.C, suspectedAdulteration: false, manual: null }), { quality: Quality.FLAG, isAuto: true });
@@ -25,4 +25,13 @@ test('AI preselects its grade only with high confidence and when no grade is cho
   assert.equal(aiPreselectGrade(null, { suggested_grade: 'B', confidence: 'MEDIUM' }), null);
   assert.equal(aiPreselectGrade(OilGrade.A, { suggested_grade: 'B', confidence: 'HIGH' }), null);
   assert.equal(aiPreselectGrade(null, { suggested_grade: null, confidence: 'HIGH' }), null);
+});
+
+test('the "AI chọn sẵn" mark shows only while the AI grade is untouched by the collector', () => {
+  const analysis = { suggested_grade: 'B', confidence: 'HIGH' };
+
+  assert.equal(isAiPreselected({ grade: OilGrade.B, gradeTouched: false, analysis }), true);
+  assert.equal(isAiPreselected({ grade: OilGrade.B, gradeTouched: true, analysis }), false);
+  assert.equal(isAiPreselected({ grade: OilGrade.A, gradeTouched: false, analysis }), false);
+  assert.equal(isAiPreselected({ grade: OilGrade.B, gradeTouched: false, analysis: { suggested_grade: 'B', confidence: 'MEDIUM' } }), false);
 });
