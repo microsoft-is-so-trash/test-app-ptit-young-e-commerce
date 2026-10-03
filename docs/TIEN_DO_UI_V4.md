@@ -9,11 +9,11 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 
 | | |
 |---|---|
-| Giai đoạn | I1 — đã rà soát đầu giai đoạn (B2), mọi task bị chặn |
-| Task đang làm | — |
-| Đang chờ chủ dự án | Trả lời Q17–Q23 (Q24 không chặn) |
+| Giai đoạn | I1 — đang làm |
+| Task đang làm | I1.0 — sửa test api đang đỏ trên CI |
+| Đang chờ chủ dự án | — |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
-| Cập nhật lần cuối | 03/10/2026 — duyệt C, duyệt Society Charter, B2 giai đoạn I1 |
+| Cập nhật lần cuối | 03/10/2026 — nhận trả lời Q17–Q24 và ràng buộc chi phí Google |
 
 ## Quyết định
 
@@ -35,19 +35,13 @@ Ghi theo dạng: ngày — mã câu hỏi — nội dung đã chọn.
 
 - 03/10/2026 — Society Charter — Chủ dự án duyệt mục 2 của kế hoạch: (S-1) một luồng ghi, tác tử phụ chỉ đọc, dùng ở B2 (I2), B6, B8; (S-2) trần **12 lần** gọi tác tử phụ mỗi giai đoạn (chủ dự án ghi "chặt hơn" nhưng con số 12 lớn hơn đề xuất 9; áp dụng con số 12, mỗi vai không quá 3); (S-3) tạo agent `.claude/agents/ui-v4-verifier.md`; (S-4) sửa `.claude/rules/ui-v4-workflow.md` (B2, B3, B6, B8).
 - 03/10/2026 — Duyệt C — Chủ dự án duyệt giai đoạn C, cho sang giai đoạn I1.
+- 03/10/2026 — Q17–Q24 — (Q17) Thêm task **I1.0**: sửa test api đang đỏ trên CI trước khi làm I1.2. (Q18) Places API (New) gọi qua backend, endpoint chỉ ADMIN, `GOOGLE_MAPS_SERVER_KEY`. (Q19) Bản đồ ghim trong form trạm dùng Google Maps JavaScript; toạ độ lưu là vị trí ghim admin xác nhận. (Q20) Lúc Bắt đầu ca lưu danh sách trạm trên máy (Dexie version 3, bảng `stationCache`, S5 đã duyệt); mất mạng tính đường chim bay trên máy; cho phép lấy trạm khi chưa biết số lít. (Q21) Render đã có `REDIS_URL`; thêm `@nestjs/throttler` (S5 đã duyệt) chỉ cho endpoint gọi API trả phí; cache trong Redis. Khoá Redis mới dùng tiền tố riêng `maps:` (khoá hiện có của `ui_version_3` đều là `auth:`), không xoá/đổi khoá cũ, không dùng `FLUSHDB`/`FLUSHALL`. (Q22) Key backend giới hạn theo API (Routes + Places New) + hạn mức/ngày, không giới hạn IP; key giao diện giới hạn referrer tên miền admin + `localhost`, chỉ Maps JavaScript; chủ dự án tự tạo và đặt key; không có key thì agent dùng nhà cung cấp giả lập. (Q23) Timeout 3 s, thử lại tối đa 2 lần, tối đa 25 trạm gần nhất, làm tròn vị trí 3 chữ số thập phân, cache 10 phút, xếp theo quãng đường xe máy, dự phòng ghi "đường chim bay" (`distance_source`). (Q24) Kẹt "Đang lưu…": chủ dự án thử máy thật; giá ước tính: task nhỏ riêng sau I1; rate limit toàn API: ngoài I1; CI đỏ: I1.0.
+- 03/10/2026 — **Ràng buộc chi phí Google (áp dụng mọi giai đoạn)** — Chi phí Google Maps API và Google AI API (Gemini, Cloud TTS) phải là **0 đồng**. Bước nào có dấu hiệu phát sinh phí (vượt hoặc có thể vượt mức miễn phí, SKU không có mức miễn phí, cần trả trước) → dừng hỏi (S15), kèm phương án thay thế vẫn giữ ổn định.
 
 ## Câu hỏi đang mở
 
 | Mã | Chặn task | Câu hỏi | Đề xuất |
 |---|---|---|---|
-| Q17 | I1.2 (và cổng B4 của mọi task sửa `apps/api`) | Chạy test API ở đâu? Container không có Postgres/PostGIS, repo không có `.env.test`; `pnpm --filter @eco-oil/api test` chạy cả `*.e2e-spec.ts` (`apps/api/jest.config.js` testRegex), các test này cần DB và xoá dữ liệu. CI GitHub (có PostGIS) đang đỏ ở bước test `apps/api` từ trước v4 (cả `ui_version_3`); log chỉ xem được khi đăng nhập GitHub | (a) Trong container chỉ chạy typecheck, lint và unit spec của api (bỏ `e2e-spec`); test e2e nhánh dự phòng chạy trên CI. Trước đó CI phải xanh: chủ dự án dán log lỗi CI, hoặc cho thêm task I1.0 sửa test api đang đỏ (S6). (b) Chủ dự án đặt DB test riêng trong `.env.test` trên máy (không gửi qua chat) |
-| Q18 | I1.1 | Gợi ý địa chỉ (Places API New) gọi qua backend hay thẳng từ trình duyệt admin? | Qua backend: endpoint chỉ ADMIN, dùng `GOOGLE_MAPS_SERVER_KEY`, đúng E1 (key giao diện chỉ bật Maps JavaScript) |
-| Q19 | I1.1 | Bản đồ kéo ghim trong form trạm: Google Maps JavaScript (cần key giao diện, tải bằng thẻ script, có thể thêm devDependency `@types/google.maps` = S5) hay Leaflet có sẵn trong admin (nền OSM, không thêm thư viện)? ⚠️ Chưa xác minh: điều khoản Google Maps Platform có thể cấm hiện nội dung Places trên bản đồ không phải Google và hạn chế lưu lâu dài toạ độ lấy từ Places | (a) Google Maps JavaScript; toạ độ lưu là vị trí ghim admin tự xác nhận. Chủ dự án kiểm lại điều khoản hiện hành; nếu không có hạn chế thì (b) Leaflet rẻ hơn |
-| Q20 | I1.3 | Lúc "Bắt đầu ca" tính và lưu gì? Lúc đó chưa biết vị trí nộp trạm và số lít (`stationRecommendSchema` bắt `liters > 0`) | (a) Tải danh sách trạm đang nhận (toạ độ, sức chứa còn lại, thời điểm) và lưu trên máy. Lúc nộp trạm: có mạng thì gọi `/stations/recommend` (Routes, dự phòng `ST_Distance`); mất mạng thì tính đường chim bay trên máy từ GPS hiện tại, ghi "Sức chứa lúc …". Cần Dexie version 3 thêm bảng `stationCache` (S5) và tham số/endpoint lấy trạm khi chưa biết số lít. (b) Gọi Routes lúc Bắt đầu ca từ toạ độ điểm thu cuối tuyến, lưu bảng xếp hạng (sai khi thứ tự thu thay đổi) |
-| Q21 | I1.2 | `/stations/recommend` gọi Routes là endpoint trả phí, cần rate limit và cache (E6). Trả lời sớm T3, T4 cho I1: có `REDIS_URL` trên Render không; thêm `@nestjs/throttler` (thư viện mới, S5)? | `@nestjs/throttler` chỉ gắn vào endpoint gọi API trả phí; cache ma trận trong Redis nếu Render có `REDIS_URL`, nếu không thì bộ nhớ tiến trình (mất khi khởi động lại) |
-| Q22 | I1.1, I1.2 | Key và hạn mức Google Maps. Kế hoạch ghi key backend "giới hạn IP", nhưng Render gói Free không có IP cố định (E1) — mâu thuẫn (S2). Chủ dự án có đặt key vào `.env` trên máy để agent thử nhánh thật không? Ngân sách cảnh báo cho Maps? | Key backend giới hạn theo API (Routes + Places New) + hạn mức/ngày, không giới hạn IP; key giao diện (nếu Q19 = a) giới hạn referrer tên miền admin + `localhost`, chỉ Maps JavaScript. Chủ dự án tự tạo key, đặt vào `.env` máy và Render/Vercel; agent chỉ thêm tên biến vào `.env.example`. Không có key thì agent làm với nhà cung cấp giả lập, nhánh thật do chủ dự án thử. Cảnh báo ngân sách 5 USD/tháng (như T7) |
-| Q23 | I1.2 | Tham số gọi Routes và cách hiện kết quả (S3, S11) | Timeout 3 s mỗi lần gọi, thử lại tối đa 2 lần (E3); đưa tối đa 25 trạm gần nhất theo `ST_Distance` vào ma trận; làm tròn vị trí 3 chữ số thập phân (~100 m) để cache, giữ cache 10 phút; xếp theo quãng đường xe máy; khi dùng dự phòng thì ghi "đường chim bay" cạnh số km (thêm trường `distance_source` vào `StationRecommendation`) |
-| Q24 | Không chặn | Xử lý 3 phát hiện ngoài phạm vi cũ và CI đỏ khi nào? | Kẹt "Đang lưu…": chủ dự án thử trên máy thật. Giá ước tính 8.000đ/20.000đ: task nhỏ riêng sau I1. Rate limit toàn API: ngoài I1, I1 chỉ làm cho endpoint trả phí (Q21). CI đỏ: theo Q17 |
 | T1 | I2.1 | Nhà cung cấp Google cho TTS: Cloud TTS Chirp 3: HD, Gemini 3.8 Flash TTS, hay thử cả hai? | Chirp 3: HD (xem `docs/NGHIEN_CUU_TTS_GOOGLE.md` mục 2.3) |
 | T2 | I2.1 | Xác thực với Google: API key chỉ bật Cloud TTS, hay service account (thêm `google-auth-library`)? | API key + hạn mức/ngày + cảnh báo ngân sách |
 | T3 | I2.1, I1.2 (qua Q21) | Cache âm thanh phía server bằng Redis (cần `REDIS_URL` trên Render) hay chỉ cache trên máy? | Redis nếu Render đã có `REDIS_URL`; nếu không thì chỉ cache trên máy |
@@ -96,9 +90,10 @@ Câu T1–T7 chỉ chặn giai đoạn I2, chưa cần trả lời trước khi 
 
 | Mã | Nhóm | Trạng thái | Commit | Ghi chú |
 |---|---|---|---|---|
-| I1.1 | B | bị chặn (Q18, Q19, Q22) | | |
-| I1.2 | B | bị chặn (Q17, Q21, Q22, Q23) | | |
-| I1.3 | B | bị chặn (Q20) | | |
+| I1.0 | B | đang làm | | Thêm theo Q17: sửa test api đang đỏ trên CI |
+| I1.1 | B | chưa làm | | |
+| I1.2 | B | chưa làm | | |
+| I1.3 | B | chưa làm | | |
 
 ### Giai đoạn I2 — Đọc giọng nói (TTS)
 

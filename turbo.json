@@ -25,7 +25,22 @@
       "outputs": []
     },
     "test": {
-      "outputs": ["coverage/**"]
+      "outputs": ["coverage/**"],
+      "env": [
+        "NODE_ENV",
+        "DATABASE_URL",
+        "REDIS_URL",
+        "JWT_SECRET",
+        "DEMO_MODE",
+        "ZALO_*",
+        "GEO_MISMATCH_THRESHOLD_M",
+        "DELIVERY_VARIANCE_THRESHOLD_PCT",
+        "DENSITY_KG_PER_LITER",
+        "STATION_MAX_STORAGE_DAYS",
+        "BODY_SIZE_LIMIT",
+        "CORS_ORIGINS",
+        "FULL_FLOW_CLEAN"
+      ]
     },
     "typecheck": {
       "dependsOn": ["^build"],

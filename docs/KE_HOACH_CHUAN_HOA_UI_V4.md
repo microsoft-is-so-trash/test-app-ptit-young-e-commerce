@@ -16,6 +16,7 @@ mở và quyết định đã có nằm trong file tiến độ, không nằm tr
 | Phần giả và dataset demo | **Giữ nguyên**: không xoá, không đổi nội dung, không ẩn sau cờ. Khi tái cấu trúc thì đặt lại vào vị trí mới |
 | Thanh điều hướng | Kiểu A: thanh dưới đáy, 2 nút có chữ |
 | Tài khoản | Đã có Google Cloud (có thanh toán) và Zalo AI. Key chỉ đặt trong biến môi trường, không gửi qua chat, không commit |
+| Chi phí Google (03/10/2026) | Google Maps API và Google AI API (Gemini, Cloud TTS) phải **không mất phí**. Bước nào có dấu hiệu phát sinh phí thì dừng hỏi (S15) và đưa phương án thay thế vẫn giữ ổn định |
 
 ## 1. Cách làm chung cho mọi task
 
@@ -391,13 +392,15 @@ Thứ tự ưu tiên đã có: kế hoạch đứng trên quy tắc ECC. Khi Cha
 
 | Task | Việc | File |
 |---|---|---|
+| I1.0 | Sửa test api đang đỏ trên CI (thêm theo Q17), để cổng kiểm tra của I1.2 chạy được | `turbo.json`, `apps/api/test/` |
 | I1.1 | Admin nhập vị trí trạm: gõ địa chỉ → gợi ý Places API (New) → chọn → kéo ghim xác nhận. Giữ ô nhập tay lat/lng làm dự phòng | `apps/admin/src/components/stations-view.tsx` |
 | I1.2 | Backend: gợi ý trạm theo đường đi xe máy bằng Routes API (Compute Route Matrix, `TWO_WHEELER`); lỗi/timeout thì dùng `ST_Distance` hiện có | `apps/api/src/modules/stations/` |
 | I1.3 | Collector: tính gợi ý trạm lúc "Bắt đầu ca" và lưu trên máy; mất mạng dùng bản đã lưu | `apps/miniapp/src/lib/offline-cache.ts`, `StationDeliveryFlow.tsx` |
 
-- Key: `GOOGLE_MAPS_SERVER_KEY` (backend, giới hạn IP + Routes/Places),
-  `NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY` (admin, giới hạn referrer). Đặt hạn mức/ngày và cảnh báo
-  ngân sách trên Google Cloud.
+- Key: `GOOGLE_MAPS_SERVER_KEY` (backend, chỉ bật Routes + Places New, không giới hạn IP vì Render
+  Free không có IP cố định — Q22), `NEXT_PUBLIC_GOOGLE_MAPS_BROWSER_KEY` (admin, giới hạn referrer,
+  chỉ Maps JavaScript). Đặt hạn mức/ngày và cảnh báo ngân sách trên Google Cloud.
+- Quyết định chi tiết Q17–Q23 nằm trong mục "Quyết định" của `docs/TIEN_DO_UI_V4.md`.
 - **Nghiệm thu:** tắt mạng hoặc dùng key sai thì app vẫn gợi ý trạm (đường chim bay); có test e2e
   backend cho nhánh dự phòng.
 

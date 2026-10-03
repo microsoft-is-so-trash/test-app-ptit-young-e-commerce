@@ -195,6 +195,7 @@ Gặp **bất kỳ** điều kiện nào dưới đây thì dừng ngay, không 
 | S12 | API bên ngoài hoạt động khác tài liệu nghiên cứu, hoặc cần số liệu chưa xác minh (đánh dấu ⚠️ hoặc "chưa xác minh") để ra quyết định |
 | S13 | Sắp chuyển sang giai đoạn mới mà chưa có duyệt của chủ dự án |
 | S14 | Bất kỳ chỗ nào agent không chắc chắn đúng ý chủ dự án. **Khi phân vân giữa hỏi và tự làm: hỏi** |
+| S15 | Bước nào có dấu hiệu làm phát sinh phí Google Maps API hoặc Google AI API (vượt hoặc có thể vượt mức miễn phí, SKU không có mức miễn phí, giá chưa xác minh). Câu hỏi phải kèm phương án thay thế không mất phí mà vẫn giữ ổn định (quyết định 03/10/2026) |
 
 Không được:
 
