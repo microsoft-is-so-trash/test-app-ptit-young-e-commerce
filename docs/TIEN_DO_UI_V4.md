@@ -9,9 +9,9 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 
 | | |
 |---|---|
-| Giai đoạn | M xong — chờ chủ dự án duyệt |
+| Giai đoạn | C (đang làm) — M đã duyệt |
 | Task đang làm | — |
-| Đang chờ chủ dự án | Duyệt giai đoạn M ("duyệt M") |
+| Đang chờ chủ dự án | Trả lời Q10–Q16 (rà soát đầu giai đoạn C) |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — rà soát đầu giai đoạn M (B2) |
 
@@ -30,11 +30,19 @@ Ghi theo dạng: ngày — mã câu hỏi — nội dung đã chọn.
 - 03/10/2026 — Q4 — Giữ M5.2 (nhắc báo thu gom khi can ước tính đầy từ 85%). Chỉ thêm điều kiện: can có `capacity_l = null` thì không nhắc.
 - 03/10/2026 — Q5–Q9 — Theo đề xuất: (Q5) "Lịch sử thu gom" = nội dung tab Lịch sử + danh sách "Đơn đã huỷ"; đơn đang chờ/đã phân công ở "Hôm nay". (Q6) Mục riêng "Can chuẩn được cấp" ngay sau "Hồ sơ quán", giữ nguyên chữ và nút. (Q7) M6 chỉ đổi nút đăng xuất Merchant thành chữ thường, không thêm hộp xác nhận; 2 `window.confirm` của Collector làm ở giai đoạn C. (Q8) Mục mở rộng mặc định đóng, mở mục này thì mục khác đóng. (Q9) Chỉ nhắc khi can `AT_MERCHANT` và chưa có đơn đang chờ.
 - 03/10/2026 — Ràng buộc chung — **Giữ nguyên font**: không đổi font chữ (họ font, cỡ, độ đậm) của phần tử đang có; phần tử mới dùng lại class chữ sẵn có.
+- 03/10/2026 — Duyệt M — Chủ dự án duyệt giai đoạn M (sau khi xem kết quả kiểm thử), cho sang giai đoạn C; muốn tự thử trên localhost.
 
 ## Câu hỏi đang mở
 
 | Mã | Chặn task | Câu hỏi | Đề xuất |
 |---|---|---|---|
+| Q10 | C1, C2 | Số giao dịch chờ đồng bộ đang hiện ở 3 nơi: nút "Hàng chờ N" trên đầu màn Tuyến, thông báo trên màn Tuyến, khối "Dữ liệu trên máy" ở Tài khoản. Sau khi gom thành 1 dải trạng thái, dải có thể đang hiện việc khác ưu tiên hơn (ví dụ mất mạng), nên số hàng chờ cần một chỗ luôn thấy (U6) | Giữ nút "Hàng chờ N" (luôn thấy, bấm mở hàng chờ); bỏ khối "Dữ liệu trên máy" ở Tài khoản |
+| Q11 | C1 | Dải trạng thái gom những gì, thứ tự ra sao? Kế hoạch có cả "biên nhận đã lưu" (kèm nút Xem lại) và "ca đã sẵn sàng" (kèm nút Hủy ca), U6 không xếp hai loại này | Thứ tự: lỗi tải/lỗi đồng bộ > mất mạng > hàng chờ > GPS (đang lấy, tâm phường) > dữ liệu cũ > biên nhận đã lưu > ca đã sẵn sàng > tải lại thành công. Dải hiện mục cao nhất; bấm vào mở danh sách đầy đủ, mỗi mục giữ nút của nó (Thử lại, Xem hàng chờ, Xem lại biên nhận, Hủy ca). Lỗi khi bấm Bắt đầu ca vẫn hiện ngay dưới nút (U10). Các màn khác (quét mã, nhập) giữ thông báo mất mạng như cũ |
+| Q12 | C4.3 | Bỏ màn Tóm tắt ca thì: (1) chưa thu hết điểm có được đi nộp trạm sớm không (hiện màn Tóm tắt cho phép khi đã thu ≥ 1 điểm)? (2) Số "Đã thu hôm nay … lít (~kg)" của màn Tóm tắt đặt đâu? | (1) Có: khi đã thu ≥ 1 điểm, màn Tuyến có nút chữ "Đi nộp trạm"; thu xong điểm cuối thì nó thành nút chính. (2) Đưa vào dòng "x / y điểm đã thu · z lít". Các nút "Về tóm tắt ca" đổi thành "Về tuyến hôm nay"; mở lại app khi ca đang dở thì vào thẳng màn Tuyến |
+| Q13 | C4.4 | Khác tài liệu: trong code, bấm "Kết ca" ở biên nhận là kết ca luôn (`StationDeliveryFlow.tsx:466` gọi thẳng `onFinish`); màn "Ca làm đã khép lại" (có dòng giả "Số phiếu nộp trạm: 1") chỉ hiện khi dữ liệu nộp trạm bị thiếu, không phải bước thứ 2 | Không đổi luồng; C4.4 ghi "đã đúng, thêm test chứng minh 1 lần bấm"; giữ nguyên màn và dòng giả |
+| Q14 | C5.1 | Ô lít đang được điền sẵn số quán khai; nếu không sửa thì số quán khai được gửi như số thực tế. Khi làm kg ↔ lít tự tính: điền sẵn hay để trống? | Để trống cả hai, số quán khai vẫn hiện ở thẻ trên (người thu gom phải nhập số đo thật). Chỉ gửi ô người dùng nhập (kg đã cân hoặc lít); ô tự tính chỉ để xem, ghi "tự tính" |
+| Q15 | C5.5 | "Chọn sẵn trạm gần nhất còn đủ sức chứa": chỉ đánh dấu gợi ý, hay tự chuyển sang màn đối soát? | Đưa trạm đó lên đầu, ghi "Gần nhất còn đủ chỗ", nút "Chọn trạm này" của nó là nút chính; không tự chuyển màn |
+| Q16 | C2 | Kế hoạch C2 bỏ avatar trên đầu màn Collector, nhưng avatar nằm trong danh sách phần giả cần giữ (mục 3.1, `BrandHeader.tsx`) | Bỏ avatar chỉ ở Collector như kế hoạch C2; Merchant giữ nguyên |
 | T1 | I2.1 | Nhà cung cấp Google cho TTS: Cloud TTS Chirp 3: HD, Gemini 3.8 Flash TTS, hay thử cả hai? | Chirp 3: HD (xem `docs/NGHIEN_CUU_TTS_GOOGLE.md` mục 2.3) |
 | T2 | I2.1 | Xác thực với Google: API key chỉ bật Cloud TTS, hay service account (thêm `google-auth-library`)? | API key + hạn mức/ngày + cảnh báo ngân sách |
 | T3 | I2.1 | Cache âm thanh phía server bằng Redis (cần `REDIS_URL` trên Render) hay chỉ cache trên máy? | Redis nếu Render đã có `REDIS_URL`; nếu không thì chỉ cache trên máy |
@@ -126,6 +134,7 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
 
+- 03/10/2026 — B2 giai đoạn C — Đọc toàn bộ màn Collector (CollectorFlow, Shell, Route, QR, Entry, Summary, StationDeliveryFlow, Schedule, Stats, Account, Map, Outbox, SavedReceipt). Ảnh trước: `design/snapshots/ui-v4/C-before/`. Dừng hỏi Q10–Q16.
 - 03/10/2026 — Kiểm thử giai đoạn M (theo yêu cầu chủ dự án, trước khi duyệt) — Chạy thử trên app demo khung 375×812: 2 tab, Hôm nay, màn báo sẵn sàng (điền sẵn, sửa tay, vượt dung tích), 7 mục Của tôi (mỗi lần chỉ mở 1 mục, không lỗi tải, đủ 19 chuỗi phần giả), sheet sửa thông tin và yêu cầu can, chuyển tuần ở Tiền theo kỳ. Giả lập trong bộ nhớ trình duyệt (không sửa file): đơn đang chờ (nút khoá + lý do, thẻ Đơn đang mở, hộp xác nhận huỷ), đơn đã huỷ trong Lịch sử, can 90% (thông báo Can sắp đầy, điền sẵn 27 lít), can đang chở (nút khoá + lý do, không nhắc). Tất cả đúng. Không có lỗi console mới.
 - 03/10/2026 — B8 giai đoạn M — Review M5.1–M6: sửa gợi ý "Chọn phường để gửi hồ sơ." ở màn đăng ký chỉ hiện khi thật sự có ô chọn phường. Ghi báo cáo giai đoạn, dừng chờ duyệt.
 - 03/10/2026 — M6 — xong. Nút đăng xuất trong Cài đặt chung: chữ thường "Đăng xuất", bỏ btn-lg (không còn nút lớn); giữ class btn-danger để font giữ nguyên 14px/700 theo ràng buộc giữ font. Không thêm hộp xác nhận (Q7). Ảnh: design/snapshots/ui-v4/M6/ (ảnh bị lệch khung do công cụ chụp, nội dung đúng).
