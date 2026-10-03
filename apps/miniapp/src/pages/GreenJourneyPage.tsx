@@ -103,12 +103,7 @@ export function GreenJourneyPage() {
   ];
 
   return (
-    <div className="page-content">
-      <div className="page-header">
-        <span className="section-eyebrow">Hành trình xanh của quán</span>
-        <h1 className="page-title">🌱 Cùng ECOllect bảo vệ môi trường</h1>
-      </div>
-
+    <div className="mine-section-body">
       <div className="hero-card">
         <div className="hero-card-ambient" />
         <div className="hero-card-content">

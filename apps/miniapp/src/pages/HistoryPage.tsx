@@ -47,13 +47,7 @@ export function HistoryPage() {
   const { totalLiters, totalCount, totalCo2Kg } = summarizeMerchantHistory(transactions);
 
   return (
-    <div className="page-content">
-      {/* Header */}
-      <div className="page-header">
-        <span className="section-eyebrow">Theo dõi</span>
-        <h1 className="page-title">Lịch sử thu gom</h1>
-      </div>
-
+    <div className="mine-section-body">
       {/* KPI Summary Banner */}
       <div className="info-card" style={{ background: '#ffffff' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-sm)' }}>

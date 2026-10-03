@@ -11,58 +11,21 @@ import { MockPaymentQr } from '../components/MockPaymentQr';
 import { DEMO_REFERRAL_STATS, isDemoOfflineMode } from '../lib/demo-fixtures';
 import { buildReferralShareText, deriveReferralCode } from '../lib/referral';
 
-export function AccountPage() {
-  const user = useAuthStore((state) => state.user);
-  const signOut = useAuthStore((state) => state.signOut);
-  const identityKey = user?.id ?? 'unknown';
-  const dashboard = useQuery({ queryKey: ['merchant-dashboard', identityKey], queryFn: api.dashboard });
+// Các khối của tab "Tài khoản" cũ, nay là từng mục trong "Của tôi". Phần giả giữ nguyên chữ.
 
-  const [toggleOA, setToggleOA] = useState(true);
-  const [toggleCap, setToggleCap] = useState(true);
+/** Mục "Hồ sơ quán": thẻ hồ sơ và tài khoản nhận tiền. */
+export function MerchantProfileSection() {
+  const user = useAuthStore((state) => state.user);
   const [editingInfo, setEditingInfo] = useState(false);
-  const [requestingContainer, setRequestingContainer] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
-  if (dashboard.isPending) return <StatusView title="Đang tải thông tin tài khoản…" />;
-  if (dashboard.isError) return <StatusView title="Chưa tải được dữ liệu" message="Kiểm tra kết nối rồi thử lại nhé." action={{ label: 'Thử lại', onClick: () => { void dashboard.refetch(); } }} />;
-
-  const data = dashboard.data;
-  const container = data.containers[0];
-  const percentage = container ? fillPercent(container.estimated_liters, container.capacity_l) : 0;
-  const referralCode = user ? deriveReferralCode(user.id) : '';
-  const referralStats = isDemoOfflineMode() ? DEMO_REFERRAL_STATS : { invitedCount: 0, redeemedCount: 0 };
-
-  async function handleShareReferral() {
-    const text = buildReferralShareText(referralCode);
-    const shareApi = navigator.share as ((data: { title?: string; text?: string }) => Promise<void>) | undefined;
-    if (shareApi) {
-      try {
-        await shareApi({ title: 'ECOllect', text });
-        return;
-      } catch {
-        // User cancelled the native share sheet; fall through to clipboard copy.
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(text);
-      setNotice('Đã sao chép nội dung mời vào bộ nhớ tạm');
-    } catch {
-      setNotice(`Mã giới thiệu của bạn: ${referralCode}`);
-    }
-  }
-
   return (
-    <div className="page-content">
-      {/* Header */}
-      <div className="page-header">
-        <div className="page-header-row">
-          <span className="section-eyebrow">Thiết lập & Tài khoản</span>
-          <span className="badge badge-success">
-            <span className="badge-dot badge-dot-pulse" />
-            <span style={{ fontWeight: 600 }}>Trực tuyến</span>
-          </span>
-        </div>
-        <h1 className="page-title">Cài đặt & Hồ sơ</h1>
+    <div className="mine-section-body">
+      <div className="page-header-row">
+        <span className="badge badge-success">
+          <span className="badge-dot badge-dot-pulse" />
+          <span style={{ fontWeight: 600 }}>Trực tuyến</span>
+        </span>
       </div>
 
       {notice ? (
@@ -113,6 +76,92 @@ export function AccountPage() {
           </button>
         </div>
       </div>
+
+      {/* Bank Account */}
+      <div className="info-card">
+        <div className="section-heading">
+          <div className="section-heading-left">
+            <div className="section-icon">
+              <Icon name="account_balance" size={20} />
+            </div>
+            <h3 className="section-title">Tài khoản nhận tiền</h3>
+          </div>
+          <span className="badge badge-outline" style={{ color: 'var(--primary)', fontWeight: 600 }}>Auto-Settled</span>
+        </div>
+
+        <div className="sub-card">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-sm)', background: 'var(--surface-container-lowest)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--primary)', fontSize: 14, boxShadow: 'var(--shadow-xs)' }}>
+                MB
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span className="text-label-lg" style={{ fontWeight: 700, color: 'var(--on-surface)' }}>MB Bank Quân Đội</span>
+                <span style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--on-surface-variant)' }}>0984 **** 212</span>
+              </div>
+            </div>
+            <span className="badge badge-primary" style={{ fontWeight: 700 }}>Chính</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid var(--surface-container)' }} className="text-label-sm">
+            <span style={{ color: 'var(--on-surface-variant)' }}>Chủ tài khoản:</span>
+            <span className="text-label-md" style={{ fontWeight: 700, color: 'var(--on-surface)', textTransform: 'uppercase' }}>{user?.name ?? 'N/A'}</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 8, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.8)', color: 'var(--primary)' }} className="text-label-sm">
+            <Icon name="flash_on" size={18} style={{ color: 'var(--secondary)' }} />
+            <span>Hỗ trợ VietQR 247 & Ví ZaloPay Merchant (Quyết toán tức thì).</span>
+          </div>
+
+          <MockPaymentQr accountName={user?.name ?? 'Quán của bạn'} />
+        </div>
+
+        <button className="btn btn-secondary btn-full" style={{ fontSize: 12 }}>
+          <Icon name="credit_card" size={18} />
+          <span>Thay đổi tài khoản thụ hưởng</span>
+        </button>
+      </div>
+
+      {editingInfo && user?.merchantId ? (
+        <EditMerchantInfoSheet
+          merchantId={user.merchantId}
+          initialName={user.name ?? ''}
+          initialPhone={user.phone ?? ''}
+          onClose={() => setEditingInfo(false)}
+          onSaved={() => {
+            setEditingInfo(false);
+            setNotice('Đã lưu thông tin cơ sở');
+          }}
+        />
+      ) : null}
+
+    </div>
+  );
+}
+
+/** Mục "Can chuẩn được cấp". */
+export function MerchantContainersSection() {
+  const user = useAuthStore((state) => state.user);
+  const identityKey = user?.id ?? 'unknown';
+  const dashboard = useQuery({ queryKey: ['merchant-dashboard', identityKey], queryFn: api.dashboard });
+  const [requestingContainer, setRequestingContainer] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  if (dashboard.isPending) return <StatusView title="Đang tải thông tin can…" />;
+  if (dashboard.isError) return <StatusView title="Chưa tải được dữ liệu" message="Kiểm tra kết nối rồi thử lại nhé." action={{ label: 'Thử lại', onClick: () => { void dashboard.refetch(); } }} />;
+
+  const data = dashboard.data;
+  const container = data.containers[0];
+  const percentage = container ? fillPercent(container.estimated_liters, container.capacity_l) : 0;
+
+  return (
+    <div className="mine-section-body">
+      {notice ? (
+        <div className="notice notice-success" role="status">
+          <Icon name="check_circle" size={18} />
+          <span>{notice}</span>
+        </div>
+      ) : null}
 
       {/* Can Inventory */}
       <div className="info-card">
@@ -171,50 +220,53 @@ export function AccountPage() {
         </button>
       </div>
 
-      {/* Bank Account */}
-      <div className="info-card">
-        <div className="section-heading">
-          <div className="section-heading-left">
-            <div className="section-icon">
-              <Icon name="account_balance" size={20} />
-            </div>
-            <h3 className="section-title">Tài khoản nhận tiền</h3>
-          </div>
-          <span className="badge badge-outline" style={{ color: 'var(--primary)', fontWeight: 600 }}>Auto-Settled</span>
+      {requestingContainer ? (
+        <RequestContainerSheet
+          onClose={() => setRequestingContainer(false)}
+          onSubmitted={(quantity) => {
+            setRequestingContainer(false);
+            setNotice(`Đã gửi yêu cầu cấp thêm ${quantity} can. ECOllect sẽ liên hệ trong 1-2 ngày làm việc.`);
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/** Mục "Mời bạn". */
+export function MerchantReferralSection() {
+  const user = useAuthStore((state) => state.user);
+  const [notice, setNotice] = useState<string | null>(null);
+  const referralCode = user ? deriveReferralCode(user.id) : '';
+  const referralStats = isDemoOfflineMode() ? DEMO_REFERRAL_STATS : { invitedCount: 0, redeemedCount: 0 };
+
+  async function handleShareReferral() {
+    const text = buildReferralShareText(referralCode);
+    const shareApi = navigator.share as ((data: { title?: string; text?: string }) => Promise<void>) | undefined;
+    if (shareApi) {
+      try {
+        await shareApi({ title: 'ECOllect', text });
+        return;
+      } catch {
+        // User cancelled the native share sheet; fall through to clipboard copy.
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      setNotice('Đã sao chép nội dung mời vào bộ nhớ tạm');
+    } catch {
+      setNotice(`Mã giới thiệu của bạn: ${referralCode}`);
+    }
+  }
+
+  return (
+    <div className="mine-section-body">
+      {notice ? (
+        <div className="notice notice-success" role="status">
+          <Icon name="check_circle" size={18} />
+          <span>{notice}</span>
         </div>
-
-        <div className="sub-card">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-sm)', background: 'var(--surface-container-lowest)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: 'var(--primary)', fontSize: 14, boxShadow: 'var(--shadow-xs)' }}>
-                MB
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span className="text-label-lg" style={{ fontWeight: 700, color: 'var(--on-surface)' }}>MB Bank Quân Đội</span>
-                <span style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--on-surface-variant)' }}>0984 **** 212</span>
-              </div>
-            </div>
-            <span className="badge badge-primary" style={{ fontWeight: 700 }}>Chính</span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6, borderTop: '1px solid var(--surface-container)' }} className="text-label-sm">
-            <span style={{ color: 'var(--on-surface-variant)' }}>Chủ tài khoản:</span>
-            <span className="text-label-md" style={{ fontWeight: 700, color: 'var(--on-surface)', textTransform: 'uppercase' }}>{user?.name ?? 'N/A'}</span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 8, borderRadius: 'var(--radius-sm)', background: 'rgba(255,255,255,0.8)', color: 'var(--primary)' }} className="text-label-sm">
-            <Icon name="flash_on" size={18} style={{ color: 'var(--secondary)' }} />
-            <span>Hỗ trợ VietQR 247 & Ví ZaloPay Merchant (Quyết toán tức thì).</span>
-          </div>
-
-          <MockPaymentQr accountName={user?.name ?? 'Quán của bạn'} />
-        </div>
-
-        <button className="btn btn-secondary btn-full" style={{ fontSize: 12 }}>
-          <Icon name="credit_card" size={18} />
-          <span>Thay đổi tài khoản thụ hưởng</span>
-        </button>
-      </div>
+      ) : null}
 
       {/* Referral */}
       <div className="info-card">
@@ -246,6 +298,18 @@ export function AccountPage() {
         </button>
       </div>
 
+    </div>
+  );
+}
+
+/** Mục "Cài đặt chung": công tắc và mục giả hiện có, thông tin phiên bản, đăng xuất. */
+export function MerchantSettingsSection() {
+  const signOut = useAuthStore((state) => state.signOut);
+  const [toggleOA, setToggleOA] = useState(true);
+  const [toggleCap, setToggleCap] = useState(true);
+
+  return (
+    <div className="mine-section-body">
       {/* Settings & Toggles */}
       <div className="info-card">
         <div className="section-heading-left">
@@ -328,28 +392,6 @@ export function AccountPage() {
         </button>
       </div>
 
-      {editingInfo && user?.merchantId ? (
-        <EditMerchantInfoSheet
-          merchantId={user.merchantId}
-          initialName={user.name ?? ''}
-          initialPhone={user.phone ?? ''}
-          onClose={() => setEditingInfo(false)}
-          onSaved={() => {
-            setEditingInfo(false);
-            setNotice('Đã lưu thông tin cơ sở');
-          }}
-        />
-      ) : null}
-
-      {requestingContainer ? (
-        <RequestContainerSheet
-          onClose={() => setRequestingContainer(false)}
-          onSubmitted={(quantity) => {
-            setRequestingContainer(false);
-            setNotice(`Đã gửi yêu cầu cấp thêm ${quantity} can. ECOllect sẽ liên hệ trong 1-2 ngày làm việc.`);
-          }}
-        />
-      ) : null}
     </div>
   );
 }

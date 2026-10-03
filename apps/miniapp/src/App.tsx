@@ -9,11 +9,9 @@ import {
 } from './lib/collector-invite';
 import { LoginScreen } from './components/LoginScreen';
 import { HomePage } from './pages/HomePage';
-import { HistoryPage } from './pages/HistoryPage';
-import { OrdersPage } from './pages/OrdersPage';
-import { GreenJourneyPage } from './pages/GreenJourneyPage';
-import { PaymentsPage } from './pages/PaymentsPage';
-import { AccountPage } from './pages/AccountPage';
+import { MinePage } from './pages/MinePage';
+import { MERCHANT_TABS } from './lib/merchant-nav';
+import type { MerchantTab } from './lib/merchant-nav';
 import { CollectorShell } from './pages/collector/CollectorShell';
 import { StatusView } from './components/StatusView';
 import { MerchantApprovalView } from './components/MerchantApprovalView';
@@ -22,40 +20,19 @@ import { useOutboxStats } from './lib/outbox-hooks';
 import { Icon } from './components/Icon';
 import { BrandHeader } from './components/BrandHeader';
 
-type Tab = 'home' | 'history' | 'orders' | 'green-journey' | 'account' | 'payments';
-
-const TAB_CONFIG: { key: Tab; icon: string; label: string }[] = [
-  { key: 'home', icon: 'grid_view', label: 'Trang chủ' },
-  { key: 'orders', icon: 'inventory_2', label: 'Đơn' },
-  { key: 'history', icon: 'receipt_long', label: 'Lịch sử' },
-  { key: 'green-journey', icon: 'eco', label: 'Hành trình xanh' },
-  { key: 'account', icon: 'manage_accounts', label: 'Tài khoản' },
-  { key: 'payments', icon: 'account_balance_wallet', label: 'Thanh toán' },
-];
-
-const TAB_TITLES: Record<Tab, string> = {
-  home: 'Trang chủ',
-  orders: 'Đơn thu gom',
-  history: 'Lịch sử giao dịch',
-  'green-journey': 'Hành trình xanh',
-  account: 'Tài khoản',
-  payments: 'Thanh toán ví',
-};
-
-
-function FloatingNav({ activeTab, onTabChange }: { activeTab: Tab; onTabChange: (tab: Tab) => void }) {
+function FloatingNav({ activeTab, onTabChange }: { activeTab: MerchantTab; onTabChange: (tab: MerchantTab) => void }) {
   return (
     <nav className="floating-nav" aria-label="Điều hướng chính">
-      <div className="floating-nav-bar">
-        {TAB_CONFIG.map((item) => (
+      <div className="floating-nav-bar floating-nav-bar-labeled">
+        {MERCHANT_TABS.map((item) => (
           <button
             key={item.key}
-            className={`nav-pill ${activeTab === item.key ? 'active' : ''}`}
+            className={`nav-pill nav-pill-labeled ${activeTab === item.key ? 'active' : ''}`}
             onClick={() => onTabChange(item.key)}
-            aria-label={item.label}
             aria-current={activeTab === item.key ? 'page' : undefined}
           >
-            <Icon name={item.icon} size={24} />
+            <Icon name={item.icon} size={22} decorative />
+            <span className="text-label-md">{item.label}</span>
           </button>
         ))}
       </div>
@@ -70,7 +47,7 @@ export function App() {
   const acceptCollectorInvite = useAuthStore((state) => state.acceptCollectorInvite);
   const signOut = useAuthStore((state) => state.signOut);
   const outboxStats = useOutboxStats();
-  const [tab, setTab] = useState<Tab>('home');
+  const [tab, setTab] = useState<MerchantTab>('today');
   const [collectorInviteError, setCollectorInviteError] = useState<string | null>(null);
   const [collectorInviteRetry, setCollectorInviteRetry] = useState(0);
   const [collectorInvitePending, setCollectorInvitePending] = useState(false);
@@ -199,14 +176,10 @@ export function App() {
 
   return (
     <div className="app-shell">
-      <BrandHeader title={TAB_TITLES[tab]} withNotifications />
+      <BrandHeader title={MERCHANT_TABS.find((item) => item.key === tab)?.label ?? ''} withNotifications />
       <main className="main-area">
-        {tab === 'home' ? <HomePage key={user.id} /> : null}
-        {tab === 'history' ? <HistoryPage key={user.id} /> : null}
-        {tab === 'orders' ? <OrdersPage key={user.id} /> : null}
-        {tab === 'green-journey' ? <GreenJourneyPage key={user.id} /> : null}
-        {tab === 'account' ? <AccountPage key={user.id} /> : null}
-        {tab === 'payments' ? <PaymentsPage key={user.id} /> : null}
+        {tab === 'today' ? <HomePage key={user.id} /> : null}
+        {tab === 'mine' ? <MinePage key={user.id} /> : null}
       </main>
       <FloatingNav activeTab={tab} onTabChange={setTab} />
     </div>

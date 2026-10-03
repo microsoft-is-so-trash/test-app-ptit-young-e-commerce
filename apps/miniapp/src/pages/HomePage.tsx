@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, api } from '../lib/api';
 import { currentVietnamWeek, fillPercent, formatCurrency, formatDate, formatLiters } from '../lib/formatters';
 import { OrderSheet } from '../components/OrderSheet';
+import { MerchantOrderList } from '../components/MerchantOrderList';
+import { splitMerchantOrders } from '../lib/merchant-nav';
 import { StatusView } from '../components/StatusView';
 import { useAuthStore } from '../stores/auth-store';
 import { Icon } from '../components/Icon';
@@ -19,6 +21,7 @@ export function HomePage() {
   const identityKey = user?.id ?? 'unknown';
   const dashboard = useQuery({ queryKey: ['merchant-dashboard', identityKey], queryFn: api.dashboard });
   const oilPrice = useQuery({ queryKey: ['merchant-oil-price', identityKey], queryFn: api.currentOilPrice });
+  const orders = useQuery({ queryKey: ['merchant-orders', identityKey], queryFn: api.orders });
   const week = currentVietnamWeek();
   const weeklyPayments = useQuery({ queryKey: ['merchant-payments', identityKey, week.period], queryFn: () => api.payments(week.period) });
   const weeklyTransactions = useQuery({ queryKey: ['merchant-transactions', identityKey, week.period], queryFn: () => api.transactions(1, 100, week.from, week.to) });
@@ -39,6 +42,7 @@ export function HomePage() {
   const hasContainers = data.containers.length > 0;
   const availableContainer = data.containers.find((container) => container.state === 'AT_MERCHANT');
   const isWaiting = data.pending_orders > 0;
+  const openOrders = splitMerchantOrders(orders.data?.data ?? []).open;
   const hasClosedPayments = (weeklyPayments.data?.data.length ?? 0) > 0;
   const estimatedWeeklyLiters = weeklyTransactions.data?.data.filter((transaction) => transaction.quality === 'PASS').reduce((sum, transaction) => sum + transaction.actual_liters, 0) ?? 0;
   const estimatedWeeklyKg = weeklyTransactions.data?.data.filter((transaction) => transaction.quality === 'PASS').reduce((sum, transaction) => sum + (transaction.actual_kg ?? transaction.actual_liters * DEFAULT_DENSITY_KG_PER_LITER), 0) ?? 0;
@@ -219,6 +223,30 @@ export function HomePage() {
                 : 'Đang chờ được cấp can'}
         </span>
       </button>
+
+      {orders.isError ? (
+        <div className="notice error-panel" role="alert">
+          <Icon name="error" size={18} />
+          <span>Chưa tải được đơn đang mở. Kiểm tra kết nối rồi bấm Thử lại.</span>
+          <button className="btn-ghost" onClick={() => { void orders.refetch(); }}>Thử lại</button>
+        </div>
+      ) : null}
+
+      {/* Open orders: only when the shop has one */}
+      {openOrders.length > 0 ? (
+        <div className="info-card">
+          <div className="section-heading">
+            <div className="section-heading-left">
+              <div className="section-icon">
+                <Icon name="inventory_2" size={20} />
+              </div>
+              <h3 className="section-title">Đơn đang mở</h3>
+            </div>
+            <span className="badge badge-surface">{openOrders.length} đơn</span>
+          </div>
+          <MerchantOrderList orders={openOrders} />
+        </div>
+      ) : null}
 
       {/* Stats Grid */}
       <div className="stats-grid">

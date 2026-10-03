@@ -476,6 +476,48 @@ h1, h2, h3, h4, h5, h6, p { margin: 0; }
   background: rgba(255, 255, 255, 0.14);
 }
 .nav-pill .material-symbols-outlined { font-size: 24px; }
+.floating-nav-bar-labeled { justify-content: stretch; gap: 6px; padding: 0 6px; }
+.nav-pill-labeled {
+  flex: 1;
+  width: auto;
+  gap: 6px;
+  border-radius: var(--radius-full);
+}
+
+/* Tab "Của tôi": danh sách mục mở rộng */
+.mine-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.mine-item {
+  border-radius: var(--radius-xl);
+  background: #ffffff;
+  border: 1px solid var(--outline-variant);
+  box-shadow: var(--shadow-sm);
+}
+.mine-item-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  color: var(--on-surface-variant);
+  text-align: left;
+}
+.mine-item-title { flex: 1; }
+.mine-item.expanded .mine-item-header { border-bottom: 1px solid var(--surface-container); }
+.mine-item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px 12px 16px;
+}
+.mine-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
 /* ============================================
    Cards

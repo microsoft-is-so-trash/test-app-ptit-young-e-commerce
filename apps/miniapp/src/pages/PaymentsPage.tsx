@@ -32,13 +32,7 @@ export function PaymentsPage() {
   const totalLiters = payments.data.data.reduce((sum, p) => sum + p.liters, 0);
 
   return (
-    <div className="page-content">
-      {/* Header */}
-      <div className="page-header">
-        <span className="section-eyebrow">Minh bạch theo kỳ</span>
-        <h1 className="page-title">Tiền dầu của quán</h1>
-      </div>
-
+    <div className="mine-section-body">
       {/* Hero Overview Card */}
       <div className="hero-card">
         <div className="hero-card-ambient" />

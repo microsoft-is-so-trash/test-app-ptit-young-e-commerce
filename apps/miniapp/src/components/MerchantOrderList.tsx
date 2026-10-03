@@ -1,21 +1,22 @@
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { OrderStatus } from '@eco-oil/shared-types';
-import { api } from '../lib/api';
+import type { CollectionOrderResponse } from '@eco-oil/shared-types';
+import { ApiError, api } from '../lib/api';
 import { formatDate, formatLiters } from '../lib/formatters';
-import { StatusView } from '../components/StatusView';
-import { useAuthStore } from '../stores/auth-store';
-import { Icon } from '../components/Icon';
+import { Icon } from './Icon';
 
-type Filter = 'all' | 'ready' | 'assigned' | 'collected';
+interface MerchantOrderListProps {
+  orders: ReadonlyArray<CollectionOrderResponse>;
+}
 
-export function OrdersPage() {
+export function MerchantOrderList({ orders }: MerchantOrderListProps) {
   const queryClient = useQueryClient();
-  const userId = useAuthStore((state) => state.user?.id ?? 'unknown');
   const [cancelId, setCancelId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<Filter>('all');
-  const orders = useQuery({ queryKey: ['merchant-orders', userId], queryFn: api.orders });
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const cancelOrder = useMutation({
+    onMutate: () => setCancelError(null),
+    onError: (error) => setCancelError(error instanceof ApiError ? error.message : 'Chưa huỷ được đơn. Kiểm tra kết nối rồi thử lại.'),
     mutationFn: (id: string) => api.cancelOrder(id),
     onSuccess: async () => {
       setCancelId(null);
@@ -24,73 +25,10 @@ export function OrdersPage() {
     },
   });
 
-  if (orders.isPending) {
-    return <StatusView title="Đang tải đơn của quán…" />;
-  }
-  if (orders.isError) {
-    return <StatusView title="Chưa tải được đơn" message="Vui lòng kiểm tra kết nối và thử lại." action={{ label: 'Thử lại', onClick: () => { void orders.refetch(); } }} />;
-  }
-
-  const list = orders.data.data;
-
-  // Filter counts
-  const readyCount = list.filter((o) => o.status === OrderStatus.READY).length;
-  const assignedCount = list.filter((o) => o.status === OrderStatus.ASSIGNED).length;
-  const collectedCount = list.filter((o) => o.status === OrderStatus.COLLECTED).length;
-
-  const filteredList = filter === 'all' ? list : list.filter((o) => {
-    if (filter === 'ready') return o.status === OrderStatus.READY;
-    if (filter === 'assigned') return o.status === OrderStatus.ASSIGNED;
-    if (filter === 'collected') return o.status === OrderStatus.COLLECTED || o.status === OrderStatus.CANCELLED;
-    return true;
-  });
-
-  const FILTERS: { key: Filter; label: string; count?: number }[] = [
-    { key: 'all', label: 'Tất cả', count: list.length },
-    { key: 'ready', label: 'Chờ xử lý', count: readyCount },
-    { key: 'assigned', label: 'Đã phân công', count: assignedCount },
-    { key: 'collected', label: 'Hoàn tất', count: collectedCount },
-  ];
-
-  if (list.length === 0) {
-    return (
-      <div className="page-content">
-        <div className="page-header">
-          <span className="section-eyebrow">Quản lý</span>
-          <h1 className="page-title">Đơn của tôi</h1>
-        </div>
-        <StatusView title="Quán chưa có đơn nào" message='Bấm "Sẵn sàng thu gom" ở trang chủ khi can đã đầy nhé.' />
-      </div>
-    );
-  }
-
   return (
-    <div className="page-content">
-      {/* Header */}
-      <div className="page-header">
-        <span className="section-eyebrow">Quản lý</span>
-        <h1 className="page-title">Đơn của tôi</h1>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="filter-tabs">
-        {FILTERS.map((f) => (
-          <button
-            key={f.key}
-            className={`filter-tab ${filter === f.key ? 'active' : ''}`}
-            onClick={() => setFilter(f.key)}
-          >
-            {f.label}
-            {f.count !== undefined && f.count > 0 ? (
-              <span className="filter-tab-count">{f.count}</span>
-            ) : null}
-          </button>
-        ))}
-      </div>
-
-      {/* Orders List */}
+    <>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-        {filteredList.map((order) => {
+        {orders.map((order) => {
           const canCancel = order.status === OrderStatus.READY;
           const stripeClass = order.status === OrderStatus.ASSIGNED
             ? 'order-card-stripe-assigned'
@@ -148,16 +86,17 @@ export function OrdersPage() {
           <section className="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="cancel-title">
             <h2 id="cancel-title">Huỷ yêu cầu thu gom?</h2>
             <p>Đơn này sẽ chuyển sang trạng thái đã huỷ. Bạn có chắc muốn tiếp tục?</p>
+            {cancelError ? <p className="error-text" role="alert">{cancelError}</p> : null}
             <div className="sheet-actions">
-              <button className="btn btn-secondary" onClick={() => setCancelId(null)} disabled={cancelOrder.isPending}>Để lại</button>
-              <button className="btn btn-danger" onClick={() => void cancelOrder.mutateAsync(cancelId)} disabled={cancelOrder.isPending}>
+              <button className="btn btn-secondary" onClick={() => { setCancelId(null); setCancelError(null); }} disabled={cancelOrder.isPending}>Để lại</button>
+              <button className="btn btn-danger" onClick={() => cancelOrder.mutate(cancelId)} disabled={cancelOrder.isPending}>
                 {cancelOrder.isPending ? 'Đang huỷ…' : 'Huỷ đơn'}
               </button>
             </div>
           </section>
         </div>
       ) : null}
-    </div>
+    </>
   );
 }
 
