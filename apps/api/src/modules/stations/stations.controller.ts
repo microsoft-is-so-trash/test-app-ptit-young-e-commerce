@@ -2,11 +2,15 @@ import { Body, Controller, Get, Inject, Param, Patch, Post, Query } from '@nestj
 import { Role } from '@prisma/client';
 import { entityStatusSchema, personListQuerySchema, stationCreateSchema, stationPatchSchema, stationRecommendSchema } from '@eco-oil/validation';
 import { Roles } from '../auth/decorators/roles.decorator';
+import { RoadDistanceService } from './road-distance';
 import { StationsService } from './stations.service';
 
 @Controller('stations')
 export class StationsController {
-  constructor(@Inject(StationsService) private readonly service: StationsService) {}
+  constructor(
+    @Inject(StationsService) private readonly service: StationsService,
+    @Inject(RoadDistanceService) private readonly roadDistance: RoadDistanceService,
+  ) {}
 
   @Roles(Role.ADMIN)
   @Post()
@@ -22,8 +26,10 @@ export class StationsController {
 
   @Roles(Role.COLLECTOR, Role.ADMIN)
   @Get('recommend')
-  recommend(@Query() query: Record<string, unknown>) {
-    return this.service.recommend(stationRecommendSchema.parse(query));
+  async recommend(@Query() query: Record<string, unknown>) {
+    const input = stationRecommendSchema.parse(query);
+    // Đường chim bay từ PostGIS, rồi xếp lại các trạm gần nhất theo quãng đường nếu được (I1.2).
+    return this.roadDistance.enrich({ lat: input.lat, lng: input.lng }, await this.service.recommend(input));
   }
 
   @Roles(Role.ADMIN)

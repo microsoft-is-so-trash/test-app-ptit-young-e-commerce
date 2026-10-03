@@ -527,6 +527,8 @@ export interface StationRecommendation {
   current_volume_l: number;
   remaining_capacity_l: number;
   distance_m: number;
+  /** "road": quãng đường ô tô từ Routes API; "straight": đường chim bay (dự phòng, mất mạng). I1.2 */
+  distance_source?: 'road' | 'straight';
 }
 
 export interface StationDeliveryCreateRequest {

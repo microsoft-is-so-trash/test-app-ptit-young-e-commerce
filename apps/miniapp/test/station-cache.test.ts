@@ -5,7 +5,7 @@ import type { StationRecommendation } from '@eco-oil/shared-types';
 import { ApiError } from '../src/lib/api';
 import { cacheStations, EcoOilDatabase, getCachedStations } from '../src/lib/outbox-db';
 import { loadStationsWithCache, prefetchStations } from '../src/lib/offline-cache';
-import { recommendFromCachedStations, straightLineMeters } from '../src/lib/station-cache';
+import { recommendFromCachedStations, stationDistanceLabel, straightLineMeters } from '../src/lib/station-cache';
 
 function station(id: string, lat: number, lng: number, remaining: number): StationRecommendation {
   return {
@@ -36,6 +36,17 @@ test('cached stations are re-ranked by straight line distance from the current p
   const result = recommendFromCachedStations([far, near], here, 20);
   assert.deepEqual(result.map((item) => item.id), ['near', 'far']);
   assert.ok(Math.abs(result[0].distance_m - 1112) < 5);
+});
+
+test('cached stations are labelled as straight line distances', () => {
+  const result = recommendFromCachedStations([{ ...near, distance_source: 'road' }], here, 20);
+  assert.equal(result[0].distance_source, 'straight');
+});
+
+test('station distance label tells road distance from straight line distance', () => {
+  assert.equal(stationDistanceLabel({ distance_m: 850, distance_source: 'road' }), '850 m · đường ô tô');
+  assert.equal(stationDistanceLabel({ distance_m: 5400, distance_source: 'straight' }), '5.4 km · đường chim bay');
+  assert.equal(stationDistanceLabel({ distance_m: 5400 }), '5.4 km');
 });
 
 test('cached stations without enough remaining capacity are left out, like the server filter', () => {

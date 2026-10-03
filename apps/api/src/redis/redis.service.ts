@@ -23,6 +23,30 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     if (this.client) await this.client.connect();
   }
 
+  isConfigured(): boolean {
+    return this.client !== null;
+  }
+
+  /**
+   * Cộng `amount` vào bộ đếm nếu tổng không vượt `limit` (nguyên tử). Dùng để giữ chi phí API
+   * trả phí trong mức miễn phí (Q26). Trả về false khi vượt hạn mức.
+   */
+  async reserveWithinLimit(key: string, amount: number, limit: number, ttlSeconds: number): Promise<boolean> {
+    if (!this.client) throw new Error('Redis is not configured');
+    const result = await this.client.eval(
+      'local current = redis.call("INCRBY", KEYS[1], ARGV[1]); ' +
+        'if current == tonumber(ARGV[1]) then redis.call("EXPIRE", KEYS[1], ARGV[3]); end; ' +
+        'if current > tonumber(ARGV[2]) then redis.call("DECRBY", KEYS[1], ARGV[1]); return 0; end; ' +
+        'return 1',
+      1,
+      key,
+      String(amount),
+      String(limit),
+      String(ttlSeconds),
+    );
+    return result === 1;
+  }
+
   async ping(): Promise<'PONG' | 'DISABLED'> {
     return this.client ? this.client.ping() : 'DISABLED';
   }

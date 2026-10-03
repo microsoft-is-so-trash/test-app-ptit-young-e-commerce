@@ -4,6 +4,7 @@ import { DEFAULT_DENSITY_KG_PER_LITER, DeliveryStatus } from '@eco-oil/shared-ty
 import type { CollectionCreateRequest, GeoPoint, StationDeliveryCreateRequest, StationDeliveryResponse, StationRecommendation } from '@eco-oil/shared-types';
 import { formatCurrency, formatDate, formatLiters } from '../lib/formatters';
 import { loadStationsWithCache } from '../lib/offline-cache';
+import { stationDistanceLabel } from '../lib/station-cache';
 import { enqueueStationDelivery, retryOutbox, saveStationReceipt, type OutboxRecord, type StoredStationReceipt } from '../lib/outbox-db';
 import { syncOutbox } from '../lib/outbox-sync';
 import { useOutboxRows } from '../lib/outbox-hooks';
@@ -202,7 +203,7 @@ function StationCard({ station, liters, recommended, onChoose }: { station: Stat
   const afterDelivery = station.current_volume_l + liters;
   const fill = station.capacity_l > 0 ? Math.min(100, Math.round((afterDelivery / station.capacity_l) * 100)) : 100;
   const enough = station.remaining_capacity_l >= liters;
-  return <article className={`station-card ${enough ? '' : 'station-card-unavailable'}`}><div className="station-card-top"><div><h2>{station.name}</h2><p>{station.address ?? 'Chưa có địa chỉ'}</p><small className="station-receiving-status">{recommended ? 'Gần nhất còn đủ chỗ · Đang nhận dầu' : 'Đang nhận dầu'}</small></div><strong>{formatDistance(station.distance_m)}</strong></div><div className="station-capacity-label"><span>Còn lại sau khi nộp</span><b>{formatLiters(Math.max(station.remaining_capacity_l - liters, 0))}</b></div><div className="progress-track station-progress"><span style={{ width: `${fill}%` }} /></div>{!enough ? <p className="station-unavailable-label">Không đủ sức chứa</p> : null}{mapError ? <p className="error-text">{mapError}</p> : null}<div className="station-card-actions"><button className="map-action" onClick={() => { setMapError(null); void zaloClient.openDirections({ lat: station.lat, lng: station.lng }, station.address).catch((error: unknown) => setMapError(error instanceof Error ? error.message : 'Không mở được bản đồ.')); }}>Chỉ đường</button><button className={recommended ? 'primary-button' : 'secondary-button'} onClick={onChoose} disabled={!enough}>Chọn trạm này</button></div></article>;
+  return <article className={`station-card ${enough ? '' : 'station-card-unavailable'}`}><div className="station-card-top"><div><h2>{station.name}</h2><p>{station.address ?? 'Chưa có địa chỉ'}</p><small className="station-receiving-status">{recommended ? 'Gần nhất còn đủ chỗ · Đang nhận dầu' : 'Đang nhận dầu'}</small></div><strong>{stationDistanceLabel(station)}</strong></div><div className="station-capacity-label"><span>Còn lại sau khi nộp</span><b>{formatLiters(Math.max(station.remaining_capacity_l - liters, 0))}</b></div><div className="progress-track station-progress"><span style={{ width: `${fill}%` }} /></div>{!enough ? <p className="station-unavailable-label">Không đủ sức chứa</p> : null}{mapError ? <p className="error-text">{mapError}</p> : null}<div className="station-card-actions"><button className="map-action" onClick={() => { setMapError(null); void zaloClient.openDirections({ lat: station.lat, lng: station.lng }, station.address).catch((error: unknown) => setMapError(error instanceof Error ? error.message : 'Không mở được bản đồ.')); }}>Chỉ đường</button><button className={recommended ? 'primary-button' : 'secondary-button'} onClick={onChoose} disabled={!enough}>Chọn trạm này</button></div></article>;
 }
 
 export function StationDeliveryReview({ station, candidates, expectedLiters, expectedKg, onBack, onSubmitted }: { station: StationRecommendation; candidates: DeliveryCandidate[]; expectedLiters: number; expectedKg: number; onBack: () => void; onSubmitted: (clientUuid: string) => void }) {
@@ -509,10 +510,6 @@ function deliveryErrorMessage(error: unknown): string {
   if (value.includes('TRANSACTION_ALREADY_DELIVERED')) return 'Một giao dịch đã được nộp trong phiếu khác.';
   if (value.includes('TRANSACTION_NOT_SYNCED')) return 'Một giao dịch chưa đồng bộ lên máy chủ. Hãy thử lại sau.';
   return value;
-}
-
-function formatDistance(distanceM: number): string {
-  return distanceM < 1000 ? `${Math.round(distanceM)} m` : `${(distanceM / 1000).toFixed(1)} km`;
 }
 
 function formatTime(value: string | null): string {
