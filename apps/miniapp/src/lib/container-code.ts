@@ -30,3 +30,11 @@ export async function submitContainerCode<T>(
     callbacks.setBusy(false);
   }
 }
+
+/** Ô nhập tay mã can luôn bắt đầu trống: điền sẵn mã của điểm sẽ cho phép bỏ qua bước quét QR. */
+export const INITIAL_MANUAL_CONTAINER_CODE = '';
+
+/** Mã can khớp với điểm đang thu thì tự chuyển sang màn nhập (U9); không khớp thì dừng lại báo lỗi. */
+export function containerMatchOutcome(foundQrCode: string, expectedQrCode: string): 'continue' | 'mismatch' {
+  return foundQrCode === expectedQrCode ? 'continue' : 'mismatch';
+}

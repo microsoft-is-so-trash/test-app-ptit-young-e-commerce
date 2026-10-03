@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { submitContainerCode } from '../src/lib/container-code';
+import { submitContainerCode, containerMatchOutcome, INITIAL_MANUAL_CONTAINER_CODE } from '../src/lib/container-code';
 
 test('empty manual container code reports validation and always releases loading', async () => {
   const busy: boolean[] = [];
@@ -48,4 +48,16 @@ test('valid manual container code calls the lookup endpoint with the entered cod
   assert.deepEqual(busy, [true, false]);
   assert.deepEqual(endpointCodes, ['ECO-UCO-HB-HK-001']);
   assert.equal(resolvedCode, 'ECO-UCO-HB-HK-001');
+});
+
+test('a scanned container matching the stop moves straight on to the entry screen', () => {
+  assert.equal(containerMatchOutcome('ECO-0142', 'ECO-0142'), 'continue');
+});
+
+test('a different container is reported as a mismatch and never continues', () => {
+  assert.equal(containerMatchOutcome('ECO-9999', 'ECO-0142'), 'mismatch');
+});
+
+test('the manual code field starts empty so the stop code is never pre-filled', () => {
+  assert.equal(INITIAL_MANUAL_CONTAINER_CODE, '');
 });

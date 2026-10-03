@@ -1,26 +1,19 @@
 import { useState } from 'react';
-import { ContainerState } from '@eco-oil/shared-types';
 import type { ContainerLookupResponse, RouteStop } from '@eco-oil/shared-types';
 import { ApiError } from '../../lib/api';
-import { formatTime } from '../../lib/collector-format';
-import { formatLiters } from '../../lib/formatters';
 import { CollectorNotice } from '../../components/CollectorNotice';
 import { lookupContainerWithCache } from '../../lib/offline-cache';
-import { submitContainerCode } from '../../lib/container-code';
+import { containerMatchOutcome, INITIAL_MANUAL_CONTAINER_CODE, submitContainerCode } from '../../lib/container-code';
 import { isZaloPermissionDenied, zaloClient } from '../../lib/zalo-client';
 
 export function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteStop; onBack: () => void; onContinue: (container: ContainerLookupResponse, containerCode: string) => void }) {
-  const [code, setCode] = useState(stop.container_code);
+  const [code, setCode] = useState(INITIAL_MANUAL_CONTAINER_CODE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mismatch, setMismatch] = useState(false);
-  const [container, setContainer] = useState<ContainerLookupResponse | null>(null);
-  const [cachedAt, setCachedAt] = useState<string | null>(null);
 
   async function lookup(inputCode: string): Promise<void> {
     setMismatch(false);
-    setContainer(null);
-    setCachedAt(null);
     await submitContainerCode(
       inputCode,
       lookupContainerWithCache,
@@ -29,12 +22,11 @@ export function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteSto
         setError,
         onResolved: (found, normalized) => {
           setCode(normalized);
-          if (found.container.qr_code !== stop.container_code) {
+          if (containerMatchOutcome(found.container.qr_code, stop.container_code) === 'mismatch') {
             setMismatch(true);
             return;
           }
-          setCachedAt(found.cachedAt);
-          setContainer(found.container);
+          onContinue(found.container, normalized);
         },
       },
       (requestError) => requestError instanceof ApiError && requestError.code === 'NOT_FOUND' ? 'Không tìm thấy can này.' : 'Chưa tra được mã can, thử lại nhé.',
@@ -70,7 +62,7 @@ export function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteSto
       <button className="scan-button" onClick={() => { void scan(); }} disabled={busy}>{busy ? 'Đang kiểm tra…' : 'Quét QR bằng camera'}</button>
       <section className="manual-qr-card">
         <p className="section-label">Nhập mã can</p>
-        <label htmlFor="manual-qr">Bạn có thể nhập hoặc sửa mã can</label>
+        <label htmlFor="manual-qr">Không quét được? Nhập mã in trên can</label>
         <input id="manual-qr" className="input" value={code} onChange={(event) => setCode(event.target.value)} placeholder="ECO-UCO-Q3P7-001" />
         <button className="secondary-button" onClick={() => { void lookup(code); }} disabled={busy}>Kiểm tra mã can</button>
       </section>
@@ -79,15 +71,6 @@ export function CollectorQrScreen({ stop, onBack, onContinue }: { stop: RouteSto
         <CollectorNotice tone="danger" icon="qr_code_scanner" title="Đây không phải can của điểm này">
           Kiểm tra lại mã QR, không thể ghi nhận nhầm can.
         </CollectorNotice>
-      ) : null}
-      {container ? (
-        <section className="verified-container-card">
-          <span className="verified-badge">Đã đối chiếu</span>
-          {cachedAt ? <p className="offline-cache-note">Dữ liệu lúc {formatTime(cachedAt)}</p> : null}
-          <h2>{container.merchant.name}</h2>
-          <p>{container.qr_code} · {formatLiters(container.capacity_liters)} · {container.state === ContainerState.AT_MERCHANT ? 'Đang ở quán' : container.state}</p>
-          <button className="primary-button" onClick={() => onContinue(container, code.trim())}>Tiếp tục nhập giao dịch</button>
-        </section>
       ) : null}
     </div>
   );
