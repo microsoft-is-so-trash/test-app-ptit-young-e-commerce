@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { GeoPoint, RouteStop } from '@eco-oil/shared-types';
 import { formatLiters } from '../../lib/formatters';
-import { formatDistance, formatTime, statusLabel } from '../../lib/collector-format';
+import { formatDistance, statusLabel } from '../../lib/collector-format';
 import {
   findRowForStop,
   getEmptyRouteState,
@@ -21,10 +21,14 @@ import { outboxErrorMessage } from '../../lib/outbox-errors';
 import type { RouteLoadResult } from '../../lib/offline-cache';
 import { isValidGeoPoint, normalizeVietnamesePhone, copyPhoneNumber, zaloClient } from '../../lib/zalo-client';
 import { CollectorNotice } from '../../components/CollectorNotice';
+import { CollectorStatusStrip } from '../../components/CollectorStatusStrip';
+import { buildRouteStatusItems } from '../../lib/collector-status';
+import type { RouteStatusActionId } from '../../lib/collector-status';
 import { Icon } from '../../components/Icon';
 import { StatusView } from '../../components/StatusView';
 
 interface CollectorRouteScreenProps {
+  online: boolean;
   stops: RouteStop[];
   route: RouteLoadResult;
   location: GeoPoint | null;
@@ -50,13 +54,34 @@ interface CollectorRouteScreenProps {
   onOpenLastReceipt: () => void;
 }
 
-export function CollectorRouteScreen({ stops, route, location, locationDenied, completed, completedOrderIds, totalStops, outboxRows, outboxStats, shiftStarted, shiftError, prefetching, refreshing, refreshNotice, loadError, lastReceipt, onStartShift, onCancelShift, onOpenQr, onOpenSummary, onOpenOutbox, onRefresh, onOpenLastReceipt }: CollectorRouteScreenProps) {
+export function CollectorRouteScreen({ online, stops, route, location, locationDenied, completed, completedOrderIds, totalStops, outboxRows, outboxStats, shiftStarted, shiftError, prefetching, refreshing, refreshNotice, loadError, lastReceipt, onStartShift, onCancelShift, onOpenQr, onOpenSummary, onOpenOutbox, onRefresh, onOpenLastReceipt }: CollectorRouteScreenProps) {
   const vehicleCapacity = route.route.total_expected_liters + route.route.remaining_capacity_l;
   const routeFill = vehicleCapacity > 0 ? Math.min(100, Math.round((route.route.total_expected_liters / vehicleCapacity) * 100)) : 0;
   const completedLiters = Object.values(completed).reduce((sum, item) => sum + item.liters, 0);
   const routeOptimization = getRouteOptimizationDisplay(route.route.route_optimization);
   const routeCapacityRisk = getRouteCapacityRiskDisplay(route.route.route_capacity_risk, vehicleCapacity);
   const emptyState = getEmptyRouteState(route.route, stops.length, completedOrderIds);
+  const statusItems = buildRouteStatusItems({
+    online,
+    loadError,
+    refreshNotice,
+    locating: !location && !locationDenied,
+    locationDenied,
+    cachedAt: route.fromCache ? route.cachedAt : null,
+    unsynced: outboxStats.pending + outboxStats.syncing + outboxStats.failed,
+    syncError: outboxRows.find((row) => row.last_error)?.last_error ?? null,
+    receiptId: lastReceipt?.receipt_id ?? null,
+    shiftStarted,
+    shiftStartedAt: route.route.started_at ?? null,
+    canCancelShift: !prefetching && Object.keys(completed).length === 0,
+  });
+
+  function handleStatusAction(id: RouteStatusActionId): void {
+    if (id === 'retry') onRefresh();
+    else if (id === 'open-outbox') onOpenOutbox();
+    else if (id === 'open-receipt') onOpenLastReceipt();
+    else onCancelShift();
+  }
 
   return (
     <div className="page-content collector-content collector-route-screen">
@@ -67,57 +92,12 @@ export function CollectorRouteScreen({ stops, route, location, locationDenied, c
           <button type="button" className={`round-action ${refreshing ? 'round-action-loading' : ''}`} onClick={onRefresh} disabled={refreshing} aria-busy={refreshing ? 'true' : 'false'}>{refreshing ? 'Đang tải' : locationDenied ? 'Lấy lại GPS' : 'Tải lại'}</button>
         </div>
       </header>
-      {refreshNotice ? (
-        <CollectorNotice
-          tone={refreshNotice.kind === 'error' ? 'danger' : refreshNotice.kind === 'success' ? 'success' : 'warning'}
-          title={refreshNotice.kind === 'error' ? 'Không tải lại được tuyến' : refreshNotice.kind === 'cache' ? 'Đang dùng tuyến đã lưu' : refreshNotice.kind === 'warning' ? 'Chưa lấy được GPS' : 'Đã cập nhật tuyến'}
-        >
-          {refreshNotice.message}
-        </CollectorNotice>
-      ) : null}
-      {loadError ? (
-        <CollectorNotice tone="danger" title="Không tải được bản tuyến mới" action={{ label: 'Thử lại', onClick: onRefresh }}>
-          Dữ liệu tuyến đã lưu trên máy vẫn được giữ nguyên.
-        </CollectorNotice>
-      ) : null}
-      {!location && !locationDenied ? (
-        <CollectorNotice icon="my_location" title="Đang lấy vị trí">Để sắp xếp các điểm gần bạn trước.</CollectorNotice>
-      ) : null}
-      {locationDenied ? (
-        <CollectorNotice tone="warning" icon="location_off" title="Đang dùng vị trí tâm phường">
-          Chưa lấy được GPS nên giao dịch có thể bị gắn cờ kiểm tra.
-        </CollectorNotice>
-      ) : null}
-      {route.fromCache ? (
-        <CollectorNotice tone="warning" icon="cloud_off" title={`Dữ liệu lúc ${formatTime(route.cachedAt)}`}>
-          Chưa kết nối được máy chủ để lấy bản mới.
-        </CollectorNotice>
-      ) : null}
-      {lastReceipt ? (
-        <CollectorNotice
-          tone="success"
-          icon="receipt_long"
-          title="Đã lưu biên nhận trên máy"
-          action={{ label: 'Xem lại biên nhận', onClick: onOpenLastReceipt }}
-        >
-          Mã phiếu: {lastReceipt.receipt_id}
-        </CollectorNotice>
-      ) : null}
-      <OutboxIssueNotice rows={outboxRows} stats={outboxStats} onOpen={onOpenOutbox} />
+      <CollectorStatusStrip items={statusItems} onAction={handleStatusAction} />
       {!shiftStarted ? (
         <button className="start-shift-button" onClick={onStartShift} disabled={prefetching}>
           {prefetching ? 'Đang lưu tuyến và mã QR…' : 'Bắt đầu ca thu gom'}
         </button>
-      ) : (
-        <CollectorNotice
-          tone="success"
-          icon="cloud_done"
-          title="Tuyến đã sẵn sàng khi mất sóng"
-          action={{ label: 'Hủy ca', onClick: onCancelShift, disabled: prefetching || Object.keys(completed).length > 0 }}
-        >
-          {route.route.started_at ? `Bắt đầu lúc ${formatTime(route.route.started_at)}.` : 'Tuyến và mã QR đã lưu trên máy.'}
-        </CollectorNotice>
-      )}
+      ) : null}
       {shiftError ? <p className="error-text" role="alert">{shiftError}</p> : null}
       <section className="route-capacity-card">
         <div className="route-capacity-top"><span>Tổng lít dự kiến</span><strong>{formatLiters(route.route.total_expected_liters)} / {formatLiters(vehicleCapacity)}</strong></div>

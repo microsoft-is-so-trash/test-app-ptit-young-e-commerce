@@ -306,6 +306,8 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
   }
 
   let content: ReactNode;
+  // Màn Tuyến tự gom trạng thái mất mạng vào dải trạng thái của nó (U6).
+  let showsRouteScreen = false;
   if (screen.name === 'outbox') {
     content = <OutboxQueueScreen onBack={() => setScreen({ name: 'route' })} />;
   } else if (screen.name === 'receipt-view' && lastReceipt) {
@@ -338,8 +340,10 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
       const localRecord = findRowForStop(outboxRows, stop);
       return !activeStopIds.has(stop.order_id) || localRecord?.status === 'pending' || localRecord?.status === 'syncing' || localRecord?.status === 'failed';
     });
+    showsRouteScreen = true;
     content = (
       <CollectorRouteScreen
+        online={online}
         stops={activeStops}
         route={route.data}
         location={location}
@@ -371,7 +375,7 @@ export function CollectorFlow({ onScreenChange }: CollectorFlowProps = {}) {
 
   return (
     <div className="collector-flow-root">
-      {!online ? (
+      {!online && !showsRouteScreen ? (
         <CollectorNotice tone="warning" icon="wifi_off" title="Đang ngoại tuyến">
           Dữ liệu vẫn được lưu an toàn trên máy và sẽ tự gửi khi có mạng.
         </CollectorNotice>

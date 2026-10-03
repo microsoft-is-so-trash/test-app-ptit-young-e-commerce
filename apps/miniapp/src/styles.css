@@ -2767,3 +2767,11 @@ textarea.input { height: auto; min-height: 96px; padding: 12px var(--space-md); 
   .brand-header, .floating-nav, .receipt-actions, .back-button { display: none; }
   .app-shell { max-width: none; box-shadow: none; }
 }
+
+/* Dải trạng thái duy nhất của màn Tuyến (Collector) */
+.collector-status-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.collector-status-more { align-self: flex-start; }

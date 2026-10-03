@@ -58,6 +58,7 @@ const ENTRIES: PreviewEntry[] = [
     fullScreen: true,
     render: () => (
       <CollectorRouteScreen
+        online
         stops={fx.stops}
         route={{ route: fx.route, fromCache: false, cachedAt: null }}
         location={{ lat: 21.03, lng: 105.83 }}
