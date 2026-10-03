@@ -11,6 +11,8 @@ export interface NotificationItem {
   title: string;
   description: string;
   time: string;
+  /** Khoá lưu trạng thái đã đọc: đổi khi có sự kiện mới cùng loại. */
+  readKey: string;
 }
 
 export interface NotificationSources {
@@ -20,7 +22,7 @@ export interface NotificationSources {
 }
 
 export function buildNotifications(sources: NotificationSources, now: Date = new Date()): NotificationItem[] {
-  const items: NotificationItem[] = [];
+  const items: Array<Omit<NotificationItem, 'readKey'> & { readKey?: string }> = [];
 
   if (sources.dashboard) {
     if (sources.dashboard.pending_orders === 0) {
@@ -34,6 +36,7 @@ export function buildNotifications(sources: NotificationSources, now: Date = new
           title: 'Can sắp đầy',
           description: `Can ${container.code} ước tính đầy ${percent}%. Bấm "Sẵn sàng thu gom" ở mục Hôm nay để báo thu gom.`,
           time: now.toISOString(),
+          readKey: `container-full-${container.code}@${sources.dashboard.last_collected_at ?? 'never'}`,
         });
       }
     }
@@ -43,7 +46,8 @@ export function buildNotifications(sources: NotificationSources, now: Date = new
         icon: 'local_shipping',
         title: 'Đơn đang chờ thu gom',
         description: `Bạn có ${sources.dashboard.pending_orders} đơn đang chờ người thu gom xử lý.`,
-        time: sources.dashboard.last_collected_at ?? new Date().toISOString(),
+        time: sources.dashboard.last_collected_at ?? now.toISOString(),
+        readKey: `pending-orders-${sources.dashboard.pending_orders}@${sources.dashboard.last_collected_at ?? 'never'}`,
       });
     }
     if (sources.dashboard.last_collected_at) {
@@ -53,6 +57,7 @@ export function buildNotifications(sources: NotificationSources, now: Date = new
         title: 'Đã thu gom thành công',
         description: `Lần thu gom gần nhất: ${formatDate(sources.dashboard.last_collected_at)}.`,
         time: sources.dashboard.last_collected_at,
+        readKey: `last-collected@${sources.dashboard.last_collected_at}`,
       });
     }
   }
@@ -90,5 +95,8 @@ export function buildNotifications(sources: NotificationSources, now: Date = new
     });
   }
 
-  return items.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+  return items
+    // Thông báo thanh toán và giá dầu đã có id riêng theo từng bản ghi nên dùng luôn id làm khoá đã đọc.
+    .map((item) => ({ ...item, readKey: item.readKey ?? item.id }))
+    .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 }

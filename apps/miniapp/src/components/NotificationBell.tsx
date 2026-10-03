@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import { currentVietnamWeek } from '../lib/formatters';
 import { buildNotifications } from '../lib/notifications';
+import { addReadKeys, parseReadKeys, readStorageKey } from '../lib/notification-read';
+import { zaloClient } from '../lib/zalo-client';
 import { useAuthStore } from '../stores/auth-store';
 import { Icon } from './Icon';
 
@@ -11,7 +13,7 @@ export function NotificationBell() {
   const user = useAuthStore((state) => state.user);
   const identityKey = user?.id ?? 'unknown';
   const [open, setOpen] = useState(false);
-  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+  const [readKeys, setReadKeys] = useState<string[]>(() => loadReadKeys(identityKey));
 
   const week = currentVietnamWeek();
   const dashboard = useQuery({ queryKey: ['merchant-dashboard', identityKey], queryFn: api.dashboard, enabled: Boolean(user) });
@@ -23,10 +25,16 @@ export function NotificationBell() {
   const oilPrice = useQuery({ queryKey: ['merchant-oil-price', identityKey], queryFn: api.currentOilPrice, enabled: Boolean(user) });
 
   const items = buildNotifications({ dashboard: dashboard.data, payments: payments.data, oilPrice: oilPrice.data });
-  const unreadCount = items.filter((item) => !readIds.has(item.id)).length;
+  const unreadCount = items.filter((item) => !readKeys.includes(item.readKey)).length;
+
+  function markRead(keys: string[]) {
+    const next = addReadKeys(readKeys, keys);
+    setReadKeys(next);
+    saveReadKeys(identityKey, next);
+  }
 
   function markAllRead() {
-    setReadIds(new Set(items.map((item) => item.id)));
+    markRead(items.map((item) => item.readKey));
   }
 
   return (
@@ -67,8 +75,8 @@ export function NotificationBell() {
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className={`notification-row ${readIds.has(item.id) ? 'read' : ''}`}
-                    onClick={() => setReadIds((current) => new Set(current).add(item.id))}
+                    className={`notification-row ${readKeys.includes(item.readKey) ? 'read' : ''}`}
+                    onClick={() => markRead([item.readKey])}
                   >
                     <div className="section-icon">
                       <Icon name={item.icon} size={18} />
@@ -77,7 +85,7 @@ export function NotificationBell() {
                       <strong className="text-label-lg" style={{ color: 'var(--on-surface)' }}>{item.title}</strong>
                       <span className="text-label-sm" style={{ color: 'var(--on-surface-variant)' }}>{item.description}</span>
                     </div>
-                    {!readIds.has(item.id) ? <span className="notification-dot" /> : null}
+                    {!readKeys.includes(item.readKey) ? <span className="notification-dot" /> : null}
                   </div>
                 ))}
               </div>
@@ -94,4 +102,21 @@ export function NotificationBell() {
       ) : null}
     </>
   );
+}
+
+function loadReadKeys(userId: string): string[] {
+  try {
+    return parseReadKeys(zaloClient.getStorage(readStorageKey(userId)));
+  } catch {
+    // Không đọc được bộ nhớ máy: coi như chưa đọc thông báo nào.
+    return [];
+  }
+}
+
+function saveReadKeys(userId: string, keys: string[]): void {
+  try {
+    zaloClient.setStorage(readStorageKey(userId), JSON.stringify(keys));
+  } catch {
+    // Không ghi được bộ nhớ máy: trạng thái đã đọc chỉ giữ đến khi tải lại.
+  }
 }
