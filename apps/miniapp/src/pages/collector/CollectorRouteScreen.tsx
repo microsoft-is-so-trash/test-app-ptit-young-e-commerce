@@ -27,6 +27,8 @@ import type { RouteStatusActionId } from '../../lib/collector-status';
 import { Icon } from '../../components/Icon';
 import { StatusView } from '../../components/StatusView';
 import { CollectorMapPage } from './CollectorMapPage';
+import { stopCardMenuItems } from '../../lib/stop-card-menu';
+import type { StopCardMenuItemId } from '../../lib/stop-card-menu';
 
 interface CollectorRouteScreenProps {
   online: boolean;
@@ -186,6 +188,8 @@ function CollectorStopCard({ stop, outboxRow, onOpenQr }: { stop: RouteStop; out
   const [copyNotice, setCopyNotice] = useState<string | null>(null);
   // Chỉ là trạng thái hiển thị của thẻ (đóng/mở phần chi tiết AI) — không ảnh hưởng dữ liệu.
   const [aiOpen, setAiOpen] = useState(false);
+  // Menu thao tác phụ của thẻ (Gọi quán, Chỉ đường, Sao chép số, Chi tiết AI).
+  const [menuOpen, setMenuOpen] = useState(false);
   const aiPanelId = `stop-ai-${stop.order_id}`;
   const rawPhone = typeof stop.merchant.phone === 'string' ? stop.merchant.phone.trim() : '';
   let normalizedPhone = '';
@@ -229,53 +233,86 @@ function CollectorStopCard({ stop, outboxRow, onOpenQr }: { stop: RouteStop; out
     );
   }
 
+  const hasAi = Boolean(pickupVolumeForecast || pickupPriority);
+  const menuItems = stopCardMenuItems({ phoneIssue, canOpenDirections, hasAi });
+  const menuId = `stop-menu-${stop.order_id}`;
+
+  function runMenuItem(id: StopCardMenuItemId): void {
+    if (id === 'call') openPhone();
+    else if (id === 'directions') openDirections();
+    else if (id === 'copy') copyPhone();
+    else setAiOpen((open) => !open);
+  }
+
   return (
     <article className="collector-stop-card">
       <div className={`stop-number ${status ? `stop-number-${status}` : ''}`}>{stop.seq}</div>
       <div className="stop-body">
-        <div className="stop-title-row"><h2>{stop.merchant.name}</h2><span className="distance-label">{formatDistance(stop.distance_m)}</span></div>
-        <p className="stop-address">{stop.merchant.address ?? 'Chưa có địa chỉ'}</p>
-        <strong className="stop-liters">{formatLiters(stop.expected_liters)} dự kiến</strong>
-        {pickupVolumeForecast || pickupPriority ? (
-          <div className="stop-ai">
-            <button
-              type="button"
-              className="stop-ai-toggle"
-              onClick={() => setAiOpen((open) => !open)}
-              aria-expanded={aiOpen}
-              aria-controls={aiPanelId}
-            >
-              <span className="stop-ai-toggle-label">Chi tiết AI{pickupPriority ? ` · ${pickupPriority.label}` : ''}</span>
-              <span className="stop-ai-toggle-caret" aria-hidden="true">{aiOpen ? '▲' : '▼'}</span>
-            </button>
-            <div id={aiPanelId} hidden={!aiOpen}>
-              {pickupVolumeForecast ? (
-                <section className={`pickup-volume-forecast pickup-volume-forecast-${pickupVolumeForecast.className}`} aria-label="Dự báo AI sản lượng">
-                  <div className="pickup-volume-forecast-heading"><span className="pickup-volume-ai-label">Dự báo AI</span><span>{pickupVolumeForecast.confidenceLabel}</span></div>
-                  {pickupVolumeForecast.predictedLiters === null ? <strong>Chưa đủ dữ liệu để dự báo sản lượng</strong> : <strong>Khoảng {formatPickupVolumeLiters(pickupVolumeForecast.predictedLiters)}</strong>}
-                  {pickupVolumeForecast.declaredOnly ? <small>Tạm tính theo số quán khai</small> : pickupVolumeForecast.sampleSize !== null ? <small>Dựa trên {pickupVolumeForecast.sampleSize} lần thu gần nhất</small> : null}
-                  {pickupVolumeForecast.reasons.length > 0 ? <div className="pickup-volume-forecast-reasons">{pickupVolumeForecast.reasons.map((reason, index) => <span className="pickup-volume-forecast-reason" key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
-                </section>
-              ) : null}
-              {pickupPriority ? (
-                <section className={`pickup-priority pickup-priority-${pickupPriority.className}`} aria-label={`Mức ưu tiên: ${pickupPriority.label}`}>
-                  <div className="pickup-priority-heading"><strong>{pickupPriority.label}</strong><span>Điểm ưu tiên: {pickupPriority.score}</span></div>
-                  {pickupPriority.reasons.length > 0 ? <div className="pickup-priority-reasons">{pickupPriority.reasons.map((reason, index) => <span className="pickup-priority-reason" key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
-                </section>
-              ) : null}
-            </div>
-          </div>
-        ) : null}
+        <div
+          className="stop-card-toggle"
+          role="button"
+          tabIndex={0}
+          aria-expanded={menuOpen}
+          aria-controls={menuOpen ? menuId : undefined}
+          onClick={() => setMenuOpen((open) => !open)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              setMenuOpen((open) => !open);
+            }
+          }}
+        >
+          <div className="stop-title-row"><h2>{stop.merchant.name}</h2><span className="distance-label">{formatDistance(stop.distance_m)}</span></div>
+          <p className="stop-address">{stop.merchant.address ?? 'Chưa có địa chỉ'}</p>
+          <strong className="stop-liters">{formatLiters(stop.expected_liters)} dự kiến</strong>
+          <span className="stop-card-more">{menuOpen ? 'Thu gọn' : 'Gọi quán, chỉ đường…'}<span aria-hidden="true">{menuOpen ? ' ▲' : ' ▼'}</span></span>
+        </div>
         {status ? <p className={`transaction-status transaction-status-${status}`}>{statusLabel(status)}</p> : null}
-        <div className="stop-actions">
-          <button type="button" className={`call-action ${!canCall ? 'disabled-action' : ''}`} onClick={openPhone} disabled={!canCall || actionBusy !== null}>{actionBusy === 'phone' ? 'Đang mở…' : 'Gọi quán'}</button>
-          <button type="button" className={`map-action ${!canOpenDirections ? 'disabled-action' : ''}`} onClick={openDirections} disabled={!canOpenDirections || actionBusy !== null}>{actionBusy === 'directions' ? 'Đang mở…' : 'Chỉ đường'}</button>
+        <div className="stop-actions stop-actions-single">
           <button className="collect-action" onClick={onOpenQr} disabled={status === 'pending' || status === 'syncing'}>{status === 'synced' ? 'Đã thu' : 'Thu gom'}</button>
         </div>
-        {phoneIssue ? <p className="action-error" role="alert">{phoneIssue}</p> : null}
-        {canCall ? <div className="phone-fallback"><span>Số quán: {normalizedPhone}</span><button type="button" className="text-button" onClick={copyPhone}>Sao chép số</button></div> : null}
-        {copyNotice ? <p className="action-notice" role="status">{copyNotice}</p> : null}
-        {actionError ? <p className="action-error" role="alert">{actionError}</p> : null}
+        {status === 'pending' || status === 'syncing' ? <p className="field-help">Giao dịch của điểm này đã lưu và đang chờ đồng bộ, không cần thu lại.</p> : null}
+        {menuOpen ? (
+          <div className="stop-menu" id={menuId}>
+            <div className="stop-menu-actions">
+              {menuItems.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={item.id === 'ai' ? 'stop-ai-toggle' : `map-action ${item.disabledReason ? 'disabled-action' : ''}`}
+                  onClick={() => runMenuItem(item.id)}
+                  disabled={item.disabledReason !== null || (actionBusy !== null && item.id !== 'ai' && item.id !== 'copy')}
+                  aria-expanded={item.id === 'ai' ? aiOpen : undefined}
+                  aria-controls={item.id === 'ai' ? aiPanelId : undefined}
+                >
+                  {item.id === 'call' && actionBusy === 'phone' ? 'Đang mở…' : item.id === 'directions' && actionBusy === 'directions' ? 'Đang mở…' : item.id === 'ai' && pickupPriority ? `${item.label} · ${pickupPriority.label}` : item.label}
+                </button>
+              ))}
+            </div>
+            {phoneIssue ? <p className="action-error" role="alert">{phoneIssue}</p> : canCall ? <p className="phone-fallback"><span>Số quán: {normalizedPhone}</span></p> : null}
+            {!canOpenDirections ? <p className="action-error">Quán chưa có vị trí trên bản đồ.</p> : null}
+            {copyNotice ? <p className="action-notice" role="status">{copyNotice}</p> : null}
+            {actionError ? <p className="action-error" role="alert">{actionError}</p> : null}
+            {hasAi ? (
+              <div id={aiPanelId} hidden={!aiOpen}>
+                {pickupVolumeForecast ? (
+                  <section className={`pickup-volume-forecast pickup-volume-forecast-${pickupVolumeForecast.className}`} aria-label="Dự báo AI sản lượng">
+                    <div className="pickup-volume-forecast-heading"><span className="pickup-volume-ai-label">Dự báo AI</span><span>{pickupVolumeForecast.confidenceLabel}</span></div>
+                    {pickupVolumeForecast.predictedLiters === null ? <strong>Chưa đủ dữ liệu để dự báo sản lượng</strong> : <strong>Khoảng {formatPickupVolumeLiters(pickupVolumeForecast.predictedLiters)}</strong>}
+                    {pickupVolumeForecast.declaredOnly ? <small>Tạm tính theo số quán khai</small> : pickupVolumeForecast.sampleSize !== null ? <small>Dựa trên {pickupVolumeForecast.sampleSize} lần thu gần nhất</small> : null}
+                    {pickupVolumeForecast.reasons.length > 0 ? <div className="pickup-volume-forecast-reasons">{pickupVolumeForecast.reasons.map((reason, index) => <span className="pickup-volume-forecast-reason" key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
+                  </section>
+                ) : null}
+                {pickupPriority ? (
+                  <section className={`pickup-priority pickup-priority-${pickupPriority.className}`} aria-label={`Mức ưu tiên: ${pickupPriority.label}`}>
+                    <div className="pickup-priority-heading"><strong>{pickupPriority.label}</strong><span>Điểm ưu tiên: {pickupPriority.score}</span></div>
+                    {pickupPriority.reasons.length > 0 ? <div className="pickup-priority-reasons">{pickupPriority.reasons.map((reason, index) => <span className="pickup-priority-reason" key={`${reason}-${index}`}>{reason}</span>)}</div> : null}
+                  </section>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </article>
   );
