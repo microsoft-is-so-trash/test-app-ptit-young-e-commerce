@@ -9,9 +9,9 @@ Trạng thái task: `chưa làm` · `đang làm` · `bị chặn (Q..)` · `xong
 
 | | |
 |---|---|
-| Giai đoạn | C (đang làm) — M đã duyệt |
-| Task đang làm | C5.2, C5.4 (dừng giữa chừng do hết hạn mức sử dụng) |
-| Đang chờ chủ dự án | — |
+| Giai đoạn | C xong — chờ chủ dự án duyệt |
+| Task đang làm | — |
+| Đang chờ chủ dự án | Duyệt giai đoạn C ("duyệt C") |
 | Branch | `ui_version_4` (tạo từ `ui_version_3` ngày 03/10/2026; trùng `origin/ui_version_4`) |
 | Cập nhật lần cuối | 03/10/2026 — rà soát đầu giai đoạn M (B2) |
 
@@ -115,6 +115,15 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
   bảo mật chung, không chỉ TTS).
 
 ## Báo cáo giai đoạn
+
+### Giai đoạn C — 03/10/2026
+
+- Đã làm: C1, C2, C3, C4.1–C4.4, C5.1–C5.5, C6 (commit 3cf77df … ccdafc9) và sửa sau review (9ee7030).
+- Cổng kiểm tra cuối: typecheck, lint, build pass; 228/228 test pass (đầu giai đoạn: 186).
+- Review: code-reviewer 1 lần cho cả giai đoạn; không CRITICAL/HIGH; sửa 5 điểm MEDIUM.
+- Ảnh trước: `design/snapshots/ui-v4/C-before/`; sau: `C-after/` và từng task `C1` … `C6`.
+- Chưa xem được trên màn hình: AI chọn sẵn hạng (cần ảnh thật cho kết quả tin cậy cao), hộp xác nhận đăng xuất khi còn hàng chờ (demo không có hàng chờ chưa đồng bộ). Đã kiểm bằng test.
+- Mất so với trước (đúng quyết định): màn Tóm tắt ca (số kg ước tính, dung tích còn lại), khối Dữ liệu trên máy, ghi chú "Dữ liệu lúc …" của thẻ đối chiếu can.
 
 ### Giai đoạn M — 03/10/2026
 
