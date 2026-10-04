@@ -142,6 +142,8 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 
 - 03/10/2026 — Review I1 ghi nhận: `StationsService.recommend` không giới hạn số trạm trả về (từ I1.3, `liters=0` trả mọi trạm đang nhận); `google.maps.Marker` đã bị Google đánh dấu deprecated (khuyến nghị `AdvancedMarkerElement`, cần Map ID trên Google Cloud). Chưa sửa.
 
+- 05/10/2026 — Kiểm tra tỷ trọng gần như không chạy: khi chỉ nhập kg, `collections.service.ts:134` suy số lít bằng kg/0,91 nhưng vẫn gắn `mass_source = SCALE`; `transaction-anomaly-scorer.ts:307-318` lấy các giao dịch này làm mẫu tỷ trọng (luôn đúng 0,91, kéo MAD về 0). Ngưỡng dự phòng 20% quá rộng (tương đương pha >200% nước). Chi tiết và mô hình đề xuất: `docs/NGHIEN_CUU_TY_TRONG_UCO.md`. Chưa sửa.
+
 ## Báo cáo giai đoạn
 
 ### Giai đoạn I1 — 03/10/2026
@@ -177,6 +179,8 @@ Ghi những vấn đề thấy được nhưng không thuộc kế hoạch; khô
 ## Nhật ký
 
 Mới nhất lên trên. Mỗi dòng: ngày — task — việc đã làm / lý do dừng.
+
+- 05/10/2026 — Nghiên cứu (theo yêu cầu chủ dự án, ngoài kế hoạch UI v4) — viết `docs/NGHIEN_CUU_TY_TRONG_UCO.md`: số liệu tỷ trọng UCO và hệ số nhiệt, độ nhạy (10% nước chỉ +0,86% tỷ trọng; cân + vạch can sai số ±2,5–5% nên không phát hiện được; tỷ trọng kế + hiệu chỉnh nhiệt độ phát hiện từ ~3%), mô hình 4 tầng (vật lý → nền thống kê theo quán → đối soát MIU ở trạm → mô hình học khi có nhãn), lỗi kiểm tra tỷ trọng trong code hiện tại. Chưa sửa code.
 
 - 03/10/2026 — Hướng dẫn — Theo yêu cầu chủ dự án: viết `docs/HUONG_DAN_GOOGLE_MAPS_UI_V4.md` (tạo key, hạn mức, ngân sách; thử đầy đủ trên máy bằng Docker không chạm Render/Neon/Vercel của `ui_version_3`; cách đưa lên online tách riêng; giải thích 4 điểm ghi nhận). Thêm cấu hình `eco-oil-admin-demo` vào `.claude/launch.json`. Chạy localhost: miniapp demo :5173, admin demo :3001; form trạm đủ ô cũ, ô tìm địa chỉ ẩn ở chế độ demo, không tải bản đồ khi chưa có key (đúng thiết kế).
 
